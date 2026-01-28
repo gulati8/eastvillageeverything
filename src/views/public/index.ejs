@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>East Village Everything</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" rel="stylesheet">
+  <link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+  <div class="row header text-center">
+    <div class="columns small-12">
+      <h1>East Village Everything</h1>
+      <h2>An insider's guide to East Village happy hours and nightly specials.</h2>
+    </div>
+  </div>
+
+  <div class="row main-content">
+    <div class="columns small-12 large-3 right bio">
+      <div class="row">
+        <div class="small-12 columns">
+          <img class="head-shot" src="/img/nicholas.jpg" alt="Nicholas VanderBorgh"/>
+          <p class="name">Nicholas VanderBorgh</p>
+          <p class="company">VanderBorgh Realty</p>
+          <a href="mailto:newyorkolas@gmail.com">newyorkolas@gmail.com</a>
+          <hr/>
+        </div>
+      </div>
+      <div class="row show-for-large-up">
+        <div class="small-12 columns">
+          <p class="more-about">More about the East Village</p>
+          <ul>
+            <li><a href="http://evgrieve.com/" target="_blank">EV Grieve</a></li>
+            <li><a href="http://localeastvillage.com/" target="_blank">The Local East Village</a></li>
+            <li><a href="http://www.boweryboogie.com/" target="_blank">Bowery Boogie</a></li>
+            <li><a href="http://www.thelodownny.com/" target="_blank">The Lo-Down</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns small-12 large-8 left">
+      <div class="row filter-row">
+        <div class="small-12 columns">
+          <label for="tag-list">Looking for something in particular?</label>
+          <select id="tag-list">
+            <option value="none">Anything</option>
+            <% tags.forEach(function(tag) { %>
+            <option value="<%= tag.value %>"><%= tag.display %></option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+
+      <div id="loading"></div>
+
+      <div id="places">
+        <div class="row title show-for-large-up">
+          <div class="small-12 large-3 columns">Name</div>
+          <div class="small-12 large-5 columns">Happy Hour / Specials</div>
+          <div class="small-12 large-4 columns">Notes</div>
+        </div>
+
+        <% places.forEach(function(place) { %>
+        <div class="row bar <%= place.tagClasses %>">
+          <div class="small-12 large-3 columns location-and-contact">
+            <% if (place.url) { %>
+            <a class="place-name" target="_blank" href="<%= place.url %>"><%= place.name %></a>
+            <% } else { %>
+            <span class="place-name"><%= place.name %></span>
+            <% } %>
+            <br>
+            <%= place.address || '' %>
+            <br>
+            <% if (place.phone) { %>
+            <a href="tel:<%= place.phone %>"><%= place.displayPhone %></a>
+            <% } %>
+          </div>
+          <div class="small-12 large-5 columns specials">
+            <%- place.specials || '' %>
+          </div>
+          <div class="small-12 large-4 columns categories-and-notes">
+            <div class="categories"><%= place.categories || '' %></div>
+            <div class="notes"><%- place.notes || '' %></div>
+          </div>
+        </div>
+        <% }); %>
+
+        <% if (places.length === 0) { %>
+        <div class="row">
+          <div class="small-12 columns text-center">
+            <p>No places found. Check back soon!</p>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      $("#tag-list").on("change", function() {
+        $("#loading").css("visibility", "visible");
+        $("#places").css("visibility", "hidden");
+
+        setTimeout(function() {
+          var filterValue = $("#tag-list").val();
+          if (filterValue === "none") {
+            $("div.bar").show();
+          } else {
+            $("div.bar").filter("." + filterValue).show();
+            $("div.bar").not("." + filterValue).hide();
+          }
+
+          $("#loading").css("visibility", "hidden");
+          $("#places").css("visibility", "visible");
+        }, 300);
+      });
+    });
+  </script>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,"script","//www.google-analytics.com/analytics.js","ga");
+    ga("create", "UA-74515357-1", "auto");
+    ga("send", "pageview");
+  </script>
+</body>
+</html>

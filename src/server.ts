@@ -7,6 +7,7 @@ import { Redis } from 'ioredis';
 
 import apiRoutes from './routes/api.js';
 import adminRoutes from './routes/admin.js';
+import publicRoutes from './routes/public.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -76,14 +77,13 @@ app.use('/api', apiRoutes);
 app.use('/admin', adminRoutes);
 
 // Public site routes
-app.get('/', (req, res) => {
+app.use('/', (req, res, next) => {
   if (req.subdomain === 'admin') {
     res.redirect('/admin');
   } else {
-    // Will be replaced with actual public site template
-    res.send('East Village Everything - coming soon');
+    next();
   }
-});
+}, publicRoutes);
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
