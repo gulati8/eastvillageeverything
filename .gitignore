@@ -1,0 +1,39 @@
+# Gas Town
+.runtime/
+.claude/
+.beads/
+.logs/
+mail/
+state.json
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Docker
+.docker/
+
+# Testing
+coverage/
