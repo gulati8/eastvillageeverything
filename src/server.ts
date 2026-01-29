@@ -23,6 +23,9 @@ redisClient.on('connect', () => {
   console.log('Connected to Redis');
 });
 
+// Trust proxy (required for secure cookies behind reverse proxy like Caddy)
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors({
   origin: true, // Allow all origins (configure for production)
