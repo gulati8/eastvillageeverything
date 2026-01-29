@@ -114,7 +114,7 @@ jobs:
               \"docker compose -f docker-compose.prod.yml pull\",
               \"docker compose -f docker-compose.prod.yml run --rm app npm run migrate || true\",
               \"docker compose -f docker-compose.prod.yml up -d\",
-              \"docker image prune -f\"
+              \"docker image prune -f --filter label=org.opencontainers.image.source=https://github.com/gulati8/eastvillageeverything || true\"
             ]" \
             --query 'Command.CommandId' \
             --output text)
