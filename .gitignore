@@ -5,6 +5,7 @@
 .logs/
 mail/
 state.json
+CLAUDE.md
 
 # Dependencies
 node_modules/
