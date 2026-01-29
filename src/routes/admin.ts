@@ -224,47 +224,9 @@ router.post('/places/:id/delete', async (req: Request, res: Response) => {
 
 // List tags
 router.get('/tags', async (req: Request, res: Response) => {
-  const sortBy = (req.query.sort_by as string) || 'sort_order';
-  const sortOrder = (req.query.sort_order as string) || 'asc';
-
-  let tags = await TagModel.findAll();
-
-  // Sort tags
-  tags = tags.sort((a, b) => {
-    let aVal: string | number | Date;
-    let bVal: string | number | Date;
-
-    switch (sortBy) {
-      case 'sort_order':
-        aVal = a.sort_order;
-        bVal = b.sort_order;
-        break;
-      case 'value':
-        aVal = a.value.toLowerCase();
-        bVal = b.value.toLowerCase();
-        break;
-      case 'display':
-        aVal = a.display.toLowerCase();
-        bVal = b.display.toLowerCase();
-        break;
-      case 'updated_at':
-        aVal = a.updated_at;
-        bVal = b.updated_at;
-        break;
-      default:
-        aVal = a.sort_order;
-        bVal = b.sort_order;
-    }
-
-    if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
-    if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
-    return 0;
-  });
-
+  const tags = await TagModel.findAll(); // Already sorted by sort_order
   res.render('admin/tags/index', {
     tags,
-    sortBy,
-    sortOrder,
     user: req.user
   });
 });
@@ -450,9 +412,28 @@ router.get('/api/tags', async (req: Request, res: Response) => {
   res.json(tags);
 });
 
-router.put('/api/tags', async (req: Request, res: Response) => {
-  const tags = await TagModel.bulkSave(req.body);
-  res.json(tags);
+router.get('/api/tags/:id', async (req: Request, res: Response) => {
+  const tag = await TagModel.findById(getParamId(req.params.id));
+  if (!tag) {
+    return res.status(404).json({ error: 'Tag not found' });
+  }
+  res.json(tag);
+});
+
+router.patch('/api/tags/:id', async (req: Request, res: Response) => {
+  const tag = await TagModel.update(getParamId(req.params.id), req.body);
+  if (!tag) {
+    return res.status(404).json({ error: 'Tag not found' });
+  }
+  res.json(tag);
+});
+
+router.delete('/api/tags/:id', async (req: Request, res: Response) => {
+  const deleted = await TagModel.delete(getParamId(req.params.id));
+  if (!deleted) {
+    return res.status(404).json({ error: 'Tag not found' });
+  }
+  res.status(204).send();
 });
 
 export default router;
