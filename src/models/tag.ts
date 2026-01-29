@@ -104,11 +104,29 @@ export class TagModel {
   }
 
   /**
-   * Delete a tag
+   * Delete a tag and remove it from all places
    */
   static async delete(id: string): Promise<boolean> {
+    // First remove the tag from all place_tags associations
+    await query('DELETE FROM place_tags WHERE tag_id = $1', [id]);
+    // Then delete the tag itself
     const result = await query('DELETE FROM tags WHERE id = $1', [id]);
     return (result.rowCount ?? 0) > 0;
+  }
+
+  /**
+   * Find all places that have this tag
+   */
+  static async findPlacesByTagId(tagId: string): Promise<{ id: string; name: string }[]> {
+    const result = await query<{ id: string; name: string }>(
+      `SELECT p.id, p.name
+       FROM places p
+       JOIN place_tags pt ON p.id = pt.place_id
+       WHERE pt.tag_id = $1
+       ORDER BY p.name ASC`,
+      [tagId]
+    );
+    return result.rows;
   }
 
   /**

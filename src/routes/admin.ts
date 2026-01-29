@@ -219,50 +219,184 @@ router.post('/places/:id/delete', async (req: Request, res: Response) => {
 });
 
 // =====================================================
-// Tags Management
+// Tags CRUD
 // =====================================================
 
-// List/edit tags
+// List tags
 router.get('/tags', async (req: Request, res: Response) => {
-  const tags = await TagModel.findAll();
+  const sortBy = (req.query.sort_by as string) || 'sort_order';
+  const sortOrder = (req.query.sort_order as string) || 'asc';
+
+  let tags = await TagModel.findAll();
+
+  // Sort tags
+  tags = tags.sort((a, b) => {
+    let aVal: string | number | Date;
+    let bVal: string | number | Date;
+
+    switch (sortBy) {
+      case 'sort_order':
+        aVal = a.sort_order;
+        bVal = b.sort_order;
+        break;
+      case 'value':
+        aVal = a.value.toLowerCase();
+        bVal = b.value.toLowerCase();
+        break;
+      case 'display':
+        aVal = a.display.toLowerCase();
+        bVal = b.display.toLowerCase();
+        break;
+      case 'updated_at':
+        aVal = a.updated_at;
+        bVal = b.updated_at;
+        break;
+      default:
+        aVal = a.sort_order;
+        bVal = b.sort_order;
+    }
+
+    if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+
   res.render('admin/tags/index', {
     tags,
+    sortBy,
+    sortOrder,
+    user: req.user
+  });
+});
+
+// New tag form
+router.get('/tags/new', (req: Request, res: Response) => {
+  res.render('admin/tags/form', {
+    tag: null,
     user: req.user,
     errors: []
   });
 });
 
-// Save all tags
+// Create tag
 router.post('/tags', async (req: Request, res: Response) => {
-  const { order, value, display } = req.body;
+  const { value, display, sort_order } = req.body;
 
-  // Build tags array from form data
-  const tags: { value: string; display: string; sort_order: number }[] = [];
+  const errors: string[] = [];
+  if (!value || value.trim() === '') {
+    errors.push('Value is required');
+  }
+  if (!display || display.trim() === '') {
+    errors.push('Display name is required');
+  }
+  if (value && !/^[a-z0-9-]+$/.test(value.trim())) {
+    errors.push('Value must contain only lowercase letters, numbers, and hyphens');
+  }
 
-  // Handle array inputs from form
-  const orders = Array.isArray(order) ? order : [order];
-  const values = Array.isArray(value) ? value : [value];
-  const displays = Array.isArray(display) ? display : [display];
-
-  for (let i = 0; i < values.length; i++) {
-    const o = orders[i]?.trim();
-    const v = values[i]?.trim();
-    const d = displays[i]?.trim();
-
-    // Skip empty rows
-    if (!o && !v && !d) continue;
-
-    // Validate complete rows
-    if (o && v && d) {
-      tags.push({
-        value: v,
-        display: d,
-        sort_order: parseInt(o, 10) || 0
-      });
+  // Check for duplicate value
+  if (value) {
+    const existing = await TagModel.findByValue(value.trim());
+    if (existing) {
+      errors.push('A tag with this value already exists');
     }
   }
 
-  await TagModel.bulkSave(tags);
+  if (errors.length > 0) {
+    return res.render('admin/tags/form', {
+      tag: req.body,
+      user: req.user,
+      errors
+    });
+  }
+
+  await TagModel.create({
+    value: value.trim(),
+    display: display.trim(),
+    sort_order: parseInt(sort_order, 10) || 0
+  });
+
+  res.redirect('/admin/tags');
+});
+
+// Edit tag form
+router.get('/tags/:id/edit', async (req: Request, res: Response) => {
+  const tag = await TagModel.findById(getParamId(req.params.id));
+  if (!tag) {
+    return res.status(404).send('Tag not found');
+  }
+
+  res.render('admin/tags/form', {
+    tag,
+    user: req.user,
+    errors: []
+  });
+});
+
+// Update tag
+router.post('/tags/:id', async (req: Request, res: Response) => {
+  const { value, display, sort_order } = req.body;
+  const tagId = getParamId(req.params.id);
+
+  const errors: string[] = [];
+  if (!value || value.trim() === '') {
+    errors.push('Value is required');
+  }
+  if (!display || display.trim() === '') {
+    errors.push('Display name is required');
+  }
+  if (value && !/^[a-z0-9-]+$/.test(value.trim())) {
+    errors.push('Value must contain only lowercase letters, numbers, and hyphens');
+  }
+
+  // Check for duplicate value (excluding current tag)
+  if (value) {
+    const existing = await TagModel.findByValue(value.trim());
+    if (existing && existing.id !== tagId) {
+      errors.push('A tag with this value already exists');
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.render('admin/tags/form', {
+      tag: { id: tagId, ...req.body },
+      user: req.user,
+      errors
+    });
+  }
+
+  const updated = await TagModel.update(tagId, {
+    value: value.trim(),
+    display: display.trim(),
+    sort_order: parseInt(sort_order, 10) || 0
+  });
+
+  if (!updated) {
+    return res.status(404).send('Tag not found');
+  }
+
+  res.redirect('/admin/tags');
+});
+
+// Delete tag confirmation page
+router.get('/tags/:id/delete', async (req: Request, res: Response) => {
+  const tag = await TagModel.findById(getParamId(req.params.id));
+  if (!tag) {
+    return res.status(404).send('Tag not found');
+  }
+
+  // Find places that use this tag
+  const affectedPlaces = await TagModel.findPlacesByTagId(tag.id);
+
+  res.render('admin/tags/delete', {
+    tag,
+    affectedPlaces,
+    user: req.user
+  });
+});
+
+// Delete tag (confirmed)
+router.post('/tags/:id/delete', async (req: Request, res: Response) => {
+  await TagModel.delete(getParamId(req.params.id));
   res.redirect('/admin/tags');
 });
 
