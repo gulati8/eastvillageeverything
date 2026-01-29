@@ -1,3 +1,5 @@
+name: eve
+
 services:
   app:
     build:

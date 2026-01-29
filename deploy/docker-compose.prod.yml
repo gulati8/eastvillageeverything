@@ -1,0 +1,63 @@
+name: eve
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: eve-db
+    environment:
+      POSTGRES_USER: eve
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eve_prod_password_change_me}
+      POSTGRES_DB: eve_production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eve -d eve_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    container_name: eve-redis
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - internal
+
+  app:
+    image: ghcr.io/gulati8/eve-app:latest
+    container_name: eve-app
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://eve:${POSTGRES_PASSWORD:-eve_prod_password_change_me}@eve-db:5432/eve_production
+      REDIS_URL: redis://eve-redis:6379
+      SESSION_SECRET: ${SESSION_SECRET:-change_this_session_secret_in_production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+      - proxy
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  internal:
+    driver: bridge
+  proxy:
+    external: true
