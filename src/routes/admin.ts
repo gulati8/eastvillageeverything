@@ -109,10 +109,11 @@ router.get('/places', async (req: Request, res: Response) => {
 
 // New place form
 router.get('/places/new', async (req: Request, res: Response) => {
-  const tags = await TagModel.findAll();
+  const { parents, standalone } = await TagModel.findAllStructured();
   res.render('admin/places/form', {
     place: null,
-    tags,
+    parents,
+    standalone,
     user: req.user,
     errors: []
   });
@@ -128,10 +129,11 @@ router.post('/places', async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
-    const allTags = await TagModel.findAll();
+    const { parents, standalone } = await TagModel.findAllStructured();
     return res.render('admin/places/form', {
       place: req.body,
-      tags: allTags,
+      parents,
+      standalone,
       user: req.user,
       errors
     });
@@ -158,7 +160,7 @@ router.get('/places/:id/edit', async (req: Request, res: Response) => {
     return res.status(404).send('Place not found');
   }
 
-  const tags = await TagModel.findAll();
+  const { parents, standalone } = await TagModel.findAllStructured();
 
   // Convert HTML breaks back to newlines for editing
   const editablePlace = {
@@ -169,7 +171,8 @@ router.get('/places/:id/edit', async (req: Request, res: Response) => {
 
   res.render('admin/places/form', {
     place: editablePlace,
-    tags,
+    parents,
+    standalone,
     user: req.user,
     errors: []
   });
@@ -185,10 +188,11 @@ router.post('/places/:id', async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
-    const allTags = await TagModel.findAll();
+    const { parents, standalone } = await TagModel.findAllStructured();
     return res.render('admin/places/form', {
       place: { id: getParamId(req.params.id), ...req.body },
-      tags: allTags,
+      parents,
+      standalone,
       user: req.user,
       errors
     });
@@ -224,17 +228,20 @@ router.post('/places/:id/delete', async (req: Request, res: Response) => {
 
 // List tags
 router.get('/tags', async (req: Request, res: Response) => {
-  const tags = await TagModel.findAll(); // Already sorted by sort_order
+  const structuredTags = await TagModel.findAllStructured();
   res.render('admin/tags/index', {
-    tags,
+    parents: structuredTags.parents,
+    standalone: structuredTags.standalone,
     user: req.user
   });
 });
 
 // New tag form
-router.get('/tags/new', (req: Request, res: Response) => {
+router.get('/tags/new', async (req: Request, res: Response) => {
+  const potentialParents = await TagModel.getPotentialParents();
   res.render('admin/tags/form', {
     tag: null,
+    potentialParents,
     user: req.user,
     errors: []
   });
@@ -242,7 +249,7 @@ router.get('/tags/new', (req: Request, res: Response) => {
 
 // Create tag
 router.post('/tags', async (req: Request, res: Response) => {
-  const { value, display, sort_order } = req.body;
+  const { value, display, sort_order, parent_tag_id } = req.body;
 
   const errors: string[] = [];
   if (!value || value.trim() === '') {
@@ -264,8 +271,10 @@ router.post('/tags', async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
+    const potentialParents = await TagModel.getPotentialParents();
     return res.render('admin/tags/form', {
       tag: req.body,
+      potentialParents,
       user: req.user,
       errors
     });
@@ -274,7 +283,8 @@ router.post('/tags', async (req: Request, res: Response) => {
   await TagModel.create({
     value: value.trim(),
     display: display.trim(),
-    sort_order: parseInt(sort_order, 10) || 0
+    sort_order: parseInt(sort_order, 10) || 0,
+    parent_tag_id: parent_tag_id || null
   });
 
   res.redirect('/admin/tags');
@@ -282,13 +292,18 @@ router.post('/tags', async (req: Request, res: Response) => {
 
 // Edit tag form
 router.get('/tags/:id/edit', async (req: Request, res: Response) => {
-  const tag = await TagModel.findById(getParamId(req.params.id));
+  const tagId = getParamId(req.params.id);
+  const tag = await TagModel.findById(tagId);
   if (!tag) {
     return res.status(404).send('Tag not found');
   }
 
+  // Get potential parents, excluding self and children
+  const potentialParents = await TagModel.getPotentialParents(tagId);
+
   res.render('admin/tags/form', {
     tag,
+    potentialParents,
     user: req.user,
     errors: []
   });
@@ -296,7 +311,7 @@ router.get('/tags/:id/edit', async (req: Request, res: Response) => {
 
 // Update tag
 router.post('/tags/:id', async (req: Request, res: Response) => {
-  const { value, display, sort_order } = req.body;
+  const { value, display, sort_order, parent_tag_id } = req.body;
   const tagId = getParamId(req.params.id);
 
   const errors: string[] = [];
@@ -319,8 +334,10 @@ router.post('/tags/:id', async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
+    const potentialParents = await TagModel.getPotentialParents(tagId);
     return res.render('admin/tags/form', {
       tag: { id: tagId, ...req.body },
+      potentialParents,
       user: req.user,
       errors
     });
@@ -329,7 +346,8 @@ router.post('/tags/:id', async (req: Request, res: Response) => {
   const updated = await TagModel.update(tagId, {
     value: value.trim(),
     display: display.trim(),
-    sort_order: parseInt(sort_order, 10) || 0
+    sort_order: parseInt(sort_order, 10) || 0,
+    parent_tag_id: parent_tag_id || null
   });
 
   if (!updated) {

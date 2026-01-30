@@ -72,6 +72,19 @@
                    style="max-width: 120px;">
             <div class="form-text">Lower numbers appear first. Tags with the same order are sorted alphabetically.</div>
           </div>
+
+          <div class="mb-3">
+            <label for="parent_tag_id" class="form-label">Parent Tag (optional)</label>
+            <select class="form-select" id="parent_tag_id" name="parent_tag_id">
+              <option value="">None - Top Level Tag</option>
+              <% potentialParents.forEach(function(parent) { %>
+              <option value="<%= parent.id %>" <%= tag && tag.parent_tag_id === parent.id ? 'selected' : '' %>>
+                <%= parent.display %>
+              </option>
+              <% }); %>
+            </select>
+            <div class="form-text">Select a parent to nest this tag under it. Leave empty for a top-level tag.</div>
+          </div>
         </div>
       </div>
 

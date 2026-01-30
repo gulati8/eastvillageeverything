@@ -86,19 +86,48 @@
 
       <div class="mb-4">
         <label class="form-label">Tags</label>
-        <div class="row">
-          <% tags.forEach(function(tag) { %>
-          <div class="col-md-3 col-sm-4 col-6">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="tags" value="<%= tag.value %>" id="tag-<%= tag.value %>"
-                <%= place && place.tags && place.tags.includes(tag.value) ? 'checked' : '' %>>
-              <label class="form-check-label" for="tag-<%= tag.value %>">
-                <%= tag.display %>
-              </label>
+
+        <% parents.forEach(function(parent) { %>
+        <div class="card mb-2">
+          <div class="card-header py-2"><strong><%= parent.display %></strong></div>
+          <div class="card-body py-2">
+            <div class="row">
+              <% parent.children.forEach(function(tag) { %>
+              <div class="col-md-3 col-sm-4 col-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="tags" value="<%= tag.value %>" id="tag-<%= tag.value %>"
+                    <%= place && place.tags && place.tags.includes(tag.value) ? 'checked' : '' %>>
+                  <label class="form-check-label" for="tag-<%= tag.value %>">
+                    <%= tag.display %>
+                  </label>
+                </div>
+              </div>
+              <% }); %>
             </div>
           </div>
-          <% }); %>
         </div>
+        <% }); %>
+
+        <% if (standalone.length > 0) { %>
+        <div class="card mb-2">
+          <div class="card-header py-2"><strong>Other Tags</strong></div>
+          <div class="card-body py-2">
+            <div class="row">
+              <% standalone.forEach(function(tag) { %>
+              <div class="col-md-3 col-sm-4 col-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="tags" value="<%= tag.value %>" id="tag-<%= tag.value %>"
+                    <%= place && place.tags && place.tags.includes(tag.value) ? 'checked' : '' %>>
+                  <label class="form-check-label" for="tag-<%= tag.value %>">
+                    <%= tag.display %>
+                  </label>
+                </div>
+              </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+        <% } %>
       </div>
 
       <div class="mb-3">

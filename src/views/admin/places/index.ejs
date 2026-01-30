@@ -27,6 +27,9 @@
     .btn-actions .btn:last-child {
       margin-right: 0;
     }
+    .date-cell {
+      white-space: nowrap;
+    }
 
     /* Mobile card styles */
     .place-cards {
@@ -158,8 +161,8 @@
                 <a href="<%= place.url %>" target="_blank"><%= place.url %></a>
               <% } %>
             </td>
-            <td><%= formatDate(place.updated_at) %></td>
-            <td><%= formatDate(place.created_at) %></td>
+            <td class="date-cell"><%= formatDate(place.updated_at) %></td>
+            <td class="date-cell"><%= formatDate(place.created_at) %></td>
           </tr>
           <% }); %>
         </tbody>

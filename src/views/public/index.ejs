@@ -46,8 +46,14 @@
           <label for="tag-list">Looking for something in particular?</label>
           <select id="tag-list">
             <option value="none">Anything</option>
-            <% tags.forEach(function(tag) { %>
+            <% structuredTags.standalone.forEach(function(tag) { %>
             <option value="<%= tag.value %>"><%= tag.display %></option>
+            <% }); %>
+            <% structuredTags.parents.forEach(function(parent) { %>
+            <option value="<%= parent.value %>"><%= parent.display %></option>
+            <% parent.children.forEach(function(child) { %>
+            <option value="<%= child.value %>">&nbsp;&nbsp;&nbsp;&nbsp;<%= child.display %></option>
+            <% }); %>
             <% }); %>
           </select>
         </div>

@@ -50,42 +50,22 @@
       70% { opacity: 1; }
       100% { opacity: 0; }
     }
-
-    /* Mobile card styles */
-    .tag-cards {
-      display: none;
-    }
-    .tag-card {
-      background: #fff;
-      border: 1px solid #dee2e6;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-    }
-    .tag-card table {
-      margin-bottom: 0;
-    }
-    .tag-card th {
-      width: 100px;
-      background-color: #f8f9fa;
+    .parent-tag {
+      background-color: #e7f1ff;
       font-weight: 600;
     }
-    .tag-card td, .tag-card th {
-      padding: 0.5rem 0.75rem;
-      border-color: #dee2e6;
+    .child-tag td:first-child {
+      padding-left: 2rem;
     }
-
-    @media (max-width: 768px) {
-      .tags-table-wrapper {
-        display: none;
-      }
-      .tag-cards {
-        display: block;
-      }
-      .page-header {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 1rem;
-      }
+    .child-tag {
+      background-color: #f8f9fa;
+    }
+    .section-header {
+      background-color: #dee2e6;
+      font-weight: 600;
+    }
+    .section-header td {
+      padding: 0.5rem 0.75rem;
     }
   </style>
 </head>
@@ -116,7 +96,7 @@
   </nav>
 
   <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4 page-header">
+    <div class="d-flex justify-content-between align-items-center mb-4">
       <h1>
         Tags
         <span class="save-indicator" id="saveIndicator">
@@ -126,21 +106,22 @@
       <a href="/admin/tags/new" class="btn btn-success">New Tag</a>
     </div>
 
-    <p class="text-muted mb-3">Drag rows to reorder tags. Changes are saved automatically.</p>
+    <p class="text-muted mb-3">Standalone tags shown first. Tag groups (parent with children) shown below with header.</p>
 
-    <!-- Desktop Table View -->
-    <div class="tags-table-wrapper">
-      <table class="table table-striped table-bordered">
+    <div class="table-responsive">
+      <table class="table table-bordered">
         <thead class="table-light">
           <tr>
             <th style="width: 50px;"></th>
-            <th style="width: 120px;">Actions</th>
+            <th style="width: 140px;">Actions</th>
             <th>Display Name</th>
             <th>Value</th>
           </tr>
         </thead>
         <tbody id="tagsTableBody">
-          <% tags.forEach(function(tag) { %>
+          <% if (standalone.length > 0) { %>
+          <!-- Standalone Tags (no header) -->
+          <% standalone.forEach(function(tag) { %>
           <tr data-id="<%= tag.id %>">
             <td class="drag-handle text-center">☰</td>
             <td class="btn-actions">
@@ -151,40 +132,41 @@
             <td><code><%= tag.value %></code></td>
           </tr>
           <% }); %>
+          <% } %>
+
+          <% if (parents.length > 0) { %>
+          <!-- Tag Groups -->
+          <tr class="section-header">
+            <td colspan="4">Tag Groups</td>
+          </tr>
+          <% parents.forEach(function(parent) { %>
+          <tr class="parent-tag" data-id="<%= parent.id %>">
+            <td class="drag-handle text-center">☰</td>
+            <td class="btn-actions">
+              <a href="/admin/tags/<%= parent.id %>/edit" class="btn btn-sm btn-success">Edit</a>
+              <a href="/admin/tags/<%= parent.id %>/delete" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+            <td><%= parent.display %></td>
+            <td><code><%= parent.value %></code></td>
+          </tr>
+          <% parent.children.forEach(function(child) { %>
+          <tr class="child-tag" data-id="<%= child.id %>" data-parent="<%= parent.id %>">
+            <td class="drag-handle text-center">↳</td>
+            <td class="btn-actions">
+              <a href="/admin/tags/<%= child.id %>/edit" class="btn btn-sm btn-success">Edit</a>
+              <a href="/admin/tags/<%= child.id %>/delete" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+            <td><%= child.display %></td>
+            <td><code><%= child.value %></code></td>
+          </tr>
+          <% }); %>
+          <% }); %>
+          <% } %>
         </tbody>
       </table>
     </div>
 
-    <!-- Mobile Card View -->
-    <div class="tag-cards" id="tagsCardContainer">
-      <% tags.forEach(function(tag) { %>
-      <div class="tag-card" data-id="<%= tag.id %>">
-        <table class="table table-bordered">
-          <tbody>
-            <tr>
-              <th>
-                <span class="drag-handle">☰</span>
-              </th>
-              <td class="btn-actions">
-                <a href="/admin/tags/<%= tag.id %>/edit" class="btn btn-sm btn-success">Edit</a>
-                <a href="/admin/tags/<%= tag.id %>/delete" class="btn btn-sm btn-danger">Delete</a>
-              </td>
-            </tr>
-            <tr>
-              <th>Display</th>
-              <td><%= tag.display %></td>
-            </tr>
-            <tr>
-              <th>Value</th>
-              <td><code><%= tag.value %></code></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <% }); %>
-    </div>
-
-    <% if (tags.length === 0) { %>
+    <% if (parents.length === 0 && standalone.length === 0) { %>
     <p class="text-muted">No tags yet. <a href="/admin/tags/new">Add one</a>.</p>
     <% } %>
   </div>
@@ -227,8 +209,8 @@
     async function handleReorder(evt) {
       showSaving();
 
-      // Get all rows in their new order
-      const rows = evt.to.querySelectorAll('[data-id]');
+      // Get all rows in their new order (excluding section headers)
+      const rows = evt.to.querySelectorAll('tr[data-id]');
       const updates = [];
 
       rows.forEach((row, index) => {
@@ -240,7 +222,7 @@
       showSaved();
     }
 
-    // Initialize Sortable for desktop table
+    // Initialize Sortable for the table
     const tableBody = document.getElementById('tagsTableBody');
     if (tableBody) {
       new Sortable(tableBody, {
@@ -248,18 +230,7 @@
         handle: '.drag-handle',
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
-        onEnd: handleReorder
-      });
-    }
-
-    // Initialize Sortable for mobile cards
-    const cardContainer = document.getElementById('tagsCardContainer');
-    if (cardContainer) {
-      new Sortable(cardContainer, {
-        animation: 150,
-        handle: '.drag-handle',
-        ghostClass: 'sortable-ghost',
-        chosenClass: 'sortable-chosen',
+        filter: '.section-header',
         onEnd: handleReorder
       });
     }
