@@ -2,10 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import session from 'express-session';
-import cookieParser from 'cookie-parser';
 import RedisStore from 'connect-redis';
 import { Redis } from 'ioredis';
-import { doubleCsrf } from 'csrf-csrf';
+import { csrfSync } from 'csrf-sync';
 
 import apiRoutes from './routes/api.js';
 import adminRoutes from './routes/admin.js';
@@ -64,31 +63,14 @@ app.use(session({
   }
 }));
 
-// CSRF protection
-app.use(cookieParser());
-const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
-  getSecret: () => sessionSecret,
-  getSessionIdentifier: (req: express.Request) => req.session?.id || '',
-  cookieName: '__csrf',
-  cookieOptions: {
-    httpOnly: true,
-    sameSite: 'lax' as const,
-    path: '/',
-    secure: process.env.NODE_ENV === 'production',
-  },
-  getCsrfTokenFromRequest: (req: express.Request) =>
-    req.body?._csrf || req.headers['x-csrf-token'],
+// CSRF protection (synchronizer token pattern — stored in session)
+const { csrfSynchronisedProtection, generateToken } = csrfSync({
+  getTokenFromRequest: (req) => req.body?._csrf || req.headers['x-csrf-token'],
 });
 
 // Apply CSRF to admin routes only (public API is stateless)
-app.use('/admin', (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  // Ensure session exists so CSRF can use session ID for token binding
-  if (!req.session.csrfInit) {
-    req.session.csrfInit = true;
-  }
-  next();
-}, doubleCsrfProtection, (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.locals.csrfToken = generateCsrfToken(req, res);
+app.use('/admin', csrfSynchronisedProtection, (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  res.locals.csrfToken = generateToken(req);
   next();
 });
 
