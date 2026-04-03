@@ -89,6 +89,7 @@
         <% if (user) { %>
         <span class="navbar-text me-3"><%= user.name %></span>
         <form action="/admin/logout" method="POST" class="d-inline">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
         </form>
         <% } %>
@@ -152,6 +153,7 @@
             <td class="btn-actions">
               <a href="/admin/places/<%= place.id %>/edit" class="btn btn-sm btn-success">Edit</a>
               <form action="/admin/places/<%= place.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this place?')">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
               </form>
             </td>

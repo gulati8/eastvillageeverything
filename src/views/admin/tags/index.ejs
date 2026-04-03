@@ -88,6 +88,7 @@
         <% if (user) { %>
         <span class="navbar-text me-3"><%= user.name %></span>
         <form action="/admin/logout" method="POST" class="d-inline">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
         </form>
         <% } %>
@@ -186,12 +187,15 @@
       saveIndicator.className = 'save-indicator saved';
     }
 
+    const csrfToken = '<%= csrfToken %>';
+
     async function updateTagOrder(tagId, newOrder) {
       try {
         const response = await fetch(`/admin/api/tags/${tagId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            'x-csrf-token': csrfToken,
           },
           credentials: 'same-origin',
           body: JSON.stringify({ sort_order: newOrder })

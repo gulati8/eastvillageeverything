@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 import RedisStore from 'connect-redis';
 import { Redis } from 'ioredis';
+import { doubleCsrf } from 'csrf-csrf';
 
 import apiRoutes from './routes/api.js';
 import adminRoutes from './routes/admin.js';
@@ -27,8 +29,11 @@ redisClient.on('connect', () => {
 app.set('trust proxy', 1);
 
 // Middleware
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',')
+  : ['http://localhost:3000', 'http://admin.localhost:3000'];
 app.use(cors({
-  origin: true, // Allow all origins (configure for production)
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -42,17 +47,44 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(process.cwd(), 'src/views'));
 
 // Session configuration with Redis store
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret) {
+  throw new Error('SESSION_SECRET environment variable is required');
+}
 app.use(session({
   store: new RedisStore({ client: redisClient }),
-  secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
+
+// CSRF protection
+app.use(cookieParser());
+const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
+  getSecret: () => sessionSecret,
+  getSessionIdentifier: (req: express.Request) => req.session?.id || '',
+  cookieName: '__csrf',
+  cookieOptions: {
+    httpOnly: true,
+    sameSite: 'lax' as const,
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+  },
+  getCsrfTokenFromRequest: (req: express.Request) =>
+    req.body?._csrf || req.headers['x-csrf-token'],
+});
+
+// Apply CSRF to admin routes only (public API is stateless)
+app.use('/admin', doubleCsrfProtection, (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  res.locals.csrfToken = generateCsrfToken(req, res);
+  next();
+});
 
 // Subdomain routing middleware
 app.use((req, res, next) => {
@@ -90,7 +122,10 @@ app.use('/', (req, res, next) => {
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Unhandled error:', err);
+  console.error('Unhandled error:', err.message);
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(err.stack);
+  }
   res.status(500).json({ error: 'Internal server error' });
 });
 

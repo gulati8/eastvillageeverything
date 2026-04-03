@@ -83,12 +83,12 @@
             <a href="tel:<%= place.phone %>"><%= place.displayPhone %></a>
             <% } %>
           </div>
-          <div class="small-12 large-5 columns specials">
-            <%- place.specials || '' %>
+          <div class="small-12 large-5 columns specials" style="white-space: pre-wrap;">
+            <%= place.specials || '' %>
           </div>
           <div class="small-12 large-4 columns categories-and-notes">
             <div class="categories"><%= place.categories || '' %></div>
-            <div class="notes"><%- place.notes || '' %></div>
+            <div class="notes" style="white-space: pre-wrap;"><%= place.notes || '' %></div>
           </div>
         </div>
         <% }); %>

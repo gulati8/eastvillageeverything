@@ -33,10 +33,18 @@ function normalizePhone(phone: string | undefined): string | null {
   return digits.length === 10 ? digits : null;
 }
 
-// Convert newlines to HTML <br/> tags for storage
-function toHtmlBreaks(text: string | undefined): string | null {
-  if (!text) return null;
-  return text.replace(/\r?\n/g, '<br/>');
+// Validate URL scheme (only http/https allowed)
+function validateUrl(url: string | undefined): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return null;
+    }
+    return url;
+  } catch {
+    return null;
+  }
 }
 
 export class PlaceModel {
@@ -120,10 +128,10 @@ export class PlaceModel {
         data.name,
         data.address || null,
         normalizePhone(data.phone),
-        data.url || null,
-        toHtmlBreaks(data.specials),
+        validateUrl(data.url),
+        data.specials || null,
         data.categories || null,
-        toHtmlBreaks(data.notes)
+        data.notes || null
       ]);
 
       const place = placeResult.rows[0];
@@ -162,11 +170,11 @@ export class PlaceModel {
       }
       if (data.url !== undefined) {
         updates.push(`url = $${paramIndex++}`);
-        params.push(data.url || null);
+        params.push(validateUrl(data.url));
       }
       if (data.specials !== undefined) {
         updates.push(`specials = $${paramIndex++}`);
-        params.push(toHtmlBreaks(data.specials));
+        params.push(data.specials || null);
       }
       if (data.categories !== undefined) {
         updates.push(`categories = $${paramIndex++}`);
@@ -174,7 +182,7 @@ export class PlaceModel {
       }
       if (data.notes !== undefined) {
         updates.push(`notes = $${paramIndex++}`);
-        params.push(toHtmlBreaks(data.notes));
+        params.push(data.notes || null);
       }
 
       // Always update updated_at

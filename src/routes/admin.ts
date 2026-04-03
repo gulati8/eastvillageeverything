@@ -162,15 +162,8 @@ router.get('/places/:id/edit', async (req: Request, res: Response) => {
 
   const { parents, standalone } = await TagModel.findAllStructured();
 
-  // Convert HTML breaks back to newlines for editing
-  const editablePlace = {
-    ...place,
-    specials: place.specials?.replace(/<br\s*\/?>/gi, '\n') || '',
-    notes: place.notes?.replace(/<br\s*\/?>/gi, '\n') || ''
-  };
-
   res.render('admin/places/form', {
-    place: editablePlace,
+    place,
     parents,
     standalone,
     user: req.user,
@@ -404,12 +397,20 @@ router.get('/api/places/:id', async (req: Request, res: Response) => {
 });
 
 router.post('/api/places', async (req: Request, res: Response) => {
-  const place = await PlaceModel.create(req.body);
+  const { name, address, phone, url, specials, categories, notes, tags } = req.body;
+  const place = await PlaceModel.create({
+    name, address, phone, url, specials, categories, notes,
+    tags: Array.isArray(tags) ? tags : tags ? [tags] : []
+  });
   res.status(201).json(place);
 });
 
 router.put('/api/places/:id', async (req: Request, res: Response) => {
-  const place = await PlaceModel.update(getParamId(req.params.id), req.body);
+  const { name, address, phone, url, specials, categories, notes, tags } = req.body;
+  const place = await PlaceModel.update(getParamId(req.params.id), {
+    name, address, phone, url, specials, categories, notes,
+    tags: Array.isArray(tags) ? tags : tags ? [tags] : []
+  });
   if (!place) {
     return res.status(404).json({ error: 'Place not found' });
   }
@@ -439,7 +440,13 @@ router.get('/api/tags/:id', async (req: Request, res: Response) => {
 });
 
 router.patch('/api/tags/:id', async (req: Request, res: Response) => {
-  const tag = await TagModel.update(getParamId(req.params.id), req.body);
+  const { value, display, sort_order, parent_tag_id } = req.body;
+  const tag = await TagModel.update(getParamId(req.params.id), {
+    ...(value !== undefined && { value }),
+    ...(display !== undefined && { display }),
+    ...(sort_order !== undefined && { sort_order: parseInt(sort_order, 10) || 0 }),
+    ...(parent_tag_id !== undefined && { parent_tag_id: parent_tag_id || null }),
+  });
   if (!tag) {
     return res.status(404).json({ error: 'Tag not found' });
   }

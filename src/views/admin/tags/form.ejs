@@ -22,6 +22,7 @@
         <% if (user) { %>
         <span class="navbar-text me-3"><%= user.name %></span>
         <form action="/admin/logout" method="POST" class="d-inline">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
         </form>
         <% } %>
@@ -43,6 +44,7 @@
     <% } %>
 
     <form method="POST" action="<%= tag && tag.id ? '/admin/tags/' + tag.id : '/admin/tags' %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
