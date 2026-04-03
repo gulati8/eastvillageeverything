@@ -81,7 +81,13 @@ const { doubleCsrfProtection, generateCsrfToken } = doubleCsrf({
 });
 
 // Apply CSRF to admin routes only (public API is stateless)
-app.use('/admin', doubleCsrfProtection, (req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use('/admin', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // Ensure session exists so CSRF can use session ID for token binding
+  if (!req.session.csrfInit) {
+    req.session.csrfInit = true;
+  }
+  next();
+}, doubleCsrfProtection, (req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.locals.csrfToken = generateCsrfToken(req, res);
   next();
 });
