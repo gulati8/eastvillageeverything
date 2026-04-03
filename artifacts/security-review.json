@@ -1,0 +1,190 @@
+{
+  "verdict": "fail",
+  "summary": "The East Village Everything application has one critical and multiple high-severity vulnerabilities that block deployment. The most severe issue is stored Cross-Site Scripting on the public homepage: the EJS template renders the 'specials' and 'notes' fields with the unescaped <%- operator, and the model layer stores user-supplied newlines as raw HTML without sanitization, allowing any stored script tag to execute in every visitor's browser. Compounding this, the application has no CSRF protection on any POST endpoint, meaning an attacker can trigger admin state-changes (create, update, delete places and tags, logout) by tricking an authenticated admin into loading a malicious page. The admin JSON API additionally accepts unsanitized req.body directly in create and update calls (mass assignment). Infrastructure concerns include a wildcard CORS configuration that permits credentialed cross-origin requests from any origin, a session secret with a hardcoded fallback, a Redis instance with no authentication, session cookies missing the SameSite attribute, and missing HSTS and Content-Security-Policy headers on the public vhost. A hardcoded default admin password ('changeme123') is documented in version-controlled migration source code. None of the public-facing SQL queries use string interpolation — all use parameterized statements — so SQL injection is not a finding. EJS escaping (<%=) is used correctly in all admin views and for most fields in the public view; only specials and notes are unescaped by design, which is the root of the XSS finding.",
+  "owasp_findings": [
+    {
+      "id": "OWASP-A03-001",
+      "category": "A03:2021 - Injection (XSS)",
+      "title": "Stored XSS via unescaped specials and notes fields on public homepage",
+      "severity": "critical",
+      "file": "src/views/public/index.ejs",
+      "lines": [87, 91],
+      "description": "The EJS template renders place.specials (line 87) and place.notes (line 91) using the unescaped output operator '<%-'. The model layer (src/models/place.ts:37-40) converts newlines to '<br/>' tags but does not strip or encode other HTML. An admin who saves '<script>alert(document.cookie)</script>' in either field will have that payload executed in the browser of every public visitor who loads the homepage.",
+      "remediation": "Either (1) sanitize specials and notes at write time using a library such as DOMPurify (server-side via jsdom) or sanitize-html, restricting allowed tags to '<br>' only; or (2) store the fields as plain text and render them safely using '<%=' with CSS white-space:pre-wrap instead of converting newlines to HTML. Do not use '<%- ' for any field that originates from user input unless it has been explicitly sanitized to a safe HTML allowlist."
+    },
+    {
+      "id": "OWASP-A01-001",
+      "category": "A01:2021 - Broken Access Control (CSRF)",
+      "title": "No CSRF protection on any state-changing POST route",
+      "severity": "high",
+      "file": "src/routes/admin.ts",
+      "lines": [26, 46, 123, 182, 220, 251, 313, 378],
+      "description": "The application has no CSRF token middleware installed or referenced (csurf, csrf-csrf, or equivalent). Every POST route — login, logout, create/update/delete for places and tags — can be triggered cross-origin from any page the admin visits. The admin AJAX endpoints in the same file (e.g., PATCH /admin/api/tags/:id at line 441) are protected by the session cookie but no CSRF token, so a page on any origin can issue a fetch() with credentials and mutate data.",
+      "remediation": "Install the 'csrf-csrf' or 'csurf' package (the latter is deprecated; prefer csrf-csrf). Generate a per-session token, inject it into every admin form as a hidden field and into every EJS template, and validate it on every non-GET route. For the AJAX PATCH endpoint at /admin/api/tags/:id, also validate the token from the request header (e.g., X-CSRF-Token)."
+    },
+    {
+      "id": "OWASP-A01-002",
+      "category": "A01:2021 - Broken Access Control (Mass Assignment)",
+      "title": "req.body passed directly to PlaceModel.create and PlaceModel.update in admin JSON API",
+      "severity": "high",
+      "file": "src/routes/admin.ts",
+      "lines": [407, 412],
+      "description": "The admin JSON API routes POST /admin/api/places (line 407) and PUT /admin/api/places/:id (line 412) pass req.body directly to PlaceModel.create() and PlaceModel.update() without any field whitelist or schema validation. An attacker who can reach these endpoints (authenticated session or via CSRF) can supply arbitrary fields in the JSON body.",
+      "remediation": "Extract only the fields that are valid inputs (name, address, phone, url, specials, categories, notes, tags) from req.body before passing to the model, mirroring the explicit destructuring already applied in the form-based POST /admin/places route at line 124. Apply the same fix to PATCH /admin/api/tags/:id at line 442."
+    },
+    {
+      "id": "OWASP-A03-002",
+      "category": "A03:2021 - Injection (XSS via javascript: URI)",
+      "title": "Unvalidated URL field stored and rendered as href on public page and admin page",
+      "severity": "high",
+      "file": "src/views/public/index.ejs",
+      "lines": [75],
+      "description": "place.url is stored as supplied and rendered directly as the href of an anchor tag in src/views/public/index.ejs line 75 and src/views/admin/places/index.ejs lines 161 and 195. No protocol validation is enforced in the route handler or model. A value of 'javascript:alert(document.cookie)' or 'data:text/html,<script>...' will execute JavaScript when a user clicks the link. The HTML attribute itself is EJS-escaped (<%=) so injection into the attribute context is blocked, but the javascript: protocol bypass is independent of escaping.",
+      "remediation": "In PlaceModel.create() and PlaceModel.update() (src/models/place.ts), validate that the url field begins with 'https://' or 'http://' before storing. Reject or strip values with any other protocol. Alternatively, add a server-side URL parse check using the URL constructor and verify that url.protocol is 'https:' or 'http:'."
+    },
+    {
+      "id": "OWASP-A07-001",
+      "category": "A07:2021 - Identification and Authentication Failures",
+      "title": "Default admin credentials hardcoded and documented in version-controlled migration",
+      "severity": "high",
+      "file": "migrations/1706457600001_seed-admin-user.js",
+      "lines": [7, 13],
+      "description": "The seed migration commits the bcrypt hash of the password 'changeme123' and documents the plaintext password in a code comment at line 7. This migration runs automatically on deployment. If the admin password is not changed after first deployment, the account is trivially compromised by anyone who reads the repository. Because the hash is also committed, offline cracking is made easier.",
+      "remediation": "Remove the plaintext password from the comment immediately. Do not seed a known default password into production. Instead, seed the admin account with a randomly generated password that is written to a deployment-time secret (e.g., a GitHub Actions secret or AWS Secrets Manager), logged once, and then only changeable through a password-reset flow. Alternatively, remove the seed migration entirely and add a first-run CLI script that generates and stores a secure random password."
+    },
+    {
+      "id": "OWASP-A05-001",
+      "category": "A05:2021 - Security Misconfiguration (CORS)",
+      "title": "CORS configured with origin: true and credentials: true, allowing all origins",
+      "severity": "medium",
+      "file": "src/server.ts",
+      "lines": [30, 33],
+      "description": "The CORS middleware is configured with 'origin: true' (which reflects the request's Origin header back as the allowed origin) combined with 'credentials: true'. This effectively grants every origin permission to make credentialed cross-origin requests, including to the admin API endpoints at /admin/api/*. This undermines the session-cookie-based authentication boundary.",
+      "remediation": "Replace 'origin: true' with an explicit allowlist of origins: the public site domain for the public API, and no cross-origin access for admin routes. For the public API (/api/*) which is intentionally public, CORS may be open but credentials should be set to false. Admin routes should not be accessible from cross-origin at all — consider removing CORS headers from the admin router entirely or setting 'origin: false'."
+    },
+    {
+      "id": "OWASP-A02-001",
+      "category": "A02:2021 - Cryptographic Failures (Session Secret Fallback)",
+      "title": "Session secret has a hardcoded fallback value",
+      "severity": "medium",
+      "file": "src/server.ts",
+      "lines": [47],
+      "description": "The session configuration uses 'process.env.SESSION_SECRET || \"dev-secret-change-in-production\"'. If SESSION_SECRET is not set in any environment (including production during a misconfigured deployment), all sessions are signed with the publicly known string 'dev-secret-change-in-production'. An attacker knowing this value can forge valid session cookies.",
+      "remediation": "Remove the fallback string. Instead, throw an error at startup if SESSION_SECRET is not set or is shorter than a minimum length (e.g., 32 bytes): 'if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) throw new Error(\"SESSION_SECRET environment variable is required and must be at least 32 characters\");'"
+    },
+    {
+      "id": "OWASP-A05-002",
+      "category": "A05:2021 - Security Misconfiguration (Missing Security Headers)",
+      "title": "Missing HSTS header on both vhosts; missing CSP on public vhost; unsafe-inline in admin CSP",
+      "severity": "medium",
+      "file": "nginx/nginx.conf",
+      "lines": [75, 79, 128, 132],
+      "description": "Neither the public nor the admin nginx vhost sets a Strict-Transport-Security header, so browsers will not enforce HTTPS on subsequent visits. The public vhost (lines 75-78) has no Content-Security-Policy, leaving public visitors fully exposed to any XSS payload. The admin vhost CSP (line 132) includes 'unsafe-inline' for both script-src and style-src, which defeats XSS mitigation for admin users even though the CSP header is present.",
+      "remediation": "Add 'add_header Strict-Transport-Security \"max-age=63072000; includeSubDomains; preload\" always;' to both server blocks. Add a Content-Security-Policy to the public vhost. Remove 'unsafe-inline' from the admin CSP's script-src; instead, use nonces or hashes for the one inline script in the admin tag list page. Load Bootstrap and SortableJS from a self-hosted copy or use SRI hashes on the CDN links."
+    },
+    {
+      "id": "OWASP-A02-002",
+      "category": "A02:2021 - Cryptographic Failures (Redis No Auth)",
+      "title": "Redis session store has no authentication configured",
+      "severity": "medium",
+      "file": "docker-compose.prod.yml",
+      "lines": [42, 43],
+      "description": "The Redis service starts with only '--appendonly yes'. There is no password (requirepass) configured. Any process reachable on the Docker internal network can read, write, or delete session keys directly without authentication. A compromised container on the internal network can enumerate all sessions and hijack any admin session.",
+      "remediation": "Add a Redis password via the command flag '--requirepass <strong-password>' and pass the same password in the REDIS_URL environment variable: 'redis://:password@redis:6379'. Store the password as a Docker secret or environment variable sourced from a secrets manager."
+    },
+    {
+      "id": "OWASP-A01-003",
+      "category": "A01:2021 - Broken Access Control (Missing SameSite Cookie)",
+      "title": "Session cookie missing SameSite attribute",
+      "severity": "low",
+      "file": "src/server.ts",
+      "lines": [50, 54],
+      "description": "The express-session cookie configuration does not set the 'sameSite' attribute. Modern browsers default to 'Lax' for cookies without SameSite, which provides some protection for top-level navigation but does not protect AJAX/fetch-based CSRF. Explicitly setting SameSite is required to ensure consistent behavior across browsers and to establish a deliberate defense-in-depth layer alongside CSRF tokens.",
+      "remediation": "Add 'sameSite: \"strict\"' to the cookie configuration in src/server.ts. Strict is appropriate because the admin portal does not need to be accessed via cross-site links, and it would prevent session cookies from being sent in any cross-site context."
+    },
+    {
+      "id": "OWASP-A05-003",
+      "category": "A05:2021 - Security Misconfiguration (Infrastructure Disclosure)",
+      "title": "EC2 instance ID hardcoded in public CI/CD workflow",
+      "severity": "low",
+      "file": ".github/workflows/deploy.yml",
+      "lines": [59],
+      "description": "The production EC2 instance ID 'i-021ca6be74a5d9b16' is hardcoded in the workflow file, which is committed to the repository. While not a credential, it discloses infrastructure topology to anyone with repository read access and reduces the reconnaissance effort required for targeted attacks against the AWS account.",
+      "remediation": "Move the instance ID to a GitHub Actions environment variable or secret (e.g., secrets.EC2_INSTANCE_ID) and reference it as '${{ secrets.EC2_INSTANCE_ID }}' in the workflow."
+    },
+    {
+      "id": "OWASP-A09-001",
+      "category": "A09:2021 - Security Logging and Monitoring Failures",
+      "title": "Unstructured error logging may emit full stack traces to container stdout",
+      "severity": "low",
+      "file": "src/server.ts",
+      "lines": [93],
+      "description": "The global error handler logs the full Error object with 'console.error(\"Unhandled error:\", err)', which includes the stack trace. In production this goes to container stdout/stderr visible via SSM session or any log aggregation that lacks access controls. Stack traces disclose internal file paths, module names, and call depth.",
+      "remediation": "In production (NODE_ENV === 'production'), log only the error message and a correlation ID, not the full stack. In development, the full stack is acceptable. Use a structured logging library (pino, winston) to control log levels and ensure stack traces are only emitted when the log level permits it."
+    }
+  ],
+  "stride_analysis": {
+    "spoofing": {
+      "finding": "The authentication model is sound: bcrypt with cost 10 for password hashing, Redis-backed sessions with httpOnly cookies, and a requireAuth middleware guarding all protected routes. The primary spoofing risk is the hardcoded default password ('changeme123') in the seed migration (migrations/1706457600001_seed-admin-user.js:13) — if not rotated, an attacker can authenticate as admin with a known credential. A secondary risk is the absent SameSite attribute on the session cookie, which can be combined with CSRF to perform actions as an authenticated user. No token-based auth bypass vectors were identified in the session lookup logic.",
+      "risk": "medium",
+      "controls_present": ["bcrypt password hashing (cost 10)", "httpOnly session cookie", "Redis-backed session store", "requireAuth middleware on all protected routes"],
+      "gaps": ["Default password documented in version control", "Session cookie missing SameSite attribute", "No account lockout after failed login attempts"]
+    },
+    "tampering": {
+      "finding": "All database queries use parameterized statements — no SQL injection surface was found in any model file. However, the admin JSON API (src/routes/admin.ts:407, 412) passes req.body directly to model methods, creating a mass-assignment surface. The tag drag-drop PATCH endpoint (line 441) similarly passes req.body to TagModel.update() without field restriction. Data integrity in transit is ensured by TLS (nginx handles SSL termination with TLSv1.2/1.3 only, strong cipher suites). The CSRF gap means any form submission can be tampered with cross-origin.",
+      "risk": "high",
+      "controls_present": ["Parameterized SQL throughout all model files", "TLS 1.2/1.3 with strong ciphers on nginx", "Input validation on tag value field (regex [a-z0-9-]+)", "Transaction wrapping for multi-step place/tag operations"],
+      "gaps": ["Mass assignment via admin JSON API (req.body passed directly to model)", "No CSRF tokens — cross-origin form tampering possible", "URL field not validated for safe protocol before storage"]
+    },
+    "repudiation": {
+      "finding": "Nginx logs all requests with the standard 'main' format including IP, timestamp, URI, status, and user agent (nginx/nginx.conf:16-18). No application-level audit log exists for admin actions (create, update, delete). An admin action cannot be tied to a specific user ID in the logs — only the IP and session are traceable. There are no mechanisms to prevent an admin from denying that they performed a destructive action.",
+      "risk": "low",
+      "controls_present": ["Nginx access logging enabled", "Timestamps on all database records (created_at, updated_at)", "Session-based identity available at request time"],
+      "gaps": ["No application-level audit trail for admin CRUD operations", "Admin user identity not logged alongside mutations", "No immutable log storage (logs go to container stdout, which is ephemeral without a log aggregator)"]
+    },
+    "information_disclosure": {
+      "finding": "The public API (/api/places, /api/tags) is intentionally unauthenticated and returns only public business directory data — no user data, no session data, no internal IDs beyond UUIDs. The /admin/api/me endpoint (src/routes/admin.ts:388) returns the full req.user object (id, email, name, timestamps) without the password hash, which is acceptable. The global error handler (src/server.ts:92-95) responds to clients with only 'Internal server error' — no stack trace leaks to HTTP responses. The primary disclosure risk is the EC2 instance ID in the public workflow file and the default password hash in the migration.",
+      "risk": "medium",
+      "controls_present": ["Error handler returns generic message to client", "password_hash field stripped before placing user in session", "Public API returns only necessary fields", "Separate public and admin routing"],
+      "gaps": ["EC2 instance ID hardcoded in public CI/CD workflow", "Default password hash committed to version control", "Full stack traces logged to container stdout in production", "No CSP on public site (facilitates data exfiltration if XSS is exploited)"]
+    },
+    "denial_of_service": {
+      "finding": "Nginx applies rate limiting to the public API (10r/s, burst 20) and the login endpoint (5r/m, burst 5). No rate limiting is applied to authenticated admin CRUD endpoints or the admin JSON API. The admin tag PATCH endpoint is called once per row on every drag-drop reorder event (src/views/admin/tags/index.ejs:216-219), firing N parallel requests where N is the total number of tags — this is a minor amplification path for a logged-in attacker. The database connection pool is bounded at 20 connections (src/db.ts:6). The process.exit(-1) call on pool error (src/db.ts:13-15) is a self-DoS vector if the database becomes transiently unavailable.",
+      "risk": "low",
+      "controls_present": ["Nginx rate limiting on public API and login endpoint", "DB connection pool bounded at max 20", "Redis session store prevents session memory exhaustion in Node"],
+      "gaps": ["No rate limiting on admin CRUD/API endpoints", "process.exit(-1) on idle pool error causes self-DoS on transient DB issues", "No request body size limit configured explicitly (Express defaults apply)"]
+    },
+    "elevation_of_privilege": {
+      "finding": "The application runs as a non-root user inside the container (Dockerfile:26-49, user 'nodejs' uid 1001). The Docker network isolates app, postgres, and redis on an internal bridge with only nginx exposed externally. The admin subdomain routing is done at the application layer based on hostname (src/server.ts:58-68), not at nginx. This means any request to the main site at /admin/* will reach admin routes if the Host header can be manipulated — however, requireAuth is applied via router.use(requireAuth) at line 60 of admin.ts, so unauthenticated requests are redirected to login regardless of Host routing. No privilege escalation path from public user to admin was found beyond the CSRF chain. The admin API has no role hierarchy — all authenticated users are equivalent admins.",
+      "risk": "low",
+      "controls_present": ["Container runs as non-root (nodejs uid 1001)", "requireAuth middleware applied via router.use() covering all routes below it", "Docker internal network isolates postgres and redis", "Admin actions require active session"],
+      "gaps": ["No IP allowlisting on admin subdomain (any IP can attempt admin login)", "Subdomain routing logic in application layer rather than nginx — relies on Host header", "No multi-factor authentication on admin login", "CSRF gap allows privilege actions if admin session is active and admin visits attacker page"]
+    }
+  },
+  "secrets_scan": {
+    "clean": false,
+    "findings": [
+      {
+        "description": "Bcrypt hash of the documented default admin password 'changeme123' hardcoded in version-controlled migration file",
+        "file": "migrations/1706457600001_seed-admin-user.js",
+        "line": 13,
+        "severity": "high",
+        "remediation": "Remove the DEFAULT_PASSWORD_HASH constant and the plaintext password from the comment. Generate a secure random password at deployment time and inject it via a secrets manager rather than committing any credential or its hash to source control."
+      },
+      {
+        "description": "Hardcoded session secret fallback string 'dev-secret-change-in-production' in application startup code",
+        "file": "src/server.ts",
+        "line": 47,
+        "severity": "medium",
+        "remediation": "Remove the fallback string. Require SESSION_SECRET to be explicitly set in the environment and throw a startup error if it is absent or too short."
+      },
+      {
+        "description": "Hardcoded development database credentials in .env.example (password 'eve_dev_password')",
+        "file": ".env.example",
+        "line": 4,
+        "severity": "low",
+        "remediation": "This is an example file and the credentials are for local development only — acceptable. Ensure .env is in .gitignore (confirmed present) and that production values are never placed in .env.example."
+      }
+    ]
+  }
+}
