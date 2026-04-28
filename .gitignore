@@ -38,3 +38,8 @@ npm-debug.log*
 
 # Testing
 coverage/
+tmp/
+
+# Factory
+.factory/
+.factory-run/
