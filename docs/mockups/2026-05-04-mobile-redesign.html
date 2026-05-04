@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EVE — directory layouts (v2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:     #16110C;
+    --paper2:    #1F1812;
+    --card:      #231C15;
+    --ink:       #F5EBDA;
+    --ink2:      #C4B49C;
+    --ink3:      #8B7E69;
+    --line:      rgba(245,235,218,0.14);
+    --line-strong: rgba(245,235,218,0.22);
+    --accent:    #F09060;
+    --accentDeep:#E07B3F;
+
+    --happyBg:   rgba(224,123,63,0.16);
+    --happyFg:   #F09060;
+    --musicBg:   rgba(122,91,184,0.20);
+    --musicFg:   #B399E0;
+    --closingBg: rgba(208,74,40,0.18);
+    --closingFg: #E37257;
+    --walkinBg:  rgba(63,184,113,0.16);
+    --walkinFg:  #5FCB8E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #08060a;
+    color: var(--ink);
+    font-family: 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .page { padding: 56px 40px 96px; max-width: 1480px; margin: 0 auto; }
+
+  .page-header { margin-bottom: 40px; color: var(--ink2); }
+  .page-header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 38px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .page-header p { font-size: 14px; line-height: 1.6; max-width: 760px; }
+  .page-header p + p { margin-top: 8px; }
+  .page-header code { color: var(--accent); font-size: 12.5px; }
+
+  .section-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 64px 0 36px;
+  }
+  .section-h {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .section-sub { font-size: 13px; color: var(--ink2); margin-bottom: 28px; max-width: 720px; line-height: 1.55; }
+
+  .phones { display: flex; gap: 36px; flex-wrap: wrap; align-items: flex-start; }
+  .phone-col { display: flex; flex-direction: column; gap: 14px; width: 375px; }
+  .phone-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink3);
+    font-weight: 600;
+  }
+
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: var(--paper);
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 8px #1a1a1a, 0 0 0 9px #2a2a2a;
+  }
+
+  .scroll-area { height: 100%; overflow: hidden; position: relative; }
+
+  /* ─── Status bar ─────────────────────────────────────────────────────────── */
+  .status-bar {
+    height: 47px;
+    padding: 14px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+  .status-icons .bars { display: inline-flex; gap: 2px; align-items: flex-end; }
+  .status-icons .bars span { width: 3px; background: var(--ink); border-radius: 1px; display: block; }
+  .status-icons .bars span:nth-child(1) { height: 4px; }
+  .status-icons .bars span:nth-child(2) { height: 6px; }
+  .status-icons .bars span:nth-child(3) { height: 8px; }
+  .status-icons .bars span:nth-child(4) { height: 10px; }
+  .status-icons .battery {
+    width: 24px; height: 11px;
+    border: 1px solid var(--ink); border-radius: 3px;
+    position: relative; padding: 1px;
+  }
+  .status-icons .battery::after {
+    content: ''; position: absolute; right: -3px; top: 3px;
+    width: 1.5px; height: 4px; background: var(--ink); border-radius: 1px;
+  }
+  .status-icons .battery::before {
+    content: ''; display: block; width: 78%; height: 100%;
+    background: var(--ink); border-radius: 1px;
+  }
+
+  /* ─── Masthead ─────────────────────────────────────────────────────────── */
+  .masthead { padding: 12px 22px 0; }
+  .eyebrow {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--ink3); margin-bottom: 4px;
+  }
+  .masthead-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px; line-height: 1.05;
+    color: var(--ink); letter-spacing: -0.02em;
+  }
+  .masthead-title em { font-style: italic; }
+
+  /* ─── Search + filter ─────────────────────────────────────────────────── */
+  .search-row { display: flex; gap: 8px; padding: 14px 22px 0; align-items: center; }
+  .search {
+    flex: 1; height: 40px;
+    border-radius: 999px;
+    background: var(--paper2); border: 1px solid var(--line);
+    display: flex; align-items: center; padding: 0 16px;
+    color: var(--ink3); font-size: 14px; gap: 8px;
+  }
+  .search-icon {
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--ink3); border-radius: 999px;
+    position: relative; flex-shrink: 0;
+  }
+  .search-icon::after {
+    content: ''; position: absolute; bottom: -4px; right: -2px;
+    width: 5px; height: 1.5px; background: var(--ink3);
+    transform: rotate(45deg); border-radius: 1px;
+  }
+  .filter-btn {
+    width: 40px; height: 40px; border-radius: 999px;
+    background: var(--paper2); border: 1px solid var(--line);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; flex-shrink: 0;
+  }
+  .filter-btn span { height: 2px; background: var(--ink); border-radius: 1px; display: block; }
+  .filter-btn span:nth-child(1) { width: 16px; }
+  .filter-btn span:nth-child(2) { width: 12px; }
+  .filter-btn span:nth-child(3) { width: 8px; }
+
+  /* ─── Filter rail ─────────────────────────────────────────────────────── */
+  .rail { display: flex; gap: 8px; padding: 14px 22px 8px; overflow: hidden; }
+  .chip {
+    flex: 0 0 auto;
+    height: 32px; padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line); background: var(--paper2);
+    font-size: 13px; font-weight: 500; color: var(--ink2);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .chip.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .chip .count { font-size: 11px; font-weight: 600; color: var(--ink3); }
+  .chip.active .count { color: rgba(22,17,12,0.6); }
+
+  /* ─── List rows ──────────────────────────────────────────────────────── */
+  .list { padding: 8px 22px 0; }
+  .row {
+    display: flex; gap: 14px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    align-items: center;
+  }
+  .row:first-child { border-top: none; padding-top: 8px; }
+  .row .text { flex: 1; min-width: 0; }
+  .row .name {
+    font-family: 'Schibsted Grotesk', sans-serif;
+    font-weight: 600; font-size: 19px;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    line-height: 1.2;
+  }
+  .row .meta {
+    margin-top: 4px;
+    font-size: 13px; color: var(--ink3);
+    line-height: 1.4; font-weight: 500;
+  }
+  .row .specials-line {
+    margin-top: 6px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 13.5px; color: var(--ink2);
+    line-height: 1.4;
+    overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .row .signals { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .pip {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 22px; padding: 0 9px;
+    border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    line-height: 1;
+  }
+  .pip .dot { width: 6px; height: 6px; border-radius: 999px; }
+  .pip.happy   { background: var(--happyBg);   color: var(--happyFg); }
+  .pip.happy   .dot { background: var(--happyFg); }
+  .pip.music   { background: var(--musicBg);   color: var(--musicFg); }
+  .pip.music   .dot { background: var(--musicFg); }
+  .pip.walkin  { background: var(--walkinBg);  color: var(--walkinFg); }
+  .pip.walkin  .dot { background: var(--walkinFg); }
+  .pip.closing { background: var(--closingBg); color: var(--closingFg); }
+  .pip.closing .dot { background: var(--closingFg); }
+
+  /* ─── Thumbnails (real photos and fallbacks) ─────────────────────────── */
+  .thumb {
+    width: 72px; height: 72px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--line-strong);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Real-photo gradient fakes (for places that have a real photo) */
+  .photo-jimmys  { background: linear-gradient(135deg, #2d1810 0%, #4a2818 50%, #1a0d08 100%); }
+  .photo-monas   { background: linear-gradient(160deg, #1a1d2e 0%, #3a2a4e 50%, #14101e 100%); }
+
+  /* ─── FALLBACK COMPOSITIONS ─────────────────────────────────────────── */
+
+  /* Single typographic element per fallback. Either initials OR full name —
+     never both. No corner labels, no badges, no ornaments. Variety comes from
+     palette + composition + the place name itself. */
+
+  .fb {
+    width: 100%; height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    padding: 10px;
+  }
+  .fb::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent 0,
+      transparent 2px,
+      rgba(255,255,255,0.012) 2px,
+      rgba(255,255,255,0.012) 3px
+    );
+    pointer-events: none;
+  }
+
+  /* Palettes — driven by hash(place_id) so each place gets a stable colour. */
+  .pal-1 { background: radial-gradient(120% 100% at 30% 30%, #4a2818 0%, #2a160b 50%, #14080a 100%); }
+  .pal-2 { background: radial-gradient(120% 100% at 30% 30%, #2a3a26 0%, #16241c 60%, #0a140f 100%); }
+  .pal-3 { background: radial-gradient(120% 100% at 30% 30%, #3d2a1f 0%, #251810 60%, #120a06 100%); }
+  .pal-4 { background: radial-gradient(120% 100% at 30% 30%, #3a1a3a 0%, #20102a 60%, #0e0820 100%); }
+  .pal-5 { background: radial-gradient(120% 100% at 30% 30%, #3a1416 0%, #20080c 60%, #0e0408 100%); }
+  .pal-6 { background: radial-gradient(120% 100% at 30% 30%, #2a3346 0%, #161e2c 60%, #0a0f18 100%); }
+
+  /* Composition A — full name in bold caps sans, bottom-left anchored. */
+  .fb.cA { align-items: flex-end; justify-content: flex-start; }
+  .fb.cA .name {
+    font-family: 'Schibsted Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.92);
+    position: relative;
+  }
+
+  /* Composition B — initials only, huge, centered, Instrument Serif. */
+  .fb.cB { align-items: center; justify-content: center; }
+  .fb.cB .initials {
+    font-family: 'Instrument Serif', serif;
+    font-size: 38px;
+    letter-spacing: -0.04em;
+    color: rgba(255,255,255,0.95);
+    line-height: 1;
+    position: relative;
+  }
+
+  /* Composition C — full name in italic serif, centered. */
+  .fb.cC { align-items: center; justify-content: center; }
+  .fb.cC .name {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: rgba(255,255,255,0.94);
+    line-height: 1.05;
+    text-align: center;
+    letter-spacing: -0.01em;
+    position: relative;
+  }
+
+  /* Bookmark icon */
+  .row .bookmark-btn {
+    width: 32px; height: 32px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink3);
+  }
+  .row .bookmark-btn::before {
+    content: '';
+    width: 12px; height: 16px;
+    border: 1.5px solid currentColor;
+    border-bottom: none;
+    border-radius: 1px 1px 0 0;
+  }
+
+  /* ─── Tab bar ────────────────────────────────────────────────────────── */
+  .tabbar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 84px;
+    background: rgba(22,17,12,0.92);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--line);
+    display: flex; justify-content: space-around;
+    padding: 10px 0 28px;
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--ink3); font-size: 11px; font-weight: 500; width: 64px;
+  }
+  .tab.active { color: var(--ink); }
+  .tab .glyph { width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 4px; }
+
+  /* ─── Detail view ─────────────────────────────────────────────────────── */
+  .hero {
+    height: 320px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 0;
+  }
+  .hero-fade {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 35%, rgba(22,17,12,0.5) 70%, rgba(22,17,12,0.97) 100%);
+    pointer-events: none;
+  }
+  .hero-photo-real {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #2d1810 0%, #4a2818 50%, #1a0d08 100%);
+  }
+  .hero-back {
+    position: absolute; top: 60px; left: 22px;
+    width: 36px; height: 36px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink);
+  }
+  .hero-back::before {
+    content: ''; width: 8px; height: 8px;
+    border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translate(1px, -1px);
+  }
+  .hero-bookmark {
+    position: absolute; top: 60px; right: 22px;
+    width: 36px; height: 36px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-bookmark::before {
+    content: ''; width: 12px; height: 14px;
+    border: 1.5px solid currentColor; border-bottom: none;
+    border-radius: 1px 1px 0 0;
+  }
+  .hero-text {
+    position: relative;
+    width: 100%;
+    padding: 0 22px 22px;
+  }
+  .hero-text .pip-row { margin-bottom: 12px; }
+  .hero-text .name {
+    font-family: 'Schibsted Grotesk', sans-serif;
+    font-size: 32px; font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em; line-height: 1.04;
+  }
+  .hero-text .meta {
+    margin-top: 8px;
+    font-size: 12px; color: var(--ink2);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  .detail-content { padding: 24px 22px 0; }
+  .detail-content > * + * { margin-top: 24px; }
+
+  .specials-card {
+    background: var(--paper2);
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .specials-card .label {
+    font-family: 'Schibsted Grotesk', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .specials-card .body {
+    font-family: 'Source Serif 4', serif;
+    font-size: 15.5px;
+    line-height: 1.55;
+    color: var(--ink);
+    white-space: pre-line;
+  }
+
+  .notes-block {
+    font-family: 'Source Serif 4', serif;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink2);
+    font-style: italic;
+  }
+
+  .contact-rows { border-top: 1px solid var(--line); }
+  .contact-rows .crow {
+    display: flex; gap: 12px; align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px; color: var(--ink); font-weight: 500;
+  }
+  .contact-rows .label {
+    width: 72px;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    font-size: 10px; color: var(--ink3); font-weight: 600;
+    flex-shrink: 0;
+  }
+  .contact-rows .value { flex: 1; line-height: 1.4; }
+  .contact-rows .chev {
+    width: 7px; height: 7px;
+    border-right: 1.5px solid var(--ink3); border-top: 1.5px solid var(--ink3);
+    transform: rotate(45deg); flex-shrink: 0;
+  }
+
+  .tag-rail { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    height: 28px; padding: 0 12px;
+    border-radius: 999px;
+    background: var(--paper2);
+    color: var(--ink2);
+    font-size: 12px; font-weight: 500;
+    display: inline-flex; align-items: center;
+  }
+
+  .cta-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(22,17,12,0.94);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--line);
+    display: flex; gap: 10px;
+    padding: 12px 18px 28px;
+  }
+  .cta-primary {
+    flex: 1; border-radius: 999px;
+    background: var(--ink); color: var(--paper);
+    height: 46px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .cta-secondary {
+    border-radius: 999px;
+    border: 1.5px solid var(--ink); color: var(--ink);
+    height: 46px; padding: 0 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .scroll-pad { height: 130px; }
+
+  /* ─── Sparse detail ──────────────────────────────────────────────────── */
+  .sparse-back {
+    width: 36px; height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--line); background: var(--paper2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink);
+    margin: 8px 22px 0;
+  }
+  .sparse-back::before {
+    content: ''; width: 8px; height: 8px;
+    border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translate(1px, -1px);
+  }
+  .sparse-fallback {
+    margin: 16px 22px 0;
+    height: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+  }
+  .sparse-header {
+    padding: 22px 22px 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sparse-header .kicker {
+    font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink3); font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .sparse-header .name {
+    font-family: 'Schibsted Grotesk', sans-serif;
+    font-weight: 700; font-size: 32px;
+    color: var(--ink);
+    letter-spacing: -0.02em; line-height: 1.04;
+  }
+  .sparse-content { padding: 0 22px; }
+
+  /* ─── Annotation captions ────────────────────────────────────────────── */
+  .annotations {
+    font-size: 12.5px;
+    color: var(--ink2);
+    line-height: 1.55;
+    padding: 6px 4px 0;
+  }
+  .annotations strong { color: var(--ink); font-weight: 600; }
+  .annotations ul { margin: 6px 0 0 16px; padding: 0; }
+  .annotations li + li { margin-top: 4px; }
+
+  /* ─── Fallback gallery ───────────────────────────────────────────────── */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+  .gallery .slot { display: flex; flex-direction: column; gap: 8px; }
+  .gallery .frame {
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    background: var(--card);
+  }
+  .gallery .cap {
+    font-size: 11px; color: var(--ink3);
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .gallery .cap strong { color: var(--ink); font-weight: 600; }
+
+  /* Larger fallback for gallery — same composition rules, bigger type. */
+  .gallery .fb { padding: 18px; }
+  .gallery .fb.cA .name { font-size: 22px; letter-spacing: 0.005em; }
+  .gallery .fb.cB .initials { font-size: 84px; }
+  .gallery .fb.cC .name { font-size: 28px; }
+
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <h1>EVE — directory layouts (v2)</h1>
+    <p>Cutting all the editorial fields (<code>pitch / perfect / insider / crowd / vibe</code>). The reliable content is what's in the legacy admin form: <code>name</code>, <code>address</code>, <code>phone</code>, <code>url</code>, <code>specials</code>, <code>categories</code>, <code>notes</code>, <code>tags</code>, plus Google enrichment (hours, price, lat/lng) when present.</p>
+    <p>Specials text is the editorial content. Notes is secondary. The detail page is a <em>directory entry</em>, not an article. Fallback art uses only the place name (or initials) — no corner labels, no badges, no ornaments. Palette and composition are both hashed from the place ID, so each place gets a stable, distinct look without depending on category metadata we may not have.</p>
+  </div>
+
+  <div class="phones">
+
+    <!-- ───────────── PHONE 1: LIST ───────────── -->
+    <div class="phone-col">
+      <div class="phone-label">List · only fields that actually exist</div>
+      <div class="phone">
+        <div class="scroll-area">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="status-icons">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"></span>
+            </span>
+          </div>
+
+          <div class="masthead">
+            <div class="eyebrow">Tue · 6:24pm · East Village</div>
+            <div class="masthead-title"><em>142 spots</em>.</div>
+          </div>
+
+          <div class="search-row">
+            <div class="search">
+              <span class="search-icon"></span>
+              <span>Search places, tags…</span>
+            </div>
+            <div class="filter-btn"><span></span><span></span><span></span></div>
+          </div>
+
+          <div class="rail">
+            <div class="chip active">Open now <span class="count">61</span></div>
+            <div class="chip">Happy hour <span class="count">22</span></div>
+            <div class="chip">Live music <span class="count">8</span></div>
+            <div class="chip">Outdoor</div>
+          </div>
+
+          <div class="list">
+
+            <!-- Real photo + specials text -->
+            <div class="row">
+              <div class="thumb photo-jimmys"></div>
+              <div class="text">
+                <div class="name">Jimmy's No. 43</div>
+                <div class="meta">Dive bar · 43 E 7th St</div>
+                <div class="specials-line">$5 happy hour 4–7pm M–F · $3 well drinks all night Tuesday</div>
+              </div>
+              <div class="bookmark-btn"></div>
+            </div>
+
+            <!-- Fallback (initials, palette 1) + signal -->
+            <div class="row">
+              <div class="thumb">
+                <div class="fb cB pal-1"><span class="initials">DH</span></div>
+              </div>
+              <div class="text">
+                <div class="name">Doc Holliday's</div>
+                <div class="meta">141 Avenue A</div>
+                <div class="signals">
+                  <span class="pip walkin"><span class="dot"></span>Open now</span>
+                </div>
+              </div>
+              <div class="bookmark-btn"></div>
+            </div>
+
+            <!-- Fallback (name in caps, palette 2) + specials -->
+            <div class="row">
+              <div class="thumb">
+                <div class="fb cA pal-2"><span class="name">SOPHIE'S</span></div>
+              </div>
+              <div class="text">
+                <div class="name">Sophie's</div>
+                <div class="meta">507 E 5th St</div>
+                <div class="specials-line">$2 PBR til 8pm everyday. Cash only.</div>
+              </div>
+              <div class="bookmark-btn"></div>
+            </div>
+
+            <!-- Real photo + signal (Mona's) -->
+            <div class="row">
+              <div class="thumb photo-monas"></div>
+              <div class="text">
+                <div class="name">Mona's</div>
+                <div class="meta">224 Avenue B</div>
+                <div class="signals">
+                  <span class="pip music"><span class="dot"></span>Live tonight · 9pm</span>
+                </div>
+              </div>
+              <div class="bookmark-btn"></div>
+            </div>
+
+            <!-- Fallback (italic name, palette 4) — sparse: only name + address -->
+            <div class="row">
+              <div class="thumb">
+                <div class="fb cC pal-4"><span class="name">Niagara</span></div>
+              </div>
+              <div class="text">
+                <div class="name">Niagara</div>
+                <div class="meta">112 Avenue A</div>
+              </div>
+              <div class="bookmark-btn"></div>
+            </div>
+
+            <!-- Fallback (initials, palette 6) — minimal: name + address + phone -->
+            <div class="row">
+              <div class="thumb">
+                <div class="fb cB pal-6"><span class="initials">TL</span></div>
+              </div>
+              <div class="text">
+                <div class="name">The Library</div>
+                <div class="meta">7 Avenue A · (212) 477-7747</div>
+              </div>
+              <div class="bookmark-btn"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab active"><span class="glyph"></span><span>List</span></div>
+          <div class="tab"><span class="glyph"></span><span>Map</span></div>
+          <div class="tab"><span class="glyph"></span><span>Saved</span></div>
+        </div>
+      </div>
+      <div class="annotations">
+        <strong>Fields used in this row</strong>
+        <ul>
+          <li><strong>Photo</strong> — real if present, otherwise category-fallback art (varied per place).</li>
+          <li><strong>Name</strong> (always).</li>
+          <li><strong>Meta line</strong> — kind/category + address. Falls back to address only.</li>
+          <li><strong>Specials excerpt</strong> — first ~80 chars of <code>specials</code> if populated. Hidden if empty.</li>
+          <li><strong>Signal pip</strong> — "Open now" / "Happy hour" / "Live tonight". Computed from Google enrichment <code>hours_json</code> + tags. Hidden if no data.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ───────────── PHONE 2: DETAIL (RICH) ───────────── -->
+    <div class="phone-col">
+      <div class="phone-label">Detail · with specials, notes, hours</div>
+      <div class="phone">
+        <div class="scroll-area">
+          <div class="hero">
+            <div class="hero-photo-real"></div>
+            <div class="hero-fade"></div>
+            <div class="hero-back"></div>
+            <div class="hero-bookmark"></div>
+            <div class="hero-text">
+              <div class="pip-row">
+                <span class="pip happy"><span class="dot"></span>Happy hour · til 7</span>
+              </div>
+              <div class="name">Jimmy's No. 43</div>
+              <div class="meta">Dive bar · 43 E 7th St</div>
+            </div>
+          </div>
+
+          <div class="detail-content">
+            <div class="specials-card">
+              <div class="label">Specials</div>
+              <div class="body">$5 happy hour 4–7pm M–F
+$3 well drinks all night Tuesday
+$1 oysters Sunday 5–9pm</div>
+            </div>
+
+            <div class="notes-block">
+              Cash &amp; card. Belgian beer list on the chalkboard. Back garden open seasonally.
+            </div>
+
+            <div class="contact-rows">
+              <div class="crow">
+                <span class="label">Address</span>
+                <span class="value">43 E 7th St</span>
+                <span class="chev"></span>
+              </div>
+              <div class="crow">
+                <span class="label">Phone</span>
+                <span class="value">(212) 982-3006</span>
+                <span class="chev"></span>
+              </div>
+              <div class="crow">
+                <span class="label">Hours</span>
+                <span class="value">Open now · closes 4am</span>
+              </div>
+              <div class="crow">
+                <span class="label">Web</span>
+                <span class="value">jimmysno43.com</span>
+                <span class="chev"></span>
+              </div>
+            </div>
+
+            <div class="tag-rail">
+              <span class="tag">Dive</span>
+              <span class="tag">Belgian beer</span>
+              <span class="tag">Late night</span>
+              <span class="tag">Outdoor</span>
+            </div>
+
+            <div class="scroll-pad"></div>
+          </div>
+
+          <div class="cta-bar">
+            <div class="cta-primary">Get directions</div>
+            <div class="cta-secondary">Call</div>
+          </div>
+        </div>
+      </div>
+      <div class="annotations">
+        <strong>Fields used on this page</strong>
+        <ul>
+          <li><strong>Photo</strong> if present, else category fallback (full-width hero).</li>
+          <li><strong>Specials</strong> in a labeled card — preserves line breaks, treats it as the editorial content.</li>
+          <li><strong>Notes</strong> as a small italic paragraph below specials. Hidden if empty.</li>
+          <li><strong>Contact rows</strong> — address / phone / hours (Google) / web. Each row hidden if its field is empty.</li>
+          <li><strong>Tags</strong> as small chips at the bottom. Hidden if empty.</li>
+          <li>No "PERFECT WHEN" / "THE MOVE" / "WHO'S THERE" sections. Those fields aren't being cut from the schema, just from the rendering.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ───────────── PHONE 3: DETAIL (SPARSE) ───────────── -->
+    <div class="phone-col">
+      <div class="phone-label">Detail · only name + address (true minimum)</div>
+      <div class="phone">
+        <div class="scroll-area">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span class="status-icons">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"></span>
+            </span>
+          </div>
+
+          <div class="sparse-back"></div>
+
+          <div class="sparse-fallback">
+            <div class="fb cC pal-4"><span class="name" style="font-size: 32px;">Niagara</span></div>
+          </div>
+
+          <div class="sparse-header">
+            <div class="kicker">Bar · East Village</div>
+            <div class="name">Niagara</div>
+          </div>
+
+          <div class="sparse-content">
+            <div style="margin-top: 4px;" class="contact-rows">
+              <div class="crow">
+                <span class="label">Address</span>
+                <span class="value">112 Avenue A</span>
+                <span class="chev"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cta-bar">
+            <div class="cta-primary">Get directions</div>
+          </div>
+        </div>
+      </div>
+      <div class="annotations">
+        <strong>What's on this page</strong>
+        <ul>
+          <li><strong>Fallback art</strong> — category-keyed, replaces the missing photo. Looks intentional.</li>
+          <li><strong>Kicker + name</strong> — small kind label + name in Schibsted Grotesk bold.</li>
+          <li><strong>One contact row</strong> (address). One CTA (Get directions).</li>
+          <li>Same template as the rich page — every block self-hides when its field is empty.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ───────────── FALLBACK GALLERY ───────────── -->
+  <div class="section-divider"></div>
+  <h2 class="section-h">Fallback art — initials and names only</h2>
+  <p class="section-sub">Each fallback is a single typographic element: either initials (composition B) or full name in caps sans (A) or italic serif (C). No corner labels, no badges, no ornaments — nothing that depends on metadata we may not have. Variety comes from palette + composition + the place name itself. Palette and composition are both picked deterministically from a hash of the place ID, so each place gets a stable look but neighbours don't collide.</p>
+
+  <div class="gallery">
+
+    <div class="slot">
+      <div class="frame"><div class="fb cA pal-1"><span class="name">JIMMY'S NO. 43</span></div></div>
+      <div class="cap"><strong>Jimmy's No. 43</strong><br>name · caps sans</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cB pal-1"><span class="initials">DH</span></div></div>
+      <div class="cap"><strong>Doc Holliday's</strong><br>initials · serif</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cC pal-1"><span class="name">Sophie's</span></div></div>
+      <div class="cap"><strong>Sophie's</strong><br>name · italic serif</div>
+    </div>
+
+    <div class="slot">
+      <div class="frame"><div class="fb cA pal-2"><span class="name">MCSORLEY'S OLD ALE HOUSE</span></div></div>
+      <div class="cap"><strong>McSorley's</strong><br>name · caps sans</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cB pal-2"><span class="initials">M</span></div></div>
+      <div class="cap"><strong>Mona's</strong><br>initials · serif</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cC pal-2"><span class="name">The Library</span></div></div>
+      <div class="cap"><strong>The Library</strong><br>name · italic serif</div>
+    </div>
+
+    <div class="slot">
+      <div class="frame"><div class="fb cA pal-3"><span class="name">ABRAÇO</span></div></div>
+      <div class="cap"><strong>Abraço</strong><br>name · caps sans</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cB pal-3"><span class="initials">B</span></div></div>
+      <div class="cap"><strong>Black Cat LES</strong><br>initials · serif</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cC pal-3"><span class="name">Ninth Street</span></div></div>
+      <div class="cap"><strong>Ninth Street</strong><br>name · italic serif</div>
+    </div>
+
+    <div class="slot">
+      <div class="frame"><div class="fb cA pal-4"><span class="name">DEATH &amp; CO</span></div></div>
+      <div class="cap"><strong>Death &amp; Co</strong><br>name · caps sans</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cB pal-4"><span class="initials">PD</span></div></div>
+      <div class="cap"><strong>PDT</strong><br>initials · serif</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cC pal-4"><span class="name">Niagara</span></div></div>
+      <div class="cap"><strong>Niagara</strong><br>name · italic serif</div>
+    </div>
+
+    <div class="slot">
+      <div class="frame"><div class="fb cA pal-5"><span class="name">MANITOBA'S</span></div></div>
+      <div class="cap"><strong>Manitoba's</strong><br>name · caps sans</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cB pal-5"><span class="initials">OS</span></div></div>
+      <div class="cap"><strong>Otto's Shrunken Head</strong><br>initials · serif</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cC pal-5"><span class="name">Doc Holliday's</span></div></div>
+      <div class="cap"><strong>Doc Holliday's</strong><br>name · italic serif</div>
+    </div>
+
+    <div class="slot">
+      <div class="frame"><div class="fb cA pal-6"><span class="name">VESELKA</span></div></div>
+      <div class="cap"><strong>Veselka</strong><br>name · caps sans</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cB pal-6"><span class="initials">BH</span></div></div>
+      <div class="cap"><strong>B&amp;H Dairy</strong><br>initials · serif</div>
+    </div>
+    <div class="slot">
+      <div class="frame"><div class="fb cC pal-6"><span class="name">Odessa</span></div></div>
+      <div class="cap"><strong>Odessa</strong><br>name · italic serif</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
