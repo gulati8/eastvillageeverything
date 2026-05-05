@@ -126,6 +126,17 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
   if (process.env.NODE_ENV !== 'production') {
     console.error(err.stack);
   }
+  // Render HTML for admin browser navigations; JSON for everything else
+  // (public API, admin AJAX endpoints under /admin/api).
+  const isAdminHtml =
+    req.path.startsWith('/admin') &&
+    !req.path.startsWith('/admin/api') &&
+    req.accepts(['html', 'json']) === 'html';
+
+  if (isAdminHtml) {
+    res.status(500).render('error', { message: 'Internal server error' });
+    return;
+  }
   res.status(500).json({ error: 'Internal server error' });
 });
 

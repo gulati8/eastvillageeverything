@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { PlaceModel, TagModel, UserModel } from '../models/index.js';
 import { requireAuth } from '../middleware/auth.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.get('/login', (req: Request, res: Response) => {
 });
 
 // Login handler
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -40,7 +41,7 @@ router.post('/login', async (req: Request, res: Response) => {
   req.session.user = user;
 
   res.redirect('/admin/places');
-});
+}));
 
 // Logout handler
 router.post('/logout', (req: Request, res: Response) => {
@@ -69,7 +70,7 @@ router.get('/', (req: Request, res: Response) => {
 // =====================================================
 
 // List places
-router.get('/places', async (req: Request, res: Response) => {
+router.get('/places', asyncHandler(async (req: Request, res: Response) => {
   const sortBy = (req.query.sort_by as string) || 'name';
   const sortOrder = (req.query.sort_order as string) || 'asc';
 
@@ -105,10 +106,10 @@ router.get('/places', async (req: Request, res: Response) => {
     sortOrder,
     user: req.user
   });
-});
+}));
 
 // New place form
-router.get('/places/new', async (req: Request, res: Response) => {
+router.get('/places/new', asyncHandler(async (req: Request, res: Response) => {
   const { parents, standalone } = await TagModel.findAllStructured();
   res.render('admin/places/form', {
     place: null,
@@ -117,10 +118,10 @@ router.get('/places/new', async (req: Request, res: Response) => {
     user: req.user,
     errors: []
   });
-});
+}));
 
 // Create place
-router.post('/places', async (req: Request, res: Response) => {
+router.post('/places', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
     cross_street, photo_url, photo_credit
@@ -164,10 +165,10 @@ router.post('/places', async (req: Request, res: Response) => {
   });
 
   res.redirect('/admin/places');
-});
+}));
 
 // Edit place form
-router.get('/places/:id/edit', async (req: Request, res: Response) => {
+router.get('/places/:id/edit', asyncHandler(async (req: Request, res: Response) => {
   const place = await PlaceModel.findById(getParamId(req.params.id));
   if (!place) {
     return res.status(404).send('Place not found');
@@ -182,10 +183,10 @@ router.get('/places/:id/edit', async (req: Request, res: Response) => {
     user: req.user,
     errors: []
   });
-});
+}));
 
 // Update place
-router.post('/places/:id', async (req: Request, res: Response) => {
+router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
     cross_street, photo_url, photo_credit
@@ -233,30 +234,30 @@ router.post('/places/:id', async (req: Request, res: Response) => {
   }
 
   res.redirect('/admin/places');
-});
+}));
 
 // Delete place
-router.post('/places/:id/delete', async (req: Request, res: Response) => {
+router.post('/places/:id/delete', asyncHandler(async (req: Request, res: Response) => {
   await PlaceModel.delete(getParamId(req.params.id));
   res.redirect('/admin/places');
-});
+}));
 
 // =====================================================
 // Tags CRUD
 // =====================================================
 
 // List tags
-router.get('/tags', async (req: Request, res: Response) => {
+router.get('/tags', asyncHandler(async (req: Request, res: Response) => {
   const structuredTags = await TagModel.findAllStructured();
   res.render('admin/tags/index', {
     parents: structuredTags.parents,
     standalone: structuredTags.standalone,
     user: req.user
   });
-});
+}));
 
 // New tag form
-router.get('/tags/new', async (req: Request, res: Response) => {
+router.get('/tags/new', asyncHandler(async (req: Request, res: Response) => {
   const potentialParents = await TagModel.getPotentialParents();
   res.render('admin/tags/form', {
     tag: null,
@@ -264,10 +265,10 @@ router.get('/tags/new', async (req: Request, res: Response) => {
     user: req.user,
     errors: []
   });
-});
+}));
 
 // Create tag
-router.post('/tags', async (req: Request, res: Response) => {
+router.post('/tags', asyncHandler(async (req: Request, res: Response) => {
   const { value, display, sort_order, parent_tag_id } = req.body;
 
   const errors: string[] = [];
@@ -307,10 +308,10 @@ router.post('/tags', async (req: Request, res: Response) => {
   });
 
   res.redirect('/admin/tags');
-});
+}));
 
 // Edit tag form
-router.get('/tags/:id/edit', async (req: Request, res: Response) => {
+router.get('/tags/:id/edit', asyncHandler(async (req: Request, res: Response) => {
   const tagId = getParamId(req.params.id);
   const tag = await TagModel.findById(tagId);
   if (!tag) {
@@ -326,10 +327,10 @@ router.get('/tags/:id/edit', async (req: Request, res: Response) => {
     user: req.user,
     errors: []
   });
-});
+}));
 
 // Update tag
-router.post('/tags/:id', async (req: Request, res: Response) => {
+router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
   const { value, display, sort_order, parent_tag_id } = req.body;
   const tagId = getParamId(req.params.id);
 
@@ -374,10 +375,10 @@ router.post('/tags/:id', async (req: Request, res: Response) => {
   }
 
   res.redirect('/admin/tags');
-});
+}));
 
 // Delete tag confirmation page
-router.get('/tags/:id/delete', async (req: Request, res: Response) => {
+router.get('/tags/:id/delete', asyncHandler(async (req: Request, res: Response) => {
   const tag = await TagModel.findById(getParamId(req.params.id));
   if (!tag) {
     return res.status(404).send('Tag not found');
@@ -391,18 +392,18 @@ router.get('/tags/:id/delete', async (req: Request, res: Response) => {
     affectedPlaces,
     user: req.user
   });
-});
+}));
 
 // Delete tag (confirmed)
-router.post('/tags/:id/delete', async (req: Request, res: Response) => {
+router.post('/tags/:id/delete', asyncHandler(async (req: Request, res: Response) => {
   await TagModel.delete(getParamId(req.params.id));
   res.redirect('/admin/tags');
-});
+}));
 
 // JSON endpoint used by tags/index.ejs drag-drop reorder.
 // CSRF-protected via the token round-tripped through the EJS template
 // (`<%= csrfToken %>`) and sent as `x-csrf-token` header by the fetch caller.
-router.patch('/api/tags/:id', async (req: Request, res: Response) => {
+router.patch('/api/tags/:id', asyncHandler(async (req: Request, res: Response) => {
   const { value, display, sort_order, parent_tag_id } = req.body;
   const tag = await TagModel.update(getParamId(req.params.id), {
     ...(value !== undefined && { value }),
@@ -414,6 +415,6 @@ router.patch('/api/tags/:id', async (req: Request, res: Response) => {
     return res.status(404).json({ error: 'Tag not found' });
   }
   res.json(tag);
-});
+}));
 
 export default router;
