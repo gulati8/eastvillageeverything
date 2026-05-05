@@ -9,10 +9,11 @@ import {
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../theme/useTheme';
-import { FILTER_SECTIONS } from '../data/filterSections';
+import type { FilterSection } from '../data/deriveFilterSections';
 
 interface FilterSheetProps {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
+  sections: FilterSection[];
   activeFilters: Map<string, Set<string>>; // sectionKey → active chip values
   chipCounts: Record<string, number>; // chipValue → count
   matchCount: number;
@@ -25,6 +26,7 @@ const SNAP_POINTS = ['76%'];
 
 export function FilterSheet({
   bottomSheetRef,
+  sections,
   activeFilters,
   chipCounts,
   matchCount,
@@ -123,7 +125,7 @@ export function FilterSheet({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {FILTER_SECTIONS.map((section) => {
+        {sections.map((section) => {
           const activeSectionFilters = activeFilters.get(section.key) ?? new Set<string>();
 
           return (

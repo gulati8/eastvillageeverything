@@ -15,7 +15,9 @@ import { router } from 'expo-router';
 import BottomSheet from '@gorhom/bottom-sheet';
 
 import { usePlacesList } from '../api/places';
+import { useTagsStructured } from '../api/tags';
 import { transformPlace } from '../data/transformPlace';
+import { deriveFilterSections } from '../data/deriveFilterSections';
 import { useFilterState } from '../state/useFilterState';
 import { PlaceRow } from '../components/PlaceRow';
 import { SearchBar } from '../components/SearchBar';
@@ -76,6 +78,13 @@ export function PlaceList() {
     [rawData],
   );
 
+  // Tags taxonomy for server-driven filter sections
+  const { data: tagsData } = useTagsStructured();
+  const filterSections = React.useMemo(
+    () => (tagsData ? deriveFilterSections(tagsData) : []),
+    [tagsData],
+  );
+
   // Filter state
   const {
     activeFilters,
@@ -91,7 +100,7 @@ export function PlaceList() {
     activeFilterCount,
     chipCounts,
     railChips,
-  } = useFilterState(allPlaces);
+  } = useFilterState(allPlaces, filterSections);
 
   // Filtered + sorted places for the list
   const displayPlaces = React.useMemo(
@@ -310,6 +319,7 @@ export function PlaceList() {
       {/* 5. FilterSheet — rendered at bottom, controlled by ref */}
       <FilterSheet
         bottomSheetRef={bottomSheetRef}
+        sections={filterSections}
         activeFilters={activeFilters}
         chipCounts={chipCounts}
         matchCount={matchCount}
