@@ -254,13 +254,9 @@ npm run typecheck
 ```
 Expected: pass.
 
-- [ ] **Step 5: Commit (if any change)**
+- [x] **Step 5: No commit needed**
 
-```bash
-git commit -am "mobile: ensure PlaceV2Display covers fields transformPlace will populate"
-```
-
-If no change needed in this task, skip the commit and note in the plan: `Task 4 — no changes needed; type already covers required fields.`
+Verified `PlaceV2Display` already covers all fields transformPlace will populate (`pitch`, `perfect`, `insider`, `crowd`, `vibe`, `crowdLevel`, `priceTier`, `photo`, `photoCredit`, `cross`, `hours`). No type change required.
 
 ---
 
@@ -1055,7 +1051,9 @@ git commit -m "server: add limit/offset pagination on /api/places (default 100, 
 
 ---
 
-#### Task 14 — Delete dead `/admin/api/*` block
+#### Task 14 — Trim dead `/admin/api/*` endpoints (NOT delete the whole block)
+
+**Note from execution:** The audit was wrong about the entire block being dead. `src/views/admin/tags/index.ejs:194` calls `PATCH /admin/api/tags/:id` for drag-drop reorder, with the CSRF token round-tripped via `<%= csrfToken %>` + `x-csrf-token` header. That one endpoint stays. The other 9 (GET /me, GET/POST/PUT/DELETE places, GET tags variants, DELETE tags) were truly unused and were deleted. See commit `0f852ad`.
 
 **Files:**
 - MODIFY: `src/routes/admin.ts`
@@ -1334,6 +1332,8 @@ git commit -am "admin: confirm getPotentialParents enforces 2-level cap; comment
 
 #### Task 18 — Render admin tags index hierarchically
 
+**Note from execution:** This was already done in the codebase before Phase 1 started. `GET /admin/tags` calls `TagModel.findAllStructured()` and `src/views/admin/tags/index.ejs` renders standalone tags first, then a "Tag Groups" section with parents and indented children. No change was needed; this task was a no-op.
+
 **Files:**
 - MODIFY: `src/views/admin/tags/index.ejs`
 - (possibly) `src/routes/admin.ts` to pass the structured shape
@@ -1399,6 +1399,14 @@ git commit -am "admin: render tags index hierarchically (parents → children, t
 ### EAS / TestFlight
 
 #### Task 19 — Wire `EXPO_PUBLIC_API_BASE_URL` and Sentry DSN into `eas.json`
+
+**Note from execution:** The plan assumed a single `eas.json` at the repo root needed wiring. In fact `apps/mobile/eas.json` is the live one (EAS uses the eas.json in the working directory it's invoked from, and `eas build` will be run from `apps/mobile/`). It is **already fully configured** with:
+- `EXPO_PUBLIC_API_BASE_URL: "https://eastvillageeverything.nyc"` for both preview and production
+- A real `EXPO_PUBLIC_SENTRY_DSN` for both preview and production
+- `EXPO_PUBLIC_SENTRY_ENVIRONMENT` per profile
+- iOS submit credentials (Apple ID, Apple team ID, ASC app ID)
+
+**No changes needed for Task 19.** The root `eas.json` is a stale/empty artifact and was left alone (not deleted, since deletion wasn't explicitly authorized).
 
 **Files:**
 - MODIFY: `eas.json`
