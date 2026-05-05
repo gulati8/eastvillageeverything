@@ -154,31 +154,10 @@ export function PlaceList() {
     listRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
 
-  // Rail chip toggle — rail chips are sourced from 'move' section primarily;
-  // we use the section key that owns the chip by looking it up in railChips.
-  // However, railChips don't carry sectionKey. The task says:
-  // onChipToggle → toggleFilter('move', value) or appropriate section.
-  // Since FilterRail only exposes `value`, and we need a sectionKey, we use
-  // a lookup map built from FILTER_SECTIONS.
+  // Rail chip toggle — sectionKey is now carried on each chip from useFilterState.railChips.
   const handleRailChipToggle = useCallback(
-    (value: string) => {
-      // Find the section that owns this chip value via useFilterState railChips.
-      // railChips flattens all sections — we need to find the section key.
-      // We look up the chip in all sections via the import below.
-      // Import is inline to avoid circular dependency; filterSections is pure data.
-      const { FILTER_SECTIONS } = require('../data/filterSections') as {
-        FILTER_SECTIONS: Array<{ key: string; chips: Array<{ value: string }> }>;
-      };
-      for (const section of FILTER_SECTIONS) {
-        for (const chip of section.chips) {
-          if (chip.value === value) {
-            toggleFilter(section.key, value);
-            return;
-          }
-        }
-      }
-      // Fallback: treat as 'move'
-      toggleFilter('move', value);
+    (sectionKey: string, value: string) => {
+      toggleFilter(sectionKey, value);
     },
     [toggleFilter],
   );

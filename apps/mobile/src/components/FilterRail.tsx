@@ -14,6 +14,7 @@ interface ChipItem {
   value: string;
   label: string;
   active: boolean;
+  sectionKey: string;
 }
 
 interface FilterRailProps {
@@ -21,7 +22,7 @@ interface FilterRailProps {
   matchCount: number;
   totalCount: number;
   activeSort: SortMode;
-  onChipToggle: (value: string) => void;
+  onChipToggle: (sectionKey: string, value: string) => void;
   onSortPress: () => void;
 }
 
@@ -44,9 +45,9 @@ export function FilterRail({
   const scrollRef = useRef<ScrollView>(null);
   const chipPositions = useRef<Record<string, number>>({});
 
-  function handleChipPress(value: string, index: number) {
+  function handleChipPress(sectionKey: string, value: string, index: number) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onChipToggle(value);
+    onChipToggle(sectionKey, value);
 
     const xPos = chipPositions.current[value];
     if (xPos !== undefined && scrollRef.current) {
@@ -73,7 +74,7 @@ export function FilterRail({
               onLayout={(e) => {
                 chipPositions.current[chip.value] = e.nativeEvent.layout.x;
               }}
-              onPress={() => handleChipPress(chip.value, index)}
+              onPress={() => handleChipPress(chip.sectionKey, chip.value, index)}
               style={[
                 styles.chip,
                 {

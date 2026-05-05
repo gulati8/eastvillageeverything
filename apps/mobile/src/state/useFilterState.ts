@@ -26,7 +26,7 @@ export interface UseFilterStateReturn {
   chipCounts: Record<string, number>;
 
   // For rail
-  railChips: Array<{ value: string; label: string; active: boolean }>;
+  railChips: Array<{ value: string; label: string; active: boolean; sectionKey: string }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -336,7 +336,7 @@ export function useFilterState(allPlaces: PlaceV2Display[] = []): UseFilterState
   // --------------------------------------------------------------------------
 
   const railChips = useMemo(() => {
-    const chips: Array<{ value: string; label: string; active: boolean }> = [];
+    const chips: Array<{ value: string; label: string; active: boolean; sectionKey: string }> = [];
     for (const section of FILTER_SECTIONS) {
       const activeChips = activeFilters.get(section.key) ?? new Set<string>();
       for (const chip of section.chips) {
@@ -344,6 +344,7 @@ export function useFilterState(allPlaces: PlaceV2Display[] = []): UseFilterState
           value: chip.value,
           label: chip.label,
           active: activeChips.has(chip.value),
+          sectionKey: section.key,
         });
       }
     }
