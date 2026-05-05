@@ -6,9 +6,6 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "ios": {
-        "image": "macos-sonoma-14.6-xcode-16.0"
-      },
       "env": {
         "EXPO_PUBLIC_SENTRY_ENVIRONMENT": "development",
         "SENTRY_ORG": "gulati-labs",
@@ -17,9 +14,6 @@
     },
     "preview": {
       "distribution": "internal",
-      "ios": {
-        "image": "macos-sonoma-14.6-xcode-16.0"
-      },
       "env": {
         "EXPO_PUBLIC_API_BASE_URL": "https://eastvillageeverything.nyc",
         "EXPO_PUBLIC_SENTRY_DSN": "https://287901cf680df0593157c65337e56667@o4511324193161216.ingest.us.sentry.io/4511324209217536",
@@ -29,9 +23,6 @@
       }
     },
     "production": {
-      "ios": {
-        "image": "macos-sonoma-14.6-xcode-16.0"
-      },
       "env": {
         "EXPO_PUBLIC_API_BASE_URL": "https://eastvillageeverything.nyc",
         "EXPO_PUBLIC_SENTRY_DSN": "https://287901cf680df0593157c65337e56667@o4511324193161216.ingest.us.sentry.io/4511324209217536",
