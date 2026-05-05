@@ -243,8 +243,12 @@ export class TagModel {
   }
 
   /**
-   * Get tags that can be parents (top-level tags, excluding a specific tag and its children)
-   * Used for parent dropdown in tag form
+   * Get tags that can be parents (top-level tags, excluding a specific tag and its children).
+   * Used for parent dropdown in tag form.
+   *
+   * The `WHERE parent_tag_id IS NULL` clause enforces the 2-level nesting cap:
+   * tags that already have a parent are not eligible to become parents themselves.
+   * Server-side enforcement of the same rule lives in TagModel.assertCanBeParent.
    */
   static async getPotentialParents(excludeTagId?: string): Promise<Tag[]> {
     let sql = `
