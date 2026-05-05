@@ -399,72 +399,9 @@ router.post('/tags/:id/delete', async (req: Request, res: Response) => {
   res.redirect('/admin/tags');
 });
 
-// =====================================================
-// Admin API endpoints (for potential AJAX use)
-// =====================================================
-
-// Get current user
-router.get('/api/me', (req: Request, res: Response) => {
-  res.json(req.user);
-});
-
-// Places API
-router.get('/api/places', async (req: Request, res: Response) => {
-  const places = await PlaceModel.findAll();
-  res.json(places);
-});
-
-router.get('/api/places/:id', async (req: Request, res: Response) => {
-  const place = await PlaceModel.findById(getParamId(req.params.id));
-  if (!place) {
-    return res.status(404).json({ error: 'Place not found' });
-  }
-  res.json(place);
-});
-
-router.post('/api/places', async (req: Request, res: Response) => {
-  const { name, address, phone, url, specials, categories, notes, tags } = req.body;
-  const place = await PlaceModel.create({
-    name, address, phone, url, specials, categories, notes,
-    tags: Array.isArray(tags) ? tags : tags ? [tags] : []
-  });
-  res.status(201).json(place);
-});
-
-router.put('/api/places/:id', async (req: Request, res: Response) => {
-  const { name, address, phone, url, specials, categories, notes, tags } = req.body;
-  const place = await PlaceModel.update(getParamId(req.params.id), {
-    name, address, phone, url, specials, categories, notes,
-    tags: Array.isArray(tags) ? tags : tags ? [tags] : []
-  });
-  if (!place) {
-    return res.status(404).json({ error: 'Place not found' });
-  }
-  res.json(place);
-});
-
-router.delete('/api/places/:id', async (req: Request, res: Response) => {
-  const deleted = await PlaceModel.delete(getParamId(req.params.id));
-  if (!deleted) {
-    return res.status(404).json({ error: 'Place not found' });
-  }
-  res.status(204).send();
-});
-
-// Tags API
-router.get('/api/tags', async (req: Request, res: Response) => {
-  const tags = await TagModel.findAll();
-  res.json(tags);
-});
-
-router.get('/api/tags/:id', async (req: Request, res: Response) => {
-  const tag = await TagModel.findById(getParamId(req.params.id));
-  if (!tag) {
-    return res.status(404).json({ error: 'Tag not found' });
-  }
-  res.json(tag);
-});
-
+// JSON endpoint used by tags/index.ejs drag-drop reorder.
+// CSRF-protected via the token round-tripped through the EJS template
+// (`<%= csrfToken %>`) and sent as `x-csrf-token` header by the fetch caller.
 router.patch('/api/tags/:id', async (req: Request, res: Response) => {
   const { value, display, sort_order, parent_tag_id } = req.body;
   const tag = await TagModel.update(getParamId(req.params.id), {
@@ -477,14 +414,6 @@ router.patch('/api/tags/:id', async (req: Request, res: Response) => {
     return res.status(404).json({ error: 'Tag not found' });
   }
   res.json(tag);
-});
-
-router.delete('/api/tags/:id', async (req: Request, res: Response) => {
-  const deleted = await TagModel.delete(getParamId(req.params.id));
-  if (!deleted) {
-    return res.status(404).json({ error: 'Tag not found' });
-  }
-  res.status(204).send();
 });
 
 export default router;
