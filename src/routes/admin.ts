@@ -121,7 +121,10 @@ router.get('/places/new', async (req: Request, res: Response) => {
 
 // Create place
 router.post('/places', async (req: Request, res: Response) => {
-  const { name, address, phone, url, specials, categories, notes, tags } = req.body;
+  const { name, address, phone, url, specials, categories, notes, tags,
+    pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
+    cross_street, photo_url, photo_credit
+  } = req.body;
 
   const errors: string[] = [];
   if (!name || name.trim() === '') {
@@ -147,7 +150,17 @@ router.post('/places', async (req: Request, res: Response) => {
     specials: specials?.trim(),
     categories: categories?.trim(),
     notes: notes?.trim(),
-    tags: Array.isArray(tags) ? tags : tags ? [tags] : []
+    tags: Array.isArray(tags) ? tags : tags ? [tags] : [],
+    pitch: pitch?.trim() || undefined,
+    perfect: perfect?.trim() || undefined,
+    insider: insider?.trim() || undefined,
+    crowd: crowd?.trim() || undefined,
+    vibe: vibe?.trim() || undefined,
+    crowd_level: crowd_level?.trim() || undefined,
+    price_tier: price_tier?.trim() || undefined,
+    cross_street: cross_street?.trim() || undefined,
+    photo_url: photo_url?.trim() || undefined,
+    photo_credit: photo_credit?.trim() || undefined
   });
 
   res.redirect('/admin/places');
@@ -173,7 +186,10 @@ router.get('/places/:id/edit', async (req: Request, res: Response) => {
 
 // Update place
 router.post('/places/:id', async (req: Request, res: Response) => {
-  const { name, address, phone, url, specials, categories, notes, tags } = req.body;
+  const { name, address, phone, url, specials, categories, notes, tags,
+    pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
+    cross_street, photo_url, photo_credit
+  } = req.body;
 
   const errors: string[] = [];
   if (!name || name.trim() === '') {
@@ -199,7 +215,17 @@ router.post('/places/:id', async (req: Request, res: Response) => {
     specials: specials?.trim(),
     categories: categories?.trim(),
     notes: notes?.trim(),
-    tags: Array.isArray(tags) ? tags : tags ? [tags] : []
+    tags: Array.isArray(tags) ? tags : tags ? [tags] : [],
+    pitch: pitch?.trim() || undefined,
+    perfect: perfect?.trim() || undefined,
+    insider: insider?.trim() || undefined,
+    crowd: crowd?.trim() || undefined,
+    vibe: vibe?.trim() || undefined,
+    crowd_level: crowd_level?.trim() || undefined,
+    price_tier: price_tier?.trim() || undefined,
+    cross_street: cross_street?.trim() || undefined,
+    photo_url: photo_url?.trim() || undefined,
+    photo_credit: photo_credit?.trim() || undefined
   });
 
   if (!updated) {

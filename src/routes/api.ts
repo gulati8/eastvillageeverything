@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { PlaceModel, TagModel } from '../models/index.js';
+import type { PlacesListResponse, PlaceDetailResponse, TagsFlatResponse, TagsStructuredResponse, TagSummary } from '@eve/shared-types';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ router.get('/places', async (req: Request, res: Response) => {
     const places = await PlaceModel.findAll({ tag });
 
     // Transform to match the Rails API response format
-    const response = places.map(place => ({
+    const response: PlacesListResponse = places.map(place => ({
       key: place.id,
       name: place.name,
       address: place.address,
@@ -26,8 +27,16 @@ router.get('/places', async (req: Request, res: Response) => {
       categories: place.categories,
       notes: place.notes,
       tags: place.tags,
-      created_at: place.created_at,
-      updated_at: place.updated_at
+      lat: place.lat,
+      lng: place.lng,
+      created_at: place.created_at instanceof Date ? place.created_at.toISOString() : String(place.created_at),
+      updated_at: place.updated_at instanceof Date ? place.updated_at.toISOString() : String(place.updated_at),
+      pitch: place.pitch ?? null,
+      crowd_level: place.crowd_level ?? null,
+      price_tier: place.price_tier ?? null,
+      photo_url: place.photo_url ?? null,
+      hours_json: place.hours_json ?? null,
+      cross_street: place.cross_street ?? null,
     }));
 
     res.json(response);
@@ -37,16 +46,85 @@ router.get('/places', async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/tags - List all tags
+// GET /api/places/:id - Get a single place by ID
+router.get('/places/:id', async (req: Request, res: Response) => {
+  try {
+    const place = await PlaceModel.findById(req.params.id as string);
+    if (!place) {
+      return res.status(404).json({ error: 'Place not found' });
+    }
+    const response: PlaceDetailResponse = {
+      key: place.id,
+      name: place.name,
+      address: place.address,
+      phone: place.phone,
+      url: place.url,
+      specials: place.specials,
+      categories: place.categories,
+      notes: place.notes,
+      tags: place.tags ?? [],
+      created_at: place.created_at instanceof Date ? place.created_at.toISOString() : String(place.created_at),
+      updated_at: place.updated_at instanceof Date ? place.updated_at.toISOString() : String(place.updated_at),
+      lat: place.lat ?? null,
+      lng: place.lng ?? null,
+      pitch: place.pitch ?? null,
+      perfect: place.perfect ?? null,
+      insider: place.insider ?? null,
+      crowd: place.crowd ?? null,
+      vibe: place.vibe ?? null,
+      crowd_level: place.crowd_level ?? null,
+      price_tier: place.price_tier ?? null,
+      cross_street: place.cross_street ?? null,
+      photo_url: place.photo_url ?? null,
+      photo_credit: place.photo_credit ?? null,
+      google_place_id: place.google_place_id ?? null,
+      hours_json: place.hours_json ?? null,
+      google_price_level: place.google_price_level ?? null,
+      enrichment_status: place.enrichment_status ?? null,
+      enriched_at: place.enriched_at instanceof Date ? place.enriched_at.toISOString() : (place.enriched_at ?? null),
+    };
+    res.json(response);
+  } catch (err: any) {
+    // Postgres invalid uuid throws code 22P02 — treat as 404, not 500
+    if (err && err.code === '22P02') {
+      return res.status(404).json({ error: 'Place not found' });
+    }
+    console.error('Error fetching place by id:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/tags - List all tags; ?structured=1 returns hierarchical shape
 router.get('/tags', async (req: Request, res: Response) => {
   try {
-    const tags = await TagModel.findAll();
+    if (req.query.structured === '1') {
+      const structuredRows = await TagModel.findAllStructured();
+      const response: TagsStructuredResponse = {
+        parents: structuredRows.parents.map(p => ({
+          value: p.value,
+          display: p.display,
+          order: String(p.sort_order),
+          children: p.children.map(c => ({
+            value: c.value,
+            display: c.display,
+            order: String(c.sort_order),
+          })),
+        })),
+        standalone: structuredRows.standalone.map(s => ({
+          value: s.value,
+          display: s.display,
+          order: String(s.sort_order),
+        })),
+      };
+      return res.json(response);
+    }
 
-    // Transform to match the Rails API response format
-    const response = tags.map(tag => ({
-      value: tag.value,
-      display: tag.display,
-      order: String(tag.sort_order)
+    // Project to trimmed API shape — existing consumers depend on { value, display, order } exactly
+    const rows = await TagModel.findAll();
+    const response: TagsFlatResponse = rows.map((t): TagSummary => ({
+      value: t.value,
+      display: t.display,
+      order: String(t.sort_order),
     }));
 
     res.json(response);

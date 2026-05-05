@@ -1,31 +1,14 @@
 import { query, withTransaction } from '../db.js';
 import type { PoolClient } from 'pg';
+import type { Tag, TagWithChildren, StructuredTags, TagWithChildrenRow, StructuredTagRows } from '@eve/shared-types';
 
-export interface Tag {
-  id: string;
-  value: string;
-  display: string;
-  sort_order: number;
-  parent_tag_id: string | null;
-  has_children: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
+export type { Tag, TagWithChildren, StructuredTags, TagWithChildrenRow, StructuredTagRows };
 
 export interface TagInput {
   value: string;
   display: string;
   sort_order: number;
   parent_tag_id?: string | null;
-}
-
-export interface TagWithChildren extends Tag {
-  children: Tag[];
-}
-
-export interface StructuredTags {
-  parents: TagWithChildren[];
-  standalone: Tag[];
 }
 
 export class TagModel {
@@ -45,7 +28,7 @@ export class TagModel {
    * Find all tags structured for UI display
    * Returns parent tags with their children, plus standalone tags
    */
-  static async findAllStructured(): Promise<StructuredTags> {
+  static async findAllStructured(): Promise<StructuredTagRows> {
     const allTags = await TagModel.findAll();
 
     // Separate parents (has_children = true) from children and standalone
@@ -64,7 +47,7 @@ export class TagModel {
     }
 
     // Build result with children nested under parents
-    const parents: TagWithChildren[] = parentTags.map(parent => ({
+    const parents: TagWithChildrenRow[] = parentTags.map(parent => ({
       ...parent,
       children: childrenByParent.get(parent.id) || []
     }));

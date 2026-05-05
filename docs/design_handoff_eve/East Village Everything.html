@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>East Village Everything — Lifestyle Overhaul</title>
+<meta name="viewport" content="width=1400">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #1F1A14; }
+  body { font-family: "Source Serif 4", Georgia, serif; }
+  @keyframes eve-spin { to { transform: rotate(360deg); } }
+  @keyframes eve-pulse { 0%,100% { opacity: 0.55; } 50% { opacity: 0.95; } }
+  *::-webkit-scrollbar { display: none; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="eve-tokens.jsx"></script>
+<script type="text/babel" src="eve-data.jsx"></script>
+<script type="text/babel" src="eve-phone.jsx"></script>
+<script type="text/babel" src="eve-hero.jsx"></script>
+<script type="text/babel" src="eve-list.jsx"></script>
+<script type="text/babel" src="eve-anatomy.jsx"></script>
+<script type="text/babel" src="eve-detail.jsx"></script>
+<script type="text/babel" src="eve-admin.jsx"></script>
+<script type="text/babel" src="eve-spec.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+  function App() {
+    return (
+      <DesignCanvas defaultZoom={0.6}>
+        <DCSection id="rationale" title="01 · The vibe" subtitle="Lifestyle directory · Urban Daddy meets Zillow · friend-voice copy">
+          <DCArtboard id="spec" label="Design system v2" width={880} height={1880}>
+            <EveSpecSheet/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="list" title="02 · The sharp list view" subtitle="Most decisions happen here, not on detail. Live signals, distance, price, vibe — every row earns its space.">
+          <DCArtboard id="list-light" label="Tonight feed · Light" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveListScreen dark={false} activeFilters={['tonight']}/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="list-dark" label="Tonight feed · Dark" width={406} height={816}>
+            <EvePhone dark={true} width={390} height={800}>
+              <EveListScreen dark={true} activeFilters={['tonight']}/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="list-filters" label="Filter sheet open" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveListScreen dark={false} activeFilters={['happy','dive','$']} filterOpen={true}/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="list-multi" label="Multi-filter active" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveListScreen dark={false} activeFilters={['tonight','happy','late','date']} sort="closing"/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="list-anatomy" label="Row anatomy" width={880} height={520}>
+            <RowAnatomy/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="detail" title="03 · The detail screen" subtitle="For when the row wasn't enough — the full pitch, hours, insider tip.">
+          <DCArtboard id="detail-light" label="Place · Light" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveDetailScreen dark={false} place={EVE_PLACES[5]}/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="detail-dark" label="Place · Dark" width={406} height={816}>
+            <EvePhone dark={true} width={390} height={800}>
+              <EveDetailScreen dark={true} place={EVE_PLACES[1]}/>
+            </EvePhone>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="fallback" title="04 · When there's no photo" subtitle="Three approaches when a place hasn't been shot — pick one (or mix). Plus the admin upload sheet.">
+          <DCArtboard id="cat-card" label="Row · Category fallback (Mona's)" width={406} height={260}>
+            <div style={{ background: '#FBF6EE', height: '100%', padding: '20px 22px' }}>
+              <div style={{ fontFamily: EVE.fonts.ui, fontSize: 11, fontWeight: 700, color: '#8C7E6C', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>A · Category photo · honest stand-in</div>
+              <PlaceRow place={{...EVE_PLACES[1], photo: null}} dark={false}/>
+            </div>
+          </DCArtboard>
+          <DCArtboard id="typo-card" label="Row · Typographic (Niagara)" width={406} height={260}>
+            <div style={{ background: '#FBF6EE', height: '100%', padding: '20px 22px' }}>
+              <div style={{ fontFamily: EVE.fonts.ui, fontSize: 11, fontWeight: 700, color: '#8C7E6C', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>B · Typographic · no photo at all</div>
+              <PlaceRow place={{...EVE_PLACES[4], photo: null}} dark={false}/>
+            </div>
+          </DCArtboard>
+          <DCArtboard id="real-card" label="Row · Real photo (for ref)" width={406} height={260}>
+            <div style={{ background: '#FBF6EE', height: '100%', padding: '20px 22px' }}>
+              <div style={{ fontFamily: EVE.fonts.ui, fontSize: 11, fontWeight: 700, color: '#8C7E6C', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 14 }}>C · Real submitted photo</div>
+              <PlaceRow place={EVE_PLACES[0]} dark={false}/>
+            </div>
+          </DCArtboard>
+
+          <DCArtboard id="detail-cat" label="Detail · Category fallback" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveDetailScreen dark={false} place={EVE_PLACES[1]} heroMode="category"/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="detail-typo" label="Detail · Typographic" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveDetailScreen dark={false} place={EVE_PLACES[4]} heroMode="typographic"/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="admin-upload" label="Admin · Add a photo" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveAdminUploadSheet dark={false} place={EVE_PLACES[1]}/>
+            </EvePhone>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection id="states" title="05 · States" subtitle="Loading · refreshing · empty · error — friend-voice everywhere">
+          <DCArtboard id="skeleton" label="Loading" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveListSkeleton dark={false}/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="refresh" label="Pull to refresh" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveListScreen dark={false} activeFilters={['tonight']} refreshing={true}/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="empty" label="Empty filter" width={406} height={816}>
+            <EvePhone dark={false} width={390} height={800}>
+              <EveListScreen dark={false} activeFilters={['brunch']} empty={true}/>
+            </EvePhone>
+          </DCArtboard>
+          <DCArtboard id="error-dark" label="Error · Dark" width={406} height={816}>
+            <EvePhone dark={true} width={390} height={800}>
+              <EveListScreen dark={true} activeFilters={['tonight']} error={true}/>
+            </EvePhone>
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

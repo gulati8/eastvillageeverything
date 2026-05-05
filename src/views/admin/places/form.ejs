@@ -86,6 +86,85 @@
         </div>
       </div>
 
+      <div class="card mb-4">
+        <div class="card-header"><strong>Editorial</strong></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="pitch" class="form-label">Pitch</label>
+                <textarea class="form-control" id="pitch" name="pitch" rows="2" placeholder="Friend-voice pitch, 1-2 sentences"><%= place ? place.pitch || '' : '' %></textarea>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="perfect" class="form-label">Perfect When</label>
+                <textarea class="form-control" id="perfect" name="perfect" rows="2" placeholder="Perfect when you want to..."><%= place ? place.perfect || '' : '' %></textarea>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="insider" class="form-label">Insider Tip</label>
+                <textarea class="form-control" id="insider" name="insider" rows="2" placeholder="Insider tip — order the..."><%= place ? place.insider || '' : '' %></textarea>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="crowd" class="form-label">Crowd</label>
+                <input type="text" class="form-control" id="crowd" name="crowd" value="<%= place ? place.crowd || '' : '' %>" placeholder="Locals, NYU grads who never left">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="vibe" class="form-label">Vibe</label>
+                <input type="text" class="form-control" id="vibe" name="vibe" value="<%= place ? place.vibe || '' : '' %>" placeholder="Loud · Cash only · No frills">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="crowd_level" class="form-label">Crowd Level</label>
+                <select class="form-select" id="crowd_level" name="crowd_level">
+                  <option value=""></option>
+                  <option value="quiet" <%= place && place.crowd_level === 'quiet' ? 'selected' : '' %>>Quiet</option>
+                  <option value="moderate" <%= place && place.crowd_level === 'moderate' ? 'selected' : '' %>>Moderate</option>
+                  <option value="busy" <%= place && place.crowd_level === 'busy' ? 'selected' : '' %>>Busy</option>
+                  <option value="packed" <%= place && place.crowd_level === 'packed' ? 'selected' : '' %>>Packed</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="price_tier" class="form-label">Price Tier</label>
+                <select class="form-select" id="price_tier" name="price_tier">
+                  <option value=""></option>
+                  <option value="$" <%= place && place.price_tier === '$' ? 'selected' : '' %>>$</option>
+                  <option value="$$" <%= place && place.price_tier === '$$' ? 'selected' : '' %>>$$</option>
+                  <option value="$$$" <%= place && place.price_tier === '$$$' ? 'selected' : '' %>>$$$</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="cross_street" class="form-label">Cross Street</label>
+                <input type="text" class="form-control" id="cross_street" name="cross_street" value="<%= place ? place.cross_street || '' : '' %>" placeholder="btwn Aves A &amp; B">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="photo_credit" class="form-label">Photo Credit</label>
+                <input type="text" class="form-control" id="photo_credit" name="photo_credit" value="<%= place ? place.photo_credit || '' : '' %>" placeholder="Submitted by @username">
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="photo_url" class="form-label">Photo URL</label>
+                <input type="url" class="form-control" id="photo_url" name="photo_url" value="<%= place ? place.photo_url || '' : '' %>" placeholder="https://...">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="mb-4">
         <label class="form-label">Tags</label>
 

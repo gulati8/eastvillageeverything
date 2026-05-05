@@ -1,19 +1,8 @@
 import { query, withTransaction } from '../db.js';
 import type { PoolClient } from 'pg';
+import type { Place } from '@eve/shared-types';
 
-export interface Place {
-  id: string;
-  name: string;
-  address: string | null;
-  phone: string | null;
-  url: string | null;
-  specials: string | null;
-  categories: string | null;
-  notes: string | null;
-  tags: string[]; // Array of tag values
-  created_at: Date;
-  updated_at: Date;
-}
+export type { Place };
 
 export interface PlaceInput {
   name: string;
@@ -24,6 +13,16 @@ export interface PlaceInput {
   categories?: string;
   notes?: string;
   tags?: string[];
+  pitch?: string;
+  perfect?: string;
+  insider?: string;
+  crowd?: string;
+  vibe?: string;
+  crowd_level?: string;
+  price_tier?: string;
+  cross_street?: string;
+  photo_url?: string;
+  photo_credit?: string;
 }
 
 // Normalize phone to digits only
@@ -57,6 +56,10 @@ export class PlaceModel {
         p.id, p.name, p.address, p.phone, p.url,
         p.specials, p.categories, p.notes,
         p.created_at, p.updated_at,
+        p.lat, p.lng,
+        p.pitch, p.perfect, p.insider, p.crowd, p.vibe,
+        p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit,
+        p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         COALESCE(
           array_agg(t.value ORDER BY t.sort_order) FILTER (WHERE t.value IS NOT NULL),
           ARRAY[]::varchar[]
@@ -97,6 +100,10 @@ export class PlaceModel {
         p.id, p.name, p.address, p.phone, p.url,
         p.specials, p.categories, p.notes,
         p.created_at, p.updated_at,
+        p.lat, p.lng,
+        p.pitch, p.perfect, p.insider, p.crowd, p.vibe,
+        p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit,
+        p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         COALESCE(
           array_agg(t.value ORDER BY t.sort_order) FILTER (WHERE t.value IS NOT NULL),
           ARRAY[]::varchar[]
@@ -119,8 +126,9 @@ export class PlaceModel {
     return withTransaction(async (client: PoolClient) => {
       // Insert the place
       const insertSql = `
-        INSERT INTO places (name, address, phone, url, specials, categories, notes)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO places (name, address, phone, url, specials, categories, notes,
+          pitch, perfect, insider, crowd, vibe, crowd_level, price_tier, cross_street, photo_url, photo_credit)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         RETURNING id, name, address, phone, url, specials, categories, notes, created_at, updated_at
       `;
 
@@ -131,7 +139,17 @@ export class PlaceModel {
         validateUrl(data.url),
         data.specials || null,
         data.categories || null,
-        data.notes || null
+        data.notes || null,
+        data.pitch || null,
+        data.perfect || null,
+        data.insider || null,
+        data.crowd || null,
+        data.vibe || null,
+        data.crowd_level || null,
+        data.price_tier || null,
+        data.cross_street || null,
+        validateUrl(data.photo_url),
+        data.photo_credit || null
       ]);
 
       const place = placeResult.rows[0];
@@ -183,6 +201,46 @@ export class PlaceModel {
       if (data.notes !== undefined) {
         updates.push(`notes = $${paramIndex++}`);
         params.push(data.notes || null);
+      }
+      if (data.pitch !== undefined) {
+        updates.push(`pitch = $${paramIndex++}`);
+        params.push(data.pitch || null);
+      }
+      if (data.perfect !== undefined) {
+        updates.push(`perfect = $${paramIndex++}`);
+        params.push(data.perfect || null);
+      }
+      if (data.insider !== undefined) {
+        updates.push(`insider = $${paramIndex++}`);
+        params.push(data.insider || null);
+      }
+      if (data.crowd !== undefined) {
+        updates.push(`crowd = $${paramIndex++}`);
+        params.push(data.crowd || null);
+      }
+      if (data.vibe !== undefined) {
+        updates.push(`vibe = $${paramIndex++}`);
+        params.push(data.vibe || null);
+      }
+      if (data.crowd_level !== undefined) {
+        updates.push(`crowd_level = $${paramIndex++}`);
+        params.push(data.crowd_level || null);
+      }
+      if (data.price_tier !== undefined) {
+        updates.push(`price_tier = $${paramIndex++}`);
+        params.push(data.price_tier || null);
+      }
+      if (data.cross_street !== undefined) {
+        updates.push(`cross_street = $${paramIndex++}`);
+        params.push(data.cross_street || null);
+      }
+      if (data.photo_url !== undefined) {
+        updates.push(`photo_url = $${paramIndex++}`);
+        params.push(validateUrl(data.photo_url));
+      }
+      if (data.photo_credit !== undefined) {
+        updates.push(`photo_credit = $${paramIndex++}`);
+        params.push(data.photo_credit || null);
       }
 
       // Always update updated_at
