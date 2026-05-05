@@ -11,10 +11,14 @@ const router = Router();
 
 // GET /api/places - List all places, optionally filtered by tag
 router.get('/places', async (req: Request, res: Response) => {
-  const tag = req.query.tag as string | undefined;
+  const tag = typeof req.query.tag === 'string' ? req.query.tag : undefined;
+  const limitRaw = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : NaN;
+  const offsetRaw = typeof req.query.offset === 'string' ? parseInt(req.query.offset, 10) : NaN;
+  const limit = Number.isFinite(limitRaw) ? limitRaw : undefined;
+  const offset = Number.isFinite(offsetRaw) ? offsetRaw : undefined;
 
   try {
-    const places = await PlaceModel.findAll({ tag });
+    const places = await PlaceModel.findAll({ tag, limit, offset });
 
     // Transform to match the Rails API response format
     const response: PlacesListResponse = places.map(place => ({

@@ -50,7 +50,7 @@ export class PlaceModel {
   /**
    * Find all places, optionally filtered by tag
    */
-  static async findAll(options?: { tag?: string }): Promise<Place[]> {
+  static async findAll(options?: { tag?: string; limit?: number; offset?: number }): Promise<Place[]> {
     let sql = `
       SELECT
         p.id, p.name, p.address, p.phone, p.url,
@@ -86,6 +86,12 @@ export class PlaceModel {
       GROUP BY p.id
       ORDER BY p.name ASC
     `;
+
+    const limit = Math.min(Math.max(1, options?.limit ?? 100), 200);
+    const offset = Math.max(0, options?.offset ?? 0);
+    sql += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(String(limit));
+    params.push(String(offset));
 
     const result = await query<Place>(sql, params);
     return result.rows;
