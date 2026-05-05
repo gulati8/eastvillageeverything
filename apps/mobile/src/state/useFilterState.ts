@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { FILTER_SECTIONS } from '../data/filterSections';
+import { useEffect, useMemo, useState } from 'react';
+import type { FilterSection } from '../data/deriveFilterSections';
 import type { PlaceV2Display, SortMode } from '../data/placeV2Display';
 
 // ---------------------------------------------------------------------------
@@ -36,64 +36,28 @@ export interface UseFilterStateReturn {
 /**
  * Build the initial empty active-filters map: one empty Set per section key.
  */
-function buildEmptyFilters(): Map<string, Set<string>> {
+function buildEmptyFilters(sections: FilterSection[]): Map<string, Set<string>> {
   const map = new Map<string, Set<string>>();
-  for (const section of FILTER_SECTIONS) {
+  for (const section of sections) {
     map.set(section.key, new Set<string>());
   }
   return map;
 }
 
 /**
- * Returns true if the place's tags array contains a value that includes
- * `chip` as a case-insensitive substring.
+ * Pure tag-match: a chip matches a place if its `value` is in `place.tags`.
+ * Case-sensitive, exact match. No substring. No special-casing by section.
  */
-function tagsContain(tags: string[], chip: string): boolean {
-  const lower = chip.toLowerCase();
-  return tags.some((t) => t.toLowerCase().includes(lower));
+export function matchesChipPure(place: PlaceV2Display, chipValue: string): boolean {
+  return place.tags.includes(chipValue);
 }
 
 /**
- * Returns true if `place` matches the given chip within the given section.
- * This is the core matching function used for both filtering and chip-count
- * computation.
+ * Returns true if `place` matches the given chip value.
+ * Delegates to matchesChipPure.
  */
-function matchesChip(place: PlaceV2Display, sectionKey: string, chipValue: string): boolean {
-  switch (sectionKey) {
-    case 'move': {
-      // Match against tags (case-insensitive contains)
-      return tagsContain(place.tags, chipValue);
-    }
-
-    case 'type': {
-      // Match against category or kind or tags
-      const lower = chipValue.toLowerCase();
-      if (place.category?.toLowerCase().includes(lower)) return true;
-      if (place.kind?.toLowerCase().includes(lower)) return true;
-      if (tagsContain(place.tags, chipValue)) return true;
-      return false;
-    }
-
-    case 'when': {
-      // Match against tags (now/late/24h/brunch)
-      return tagsContain(place.tags, chipValue);
-    }
-
-    case 'price': {
-      // Match against priceTier
-      return place.priceTier === chipValue;
-    }
-
-    case 'vibe': {
-      // Match against tags or vibe field
-      if (tagsContain(place.tags, chipValue)) return true;
-      if (place.vibe?.toLowerCase().includes(chipValue.toLowerCase())) return true;
-      return false;
-    }
-
-    default:
-      return false;
-  }
+function matchesChip(place: PlaceV2Display, chipValue: string): boolean {
+  return matchesChipPure(place, chipValue);
 }
 
 /**
@@ -104,12 +68,11 @@ function matchesChip(place: PlaceV2Display, sectionKey: string, chipValue: strin
  */
 function matchesSection(
   place: PlaceV2Display,
-  sectionKey: string,
   activeChips: Set<string>,
 ): boolean {
   if (activeChips.size === 0) return true;
   for (const chip of activeChips) {
-    if (matchesChip(place, sectionKey, chip)) return true;
+    if (matchesChip(place, chip)) return true;
   }
   return false;
 }
@@ -122,8 +85,8 @@ function matchesAllSections(
   place: PlaceV2Display,
   activeFilters: Map<string, Set<string>>,
 ): boolean {
-  for (const [sectionKey, activeChips] of activeFilters) {
-    if (!matchesSection(place, sectionKey, activeChips)) return false;
+  for (const activeChips of activeFilters.values()) {
+    if (!matchesSection(place, activeChips)) return false;
   }
   return true;
 }
@@ -235,10 +198,38 @@ function applySort(places: PlaceV2Display[], sortMode: SortMode): PlaceV2Display
 // Hook
 // ---------------------------------------------------------------------------
 
-export function useFilterState(allPlaces: PlaceV2Display[] = []): UseFilterStateReturn {
-  const [activeFilters, setActiveFilters] = useState<Map<string, Set<string>>>(buildEmptyFilters);
+export function useFilterState(
+  allPlaces: PlaceV2Display[] = [],
+  sections: FilterSection[] = [],
+): UseFilterStateReturn {
+  const [activeFilters, setActiveFilters] = useState<Map<string, Set<string>>>(
+    () => buildEmptyFilters(sections),
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [sortMode, setSortMode] = useState<SortMode>('az');
+
+  // Sync activeFilters keys when sections change (sections arrive asynchronously)
+  useEffect(() => {
+    setActiveFilters((prev) => {
+      let changed = false;
+      const next = new Map(prev);
+      // Add any newly-arrived section keys
+      for (const section of sections) {
+        if (!next.has(section.key)) {
+          next.set(section.key, new Set<string>());
+          changed = true;
+        }
+      }
+      // Remove keys for sections that no longer exist (rare; defensive)
+      for (const existingKey of next.keys()) {
+        if (!sections.some((s) => s.key === existingKey)) {
+          next.delete(existingKey);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [sections]);
 
   // --------------------------------------------------------------------------
   // Actions
@@ -259,7 +250,7 @@ export function useFilterState(allPlaces: PlaceV2Display[] = []): UseFilterState
   }
 
   function clearFilters(): void {
-    setActiveFilters(buildEmptyFilters());
+    setActiveFilters(buildEmptyFilters(sections));
     setSearchQuery('');
   }
 
@@ -317,7 +308,7 @@ export function useFilterState(allPlaces: PlaceV2Display[] = []): UseFilterState
     // Pre-filter by search query — chip counts are marginal over text-filtered results
     const searchFiltered = applySearch(allPlaces, searchQuery);
 
-    for (const section of FILTER_SECTIONS) {
+    for (const section of sections) {
       // Build a hypothetical activeFilters with only this chip active in this section
       for (const chip of section.chips) {
         const hypothetical = new Map(activeFilters);
@@ -329,7 +320,7 @@ export function useFilterState(allPlaces: PlaceV2Display[] = []): UseFilterState
     }
 
     return counts;
-  }, [activeFilters, allPlaces, searchQuery]);
+  }, [activeFilters, allPlaces, searchQuery, sections]);
 
   // --------------------------------------------------------------------------
   // Derived: railChips
@@ -337,7 +328,7 @@ export function useFilterState(allPlaces: PlaceV2Display[] = []): UseFilterState
 
   const railChips = useMemo(() => {
     const chips: Array<{ value: string; label: string; active: boolean; sectionKey: string }> = [];
-    for (const section of FILTER_SECTIONS) {
+    for (const section of sections) {
       const activeChips = activeFilters.get(section.key) ?? new Set<string>();
       for (const chip of section.chips) {
         chips.push({
@@ -349,7 +340,7 @@ export function useFilterState(allPlaces: PlaceV2Display[] = []): UseFilterState
       }
     }
     return chips;
-  }, [activeFilters]);
+  }, [activeFilters, sections]);
 
   // --------------------------------------------------------------------------
 
