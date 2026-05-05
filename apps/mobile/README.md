@@ -20,11 +20,12 @@ physical device. Note that `localhost` only works from the iOS Simulator.
 | Profile | EXPO_PUBLIC_API_BASE_URL | Defined in |
 | --- | --- | --- |
 | dev (local) | per-machine, set in `apps/mobile/.env` | `.env` |
-| preview (EAS internal build) | `https://staging.eastvillageeverything.com` | `eas.json` |
-| production (TestFlight / Play) | `https://eastvillageeverything.com` | `eas.json` |
+| preview (EAS internal distribution) | `https://eastvillageeverything.nyc` | `eas.json` |
+| production (TestFlight) | `https://eastvillageeverything.nyc` | `eas.json` |
 
-If staging is not yet provisioned, the preview build talks to production.
-That is acceptable for v1. Update `eas.json` once staging exists.
+There is no separate staging environment yet. Both `preview` and `production`
+profiles point at the live production API. When staging is provisioned, change
+the `preview` profile's `EXPO_PUBLIC_API_BASE_URL` in `eas.json`.
 
 ## API contract
 
@@ -49,10 +50,36 @@ ngrok http 3000
 
 ## Build pipeline
 
-EAS Build profiles in `eas.json`:
-- `development` — for `expo-dev-client`
-- `preview` — internal distribution
-- `production` — store distribution
+Build profiles in `apps/mobile/eas.json`:
+- `development` — for `expo-dev-client` (debugger attached, internal distribution)
+- `preview` — internal distribution, points at the prod API
+- `production` — TestFlight / App Store distribution; `autoIncrement: true` bumps the build number on every build
+
+### Local build (recommended)
+
+```bash
+cd apps/mobile
+eas build --local --profile production --platform ios
+```
+
+Produces a signed `.ipa` on disk at `apps/mobile/build-<timestamp>.ipa`. ~10–15 min on an Apple Silicon Mac. Bypasses EAS Cloud build quota.
+
+Local prerequisites:
+- Xcode 16.1+ (`xcodebuild -version`)
+- Fastlane (`brew install fastlane`)
+- An Apple distribution certificate + provisioning profile registered with the EAS project (the first run prompts to reuse or create them)
+
+### Submit to App Store Connect
+
+```bash
+eas submit --profile production --platform ios --path apps/mobile/build-<timestamp>.ipa
+```
+
+The first run interactively prompts for App Store Connect auth (Apple ID + 2FA, or an ASC API key). EAS caches the credential for future runs, so subsequent submits can run non-interactively.
+
+### TestFlight internal testers
+
+Internal testers live in the `Team (Expo)` group in App Store Connect. The `submit.production.ios.groups` field in `eas.json` references this group exactly so future submits auto-attach the new build. The group itself must be created manually in App Store Connect once. Add testers to it via TestFlight → Internal Testing → `Team (Expo)` → + Testers.
 
 See [Expo EAS docs](https://docs.expo.dev/build/introduction/).
 
@@ -97,7 +124,7 @@ Set `EXPO_PUBLIC_SENTRY_DSN` in `.env` to enable crash reporting locally. See
 
 ## Tests
 
-`jest` + `ts-jest` via the `jest-expo` preset.
+`jest` with the `ts-jest` preset (Node test environment, no React Native runtime mock — most tests are pure data/logic). See `apps/mobile/jest.config.js` and `apps/mobile/jest.setup.ts` for setup, including the virtual mocks for `expo-secure-store`, `expo-haptics`, `react-native-reanimated`, and `react-native-gesture-handler`.
 
 ```bash
 cd apps/mobile && npm test

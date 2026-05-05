@@ -1,10 +1,13 @@
-# East Village Everything - Deployment Guide
+# East Village Everything — Deployment Guide
+
+> **Initial setup only.** Once the EC2 instance is provisioned and the GitHub Actions deploy workflow at `.github/workflows/deploy.yml` is green, **subsequent deploys happen automatically on every push to `main`**: GHA builds a Docker image, pushes to GHCR (`ghcr.io/<owner>/eve-app`), and triggers a remote deploy on the EC2 host via AWS SSM `send-command` (`docker compose pull && up`). The contents below cover one-time bootstrap of the EC2 host, DNS, and SSL.
 
 ## Prerequisites
 
 - EC2 instance with Docker and Docker Compose installed
-- DNS access for eastvillageeverything.com
-- SSH access to EC2 instance
+- DNS access for `eastvillageeverything.nyc` (the production domain wired into `apps/mobile/eas.json`)
+- SSH access to EC2 instance for the initial bootstrap; ongoing deploys use AWS SSM, not SSH
+- GitHub repository secrets: `EC2_INSTANCE_ID`, `GHCR_PAT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (used by the deploy workflow)
 
 ## EC2 Instance Setup
 
@@ -68,7 +71,7 @@ Add these DNS records pointing to your EC2 public IP:
 | A | www | YOUR_EC2_IP |
 | A | admin | YOUR_EC2_IP |
 
-Wait for DNS propagation (check with `dig eastvillageeverything.com`).
+Wait for DNS propagation (check with `dig eastvillageeverything.nyc`).
 
 ### 6. Initialize SSL Certificates
 
@@ -115,10 +118,10 @@ docker-compose -f docker-compose.prod.yml exec -e HEROKU_REDIS_URL="redis://..."
 
 ## Verification
 
-1. **Public Site**: https://www.eastvillageeverything.com
-2. **Admin Site**: https://admin.eastvillageeverything.com
-3. **Health Check**: https://www.eastvillageeverything.com/health
-4. **API**: https://www.eastvillageeverything.com/api/tags
+1. **Public Site**: https://www.eastvillageeverything.nyc
+2. **Admin Site**: https://admin.eastvillageeverything.nyc
+3. **Health Check**: https://www.eastvillageeverything.nyc/health
+4. **API**: https://www.eastvillageeverything.nyc/api/tags
 
 ## Maintenance
 
