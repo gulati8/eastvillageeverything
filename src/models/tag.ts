@@ -78,6 +78,27 @@ export class TagModel {
   }
 
   /**
+   * Throw if the proposed parent_tag_id would violate the 2-level nesting cap.
+   * The cap rule: a tag's parent must itself be a top-level tag (parent_tag_id IS NULL).
+   *
+   * Pass `null` or `undefined` to skip the check (no parent, top-level tag).
+   * Throws Error with message starting with "Nesting limited" on violation.
+   *
+   * TODO(phase-2): Add a server-side Jest unit test for this method once a
+   * Jest config exists for the server (no jest setup in Phase 1). See
+   * tests/unit/models/tag.nesting.test.ts (to be created).
+   */
+  private static async assertCanBeParent(parentTagId: string): Promise<void> {
+    const parent = await TagModel.findById(parentTagId);
+    if (!parent) {
+      throw new Error(`Nesting limited: parent tag ${parentTagId} not found`);
+    }
+    if (parent.parent_tag_id !== null) {
+      throw new Error('Nesting limited to 2 levels: chosen parent already has a parent');
+    }
+  }
+
+  /**
    * Update the has_children flag for a tag based on whether it has children
    */
   private static async updateHasChildren(tagId: string): Promise<void> {
@@ -92,6 +113,10 @@ export class TagModel {
    * Create a new tag
    */
   static async create(data: TagInput): Promise<Tag> {
+    if (data.parent_tag_id) {
+      await TagModel.assertCanBeParent(data.parent_tag_id);
+    }
+
     const result = await query<Tag>(
       `INSERT INTO tags (value, display, sort_order, parent_tag_id)
        VALUES ($1, $2, $3, $4)
@@ -114,6 +139,16 @@ export class TagModel {
     // Get old tag to track parent changes
     const oldTag = await TagModel.findById(id);
     if (!oldTag) return null;
+
+    // Prevent self-parenting
+    if (data.parent_tag_id === id) {
+      throw new Error('Nesting limited: a tag cannot be its own parent');
+    }
+
+    // Enforce 2-level nesting cap: the proposed parent must be a top-level tag
+    if (data.parent_tag_id !== undefined && data.parent_tag_id !== null) {
+      await TagModel.assertCanBeParent(data.parent_tag_id);
+    }
 
     const updates: string[] = [];
     const params: unknown[] = [];

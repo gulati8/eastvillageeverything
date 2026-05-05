@@ -300,14 +300,26 @@ router.post('/tags', asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  await TagModel.create({
-    value: value.trim(),
-    display: display.trim(),
-    sort_order: parseInt(sort_order, 10) || 0,
-    parent_tag_id: parent_tag_id || null
-  });
-
-  res.redirect('/admin/tags');
+  try {
+    await TagModel.create({
+      value: value.trim(),
+      display: display.trim(),
+      sort_order: parseInt(sort_order, 10) || 0,
+      parent_tag_id: parent_tag_id || null
+    });
+    res.redirect('/admin/tags');
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('Nesting limited')) {
+      const potentialParents = await TagModel.getPotentialParents();
+      return res.status(400).render('admin/tags/form', {
+        tag: req.body,
+        potentialParents,
+        user: req.user,
+        errors: [err.message],
+      });
+    }
+    throw err;
+  }
 }));
 
 // Edit tag form
@@ -363,12 +375,26 @@ router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  const updated = await TagModel.update(tagId, {
-    value: value.trim(),
-    display: display.trim(),
-    sort_order: parseInt(sort_order, 10) || 0,
-    parent_tag_id: parent_tag_id || null
-  });
+  let updated;
+  try {
+    updated = await TagModel.update(tagId, {
+      value: value.trim(),
+      display: display.trim(),
+      sort_order: parseInt(sort_order, 10) || 0,
+      parent_tag_id: parent_tag_id || null
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('Nesting limited')) {
+      const potentialParents = await TagModel.getPotentialParents(tagId);
+      return res.status(400).render('admin/tags/form', {
+        tag: { id: tagId, ...req.body },
+        potentialParents,
+        user: req.user,
+        errors: [err.message],
+      });
+    }
+    throw err;
+  }
 
   if (!updated) {
     return res.status(404).send('Tag not found');
