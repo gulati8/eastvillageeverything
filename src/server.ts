@@ -5,6 +5,7 @@ import session from 'express-session';
 import RedisStore from 'connect-redis';
 import { Redis } from 'ioredis';
 import { csrfSync } from 'csrf-sync';
+import rateLimit from 'express-rate-limit';
 
 import apiRoutes from './routes/api.js';
 import adminRoutes from './routes/admin.js';
@@ -92,6 +93,17 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Rate limiting for the public API. Mobile app + any other caller share the bucket.
+// Higher cap in dev to avoid tripping during Expo reload cycles.
+const apiLimiter = rateLimit({
+  windowMs: 60_000, // 1 minute
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests' },
+});
+app.use('/api', apiLimiter);
 
 // Public API routes (no auth required)
 app.use('/api', apiRoutes);
