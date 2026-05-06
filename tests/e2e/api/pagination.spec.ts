@@ -41,10 +41,20 @@ test.describe('GET /api/places pagination', () => {
     expect(Array.isArray(body)).toBe(true);
   });
 
-  test('default (no params) returns at most 100', async ({ request }) => {
-    const res = await request.get(`${BASE_URL}/api/places`);
-    expect(res.status()).toBe(200);
-    const body = await res.json();
-    expect(body.length).toBeLessThanOrEqual(100);
+  test('default (no params) returns the full result set — pagination is opt-in', async ({ request }) => {
+    // The endpoint does not paginate unless ?limit is provided, so callers
+    // that don't request pagination see every row. Compare the unpaginated
+    // response to a request that explicitly asks for the max page size:
+    // both should agree on the first 200 rows, but the unpaginated response
+    // should match or exceed it in length.
+    const unpaginated = await (await request.get(`${BASE_URL}/api/places`)).json();
+    const paginated = await (await request.get(`${BASE_URL}/api/places?limit=200`)).json();
+    expect(Array.isArray(unpaginated)).toBe(true);
+    expect(unpaginated.length).toBeGreaterThanOrEqual(paginated.length);
+    // First 200 (or fewer) rows align — same SQL ordering with/without LIMIT.
+    const overlap = Math.min(paginated.length, unpaginated.length);
+    for (let i = 0; i < overlap; i++) {
+      expect(unpaginated[i].key).toBe(paginated[i].key);
+    }
   });
 });

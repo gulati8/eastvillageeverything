@@ -87,11 +87,16 @@ export class PlaceModel {
       ORDER BY p.name ASC
     `;
 
-    const limit = Math.min(Math.max(1, options?.limit ?? 100), 200);
-    const offset = Math.max(0, options?.offset ?? 0);
-    sql += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-    params.push(String(limit));
-    params.push(String(offset));
+    // Pagination is opt-in: callers must pass `limit` to slice the result.
+    // When limit is provided we still clamp to [1, 200] to bound a single
+    // request's payload size; offset is only applied when paired with limit.
+    if (options?.limit !== undefined) {
+      const limit = Math.min(Math.max(1, options.limit), 200);
+      const offset = Math.max(0, options.offset ?? 0);
+      sql += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+      params.push(String(limit));
+      params.push(String(offset));
+    }
 
     const result = await query<Place>(sql, params);
     return result.rows;
