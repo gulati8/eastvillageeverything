@@ -124,7 +124,7 @@ router.get('/places/new', asyncHandler(async (req: Request, res: Response) => {
 router.post('/places', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-    cross_street, photo_url, photo_credit
+    cross_street, photo_url, photo_credit, primary_tag_id
   } = req.body;
 
   const errors: string[] = [];
@@ -161,7 +161,8 @@ router.post('/places', asyncHandler(async (req: Request, res: Response) => {
     price_tier: price_tier?.trim() || undefined,
     cross_street: cross_street?.trim() || undefined,
     photo_url: photo_url?.trim() || undefined,
-    photo_credit: photo_credit?.trim() || undefined
+    photo_credit: photo_credit?.trim() || undefined,
+    primary_tag_id: primary_tag_id || null,
   });
 
   res.redirect('/admin/places');
@@ -189,7 +190,7 @@ router.get('/places/:id/edit', asyncHandler(async (req: Request, res: Response) 
 router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-    cross_street, photo_url, photo_credit
+    cross_street, photo_url, photo_credit, primary_tag_id
   } = req.body;
 
   const errors: string[] = [];
@@ -226,7 +227,8 @@ router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
     price_tier: price_tier?.trim() || undefined,
     cross_street: cross_street?.trim() || undefined,
     photo_url: photo_url?.trim() || undefined,
-    photo_credit: photo_credit?.trim() || undefined
+    photo_credit: photo_credit?.trim() || undefined,
+    primary_tag_id: primary_tag_id || null,
   });
 
   if (!updated) {
@@ -269,7 +271,8 @@ router.get('/tags/new', asyncHandler(async (req: Request, res: Response) => {
 
 // Create tag
 router.post('/tags', asyncHandler(async (req: Request, res: Response) => {
-  const { value, display, sort_order, parent_tag_id } = req.body;
+  const { value, display, sort_order, parent_tag_id,
+          is_primary, tint, accent, fallback_image_url } = req.body;
 
   const errors: string[] = [];
   if (!value || value.trim() === '') {
@@ -305,7 +308,11 @@ router.post('/tags', asyncHandler(async (req: Request, res: Response) => {
       value: value.trim(),
       display: display.trim(),
       sort_order: parseInt(sort_order, 10) || 0,
-      parent_tag_id: parent_tag_id || null
+      parent_tag_id: parent_tag_id || null,
+      is_primary: is_primary === 'on' || is_primary === true || is_primary === '1',
+      tint: tint || null,
+      accent: accent || null,
+      fallback_image_url: fallback_image_url || null,
     });
     res.redirect('/admin/tags');
   } catch (err) {
@@ -343,7 +350,8 @@ router.get('/tags/:id/edit', asyncHandler(async (req: Request, res: Response) =>
 
 // Update tag
 router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
-  const { value, display, sort_order, parent_tag_id } = req.body;
+  const { value, display, sort_order, parent_tag_id,
+          is_primary, tint, accent, fallback_image_url } = req.body;
   const tagId = getParamId(req.params.id);
 
   const errors: string[] = [];
@@ -381,7 +389,11 @@ router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
       value: value.trim(),
       display: display.trim(),
       sort_order: parseInt(sort_order, 10) || 0,
-      parent_tag_id: parent_tag_id || null
+      parent_tag_id: parent_tag_id || null,
+      is_primary: is_primary === 'on' || is_primary === true || is_primary === '1',
+      tint: tint || null,
+      accent: accent || null,
+      fallback_image_url: fallback_image_url || null,
     });
   } catch (err) {
     if (err instanceof Error && err.message.startsWith('Nesting limited')) {
