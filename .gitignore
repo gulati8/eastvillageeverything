@@ -49,3 +49,8 @@ apps/mobile/node_modules/
 apps/mobile/.expo/
 apps/mobile/dist/
 apps/mobile/web-build/
+
+# EAS local build artifacts
+apps/mobile/build-*.ipa
+apps/mobile/build-*.apk
+apps/mobile/build-*.aab
