@@ -8,6 +8,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePlace } from '../api/places';
 import { ApiError } from '../api/errors';
 import { formatPhone } from '../format/phone';
@@ -16,28 +18,96 @@ import { PlaceHero } from '../components/PlaceHero';
 import { Skeleton } from '../components/Skeleton';
 import { useTheme } from '../theme/useTheme';
 
+// Always-visible dismiss control. The detail screen hides the navigation
+// header for the photo overlay aesthetic, so the only way back to the
+// list lives here. Rendered above every state — loading, success, error
+// — so a 404 can never trap the user.
+function BackButton({
+  topInset,
+  tint,
+  scrim,
+}: {
+  topInset: number;
+  tint: string;
+  scrim: string;
+}) {
+  const handlePress = React.useCallback(() => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/');
+    }
+  }, []);
+
+  return (
+    <Pressable
+      onPress={handlePress}
+      hitSlop={12}
+      accessibilityRole="button"
+      accessibilityLabel="Back to list"
+      style={[
+        backStyles.button,
+        {
+          top: topInset + 8,
+          backgroundColor: scrim,
+        },
+      ]}
+    >
+      <Text style={[backStyles.glyph, { color: tint }]}>‹</Text>
+    </Pressable>
+  );
+}
+
+const backStyles = StyleSheet.create({
+  button: {
+    position: 'absolute',
+    left: 14,
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  glyph: {
+    fontSize: 28,
+    lineHeight: 30,
+    marginTop: -4,
+    fontWeight: '500',
+  },
+});
+
 export function PlaceDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error } = usePlace(id);
   const { colors, typography, radii } = useTheme();
+  const insets = useSafeAreaInsets();
+
+  // Light scrim behind the back glyph so it stays legible over both the
+  // dark paper background and the future hero photo (when prod returns
+  // photo_url). Hex with FF/26 alpha = ~15% over ink.
+  const backScrim = colors.ink + '26';
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (isLoading && !data) {
     return (
-      <ScrollView
-        style={{ flex: 1, backgroundColor: colors.paper }}
-        contentContainerStyle={{ padding: 22 }}
-      >
-        {/* Hero skeleton */}
-        <Skeleton width="100%" height={380} borderRadius={0} style={{ marginBottom: 22 }} />
-        <Skeleton width="70%" height={24} style={{ marginBottom: 12 }} />
-        <Skeleton width="90%" height={18} style={{ marginBottom: 8 }} />
-        <Skeleton width="90%" height={18} style={{ marginBottom: 8 }} />
-        <Skeleton width="60%" height={18} style={{ marginBottom: 24 }} />
-        <Skeleton width="100%" height={80} borderRadius={14} style={{ marginBottom: 20 }} />
-        <Skeleton width="40%" height={14} style={{ marginBottom: 10 }} />
-        <Skeleton width="100%" height={18} style={{ marginBottom: 8 }} />
-        <Skeleton width="80%" height={18} />
-      </ScrollView>
+      <View style={{ flex: 1, backgroundColor: colors.paper }}>
+        <BackButton topInset={insets.top} tint={colors.ink} scrim={backScrim} />
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ padding: 22 }}
+        >
+          {/* Hero skeleton */}
+          <Skeleton width="100%" height={380} borderRadius={0} style={{ marginBottom: 22 }} />
+          <Skeleton width="70%" height={24} style={{ marginBottom: 12 }} />
+          <Skeleton width="90%" height={18} style={{ marginBottom: 8 }} />
+          <Skeleton width="90%" height={18} style={{ marginBottom: 8 }} />
+          <Skeleton width="60%" height={18} style={{ marginBottom: 24 }} />
+          <Skeleton width="100%" height={80} borderRadius={14} style={{ marginBottom: 20 }} />
+          <Skeleton width="40%" height={14} style={{ marginBottom: 10 }} />
+          <Skeleton width="100%" height={18} style={{ marginBottom: 8 }} />
+          <Skeleton width="80%" height={18} />
+        </ScrollView>
+      </View>
     );
   }
 
@@ -47,6 +117,7 @@ export function PlaceDetail({ id }: { id: string }) {
     if (status === 404) {
       return (
         <View style={[styles.centerContainer, { backgroundColor: colors.paper }]}>
+          <BackButton topInset={insets.top} tint={colors.ink} scrim={backScrim} />
           <Text style={[styles.errorHeading, { color: colors.ink, fontFamily: typography.display.fontFamily }]}>
             Can't find that spot
           </Text>
@@ -58,6 +129,7 @@ export function PlaceDetail({ id }: { id: string }) {
     }
     return (
       <View style={[styles.centerContainer, { backgroundColor: colors.paper }]}>
+        <BackButton topInset={insets.top} tint={colors.ink} scrim={backScrim} />
         <Text style={[styles.errorHeading, { color: colors.ink, fontFamily: typography.display.fontFamily }]}>
           Something went wrong
         </Text>
@@ -88,6 +160,7 @@ export function PlaceDetail({ id }: { id: string }) {
 
   return (
     <View style={[styles.root, { backgroundColor: colors.paper }]}>
+      <BackButton topInset={insets.top} tint={colors.ink} scrim={backScrim} />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
