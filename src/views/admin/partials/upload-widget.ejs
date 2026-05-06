@@ -1,0 +1,145 @@
+<%
+/*
+ * Reusable image upload widget for the EJS admin.
+ *
+ * Locals required:
+ *   - id        — unique HTML id base (used for inputs and aria) — e.g. 'fallback_image_url'
+ *   - name      — form input name — e.g. 'fallback_image_url'
+ *   - value     — current URL value (string) or null/undefined
+ *   - prefix    — server-side storage prefix — e.g. 'tag' or 'place'
+ *   - label     — visible label text — e.g. 'Fallback image'
+ *   - help      — help text under the field (optional)
+ */
+const widgetId = id;
+const widgetName = name;
+const widgetValue = value || '';
+const widgetPrefix = prefix || 'misc';
+const widgetLabel = label;
+const widgetHelp = help || '';
+%>
+<div class="mb-3 upload-widget" data-prefix="<%= widgetPrefix %>" data-target="<%= widgetId %>">
+  <label for="<%= widgetId %>" class="form-label"><%= widgetLabel %></label>
+
+  <div class="upload-dropzone p-3 mb-2 text-center"
+       style="border: 2px dashed #ccc; border-radius: 8px; cursor: pointer; transition: border-color 0.15s;"
+       role="button"
+       tabindex="0"
+       aria-label="Drop image or click to browse">
+    <% if (widgetValue) { %>
+      <img class="upload-preview" src="<%= widgetValue %>" alt="" style="max-height: 120px; max-width: 100%; border-radius: 4px;">
+    <% } else { %>
+      <div class="upload-preview-empty text-muted">Drop image here or click to browse (max 10MB, jpg/png/webp/gif)</div>
+    <% } %>
+    <input type="file" class="upload-file-input" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+  </div>
+
+  <div class="upload-error text-danger small mb-2" role="alert" aria-live="polite" hidden></div>
+
+  <input type="url" class="form-control upload-url-input" id="<%= widgetId %>" name="<%= widgetName %>"
+         value="<%= widgetValue %>" placeholder="https://...">
+  <% if (widgetHelp) { %>
+    <div class="form-text"><%= widgetHelp %></div>
+  <% } %>
+</div>
+
+<script>
+(function () {
+  // Idempotent — only attach handlers once even if the partial is included multiple times.
+  if (window.__uploadWidgetWired) return;
+  window.__uploadWidgetWired = true;
+
+  // Read CSRF token from the surrounding form's hidden input. Admin forms always include it.
+  const getCsrf = () => {
+    const el = document.querySelector('input[name="_csrf"]');
+    return el ? el.value : '';
+  };
+
+  document.querySelectorAll('.upload-widget').forEach((widget) => {
+    const prefix = widget.dataset.prefix;
+    const dropzone = widget.querySelector('.upload-dropzone');
+    const fileInput = widget.querySelector('.upload-file-input');
+    const urlInput = widget.querySelector('.upload-url-input');
+    const errorEl = widget.querySelector('.upload-error');
+
+    const showError = (msg) => {
+      errorEl.textContent = msg;
+      errorEl.hidden = false;
+    };
+    const clearError = () => {
+      errorEl.textContent = '';
+      errorEl.hidden = true;
+    };
+
+    const renderPreview = (url) => {
+      const existing = dropzone.querySelector('.upload-preview, .upload-preview-empty');
+      if (existing) existing.remove();
+      const img = document.createElement('img');
+      img.className = 'upload-preview';
+      img.src = url;
+      img.alt = '';
+      img.style.maxHeight = '120px';
+      img.style.maxWidth = '100%';
+      img.style.borderRadius = '4px';
+      dropzone.insertBefore(img, fileInput);
+    };
+
+    const upload = async (file) => {
+      clearError();
+      if (file.size > 10 * 1024 * 1024) {
+        showError('File too large (max 10MB).');
+        return;
+      }
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('prefix', prefix);
+      try {
+        const r = await fetch('/admin/uploads', {
+          method: 'POST',
+          body: fd,
+          credentials: 'same-origin',
+          headers: { 'x-csrf-token': getCsrf() },
+        });
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({ error: 'Upload failed' }));
+          showError(body.error || `Upload failed (${r.status})`);
+          return;
+        }
+        const { url } = await r.json();
+        urlInput.value = url;
+        renderPreview(url);
+      } catch (err) {
+        showError(`Upload failed: ${err.message ?? err}`);
+      }
+    };
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files[0]) upload(fileInput.files[0]);
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#0d6efd';
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.style.borderColor = '#ccc';
+    });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#ccc';
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) upload(file);
+    });
+
+    urlInput.addEventListener('change', () => {
+      if (urlInput.value) renderPreview(urlInput.value);
+    });
+  });
+})();
+</script>
