@@ -54,3 +54,7 @@ apps/mobile/web-build/
 apps/mobile/build-*.ipa
 apps/mobile/build-*.apk
 apps/mobile/build-*.aab
+
+# Local image uploads — keep the directory but ignore contents
+public/uploads/*
+!public/uploads/.gitkeep
