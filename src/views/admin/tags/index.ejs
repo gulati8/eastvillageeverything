@@ -129,7 +129,7 @@
               <a href="/admin/tags/<%= tag.id %>/edit" class="btn btn-sm btn-success">Edit</a>
               <a href="/admin/tags/<%= tag.id %>/delete" class="btn btn-sm btn-danger">Delete</a>
             </td>
-            <td><%= tag.display %></td>
+            <td><%= tag.display %><% if (tag.is_primary) { %><span class="badge bg-warning text-dark ms-2" title="Primary-eligible tag">PRIMARY</span><% } %></td>
             <td><code><%= tag.value %></code></td>
           </tr>
           <% }); %>
@@ -147,7 +147,7 @@
               <a href="/admin/tags/<%= parent.id %>/edit" class="btn btn-sm btn-success">Edit</a>
               <a href="/admin/tags/<%= parent.id %>/delete" class="btn btn-sm btn-danger">Delete</a>
             </td>
-            <td><%= parent.display %></td>
+            <td><%= parent.display %><% if (parent.is_primary) { %><span class="badge bg-warning text-dark ms-2" title="Primary-eligible tag">PRIMARY</span><% } %></td>
             <td><code><%= parent.value %></code></td>
           </tr>
           <% parent.children.forEach(function(child) { %>
@@ -157,7 +157,7 @@
               <a href="/admin/tags/<%= child.id %>/edit" class="btn btn-sm btn-success">Edit</a>
               <a href="/admin/tags/<%= child.id %>/delete" class="btn btn-sm btn-danger">Delete</a>
             </td>
-            <td><%= child.display %></td>
+            <td><%= child.display %><% if (child.is_primary) { %><span class="badge bg-warning text-dark ms-2" title="Primary-eligible tag">PRIMARY</span><% } %></td>
             <td><code><%= child.value %></code></td>
           </tr>
           <% }); %>

@@ -87,6 +87,53 @@
             </select>
             <div class="form-text">Select a parent to nest this tag under it. Leave empty for a top-level tag.</div>
           </div>
+
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="is_primary" name="is_primary"
+                   <%= tag && tag.is_primary ? 'checked' : '' %>>
+            <label class="form-check-label" for="is_primary">
+              Primary-eligible
+            </label>
+            <div class="form-text">When checked, this tag can be a place's headline tag (drives row meta + fallback image in the mobile feed).</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="tint" class="form-label">Tint color (hex)</label>
+            <div class="input-group" style="max-width: 220px;">
+              <input type="color" class="form-control form-control-color" id="tint_picker"
+                     value="<%= tag && tag.tint ? tag.tint : '#1F1A14' %>"
+                     title="Pick tint color"
+                     style="max-width: 60px;">
+              <input type="text" class="form-control" id="tint" name="tint"
+                     value="<%= tag && tag.tint ? tag.tint : '' %>"
+                     pattern="^#[0-9A-Fa-f]{6}$"
+                     placeholder="#E07B3F">
+            </div>
+            <div class="form-text">Hex color used for the typographic-fallback hero background and primary-tag pip dot. Leave blank for no tint.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="accent" class="form-label">Accent color (hex)</label>
+            <div class="input-group" style="max-width: 220px;">
+              <input type="color" class="form-control form-control-color" id="accent_picker"
+                     value="<%= tag && tag.accent ? tag.accent : '#FBF6EE' %>"
+                     title="Pick accent color"
+                     style="max-width: 60px;">
+              <input type="text" class="form-control" id="accent" name="accent"
+                     value="<%= tag && tag.accent ? tag.accent : '' %>"
+                     pattern="^#[0-9A-Fa-f]{6}$"
+                     placeholder="#FBF6EE">
+            </div>
+            <div class="form-text">Hex color for the typographic-fallback hero accent (place name text on tint background). Leave blank for no accent.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="fallback_image_url" class="form-label">Fallback image URL</label>
+            <input type="url" class="form-control" id="fallback_image_url" name="fallback_image_url"
+                   value="<%= tag && tag.fallback_image_url ? tag.fallback_image_url : '' %>"
+                   placeholder="https://...">
+            <div class="form-text">CDN URL shown when a place with this primary tag has no photo. (Image upload UI ships in Phase B; for now paste any URL.)</div>
+          </div>
         </div>
       </div>
 
@@ -98,5 +145,20 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function () {
+      const wire = (pickerId, inputId) => {
+        const picker = document.getElementById(pickerId);
+        const input = document.getElementById(inputId);
+        if (!picker || !input) return;
+        picker.addEventListener('input', () => { input.value = picker.value.toUpperCase(); });
+        input.addEventListener('input', () => {
+          if (/^#[0-9A-Fa-f]{6}$/.test(input.value)) picker.value = input.value;
+        });
+      };
+      wire('tint_picker', 'tint');
+      wire('accent_picker', 'accent');
+    })();
+  </script>
 </body>
 </html>
