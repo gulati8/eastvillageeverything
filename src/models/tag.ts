@@ -9,6 +9,10 @@ export interface TagInput {
   display: string;
   sort_order: number;
   parent_tag_id?: string | null;
+  is_primary?: boolean;
+  tint?: string | null;
+  accent?: string | null;
+  fallback_image_url?: string | null;
 }
 
 export class TagModel {
@@ -17,7 +21,9 @@ export class TagModel {
    */
   static async findAll(): Promise<Tag[]> {
     const result = await query<Tag>(`
-      SELECT id, value, display, sort_order, parent_tag_id, has_children, created_at, updated_at
+      SELECT id, value, display, sort_order, parent_tag_id, has_children,
+             is_primary, tint, accent, fallback_image_url,
+             created_at, updated_at
       FROM tags
       ORDER BY sort_order ASC, value ASC
     `);
@@ -60,7 +66,7 @@ export class TagModel {
    */
   static async findById(id: string): Promise<Tag | null> {
     const result = await query<Tag>(
-      'SELECT id, value, display, sort_order, parent_tag_id, has_children, created_at, updated_at FROM tags WHERE id = $1',
+      'SELECT id, value, display, sort_order, parent_tag_id, has_children, is_primary, tint, accent, fallback_image_url, created_at, updated_at FROM tags WHERE id = $1',
       [id]
     );
     return result.rows[0] || null;
@@ -71,7 +77,7 @@ export class TagModel {
    */
   static async findByValue(value: string): Promise<Tag | null> {
     const result = await query<Tag>(
-      'SELECT id, value, display, sort_order, parent_tag_id, has_children, created_at, updated_at FROM tags WHERE value = $1',
+      'SELECT id, value, display, sort_order, parent_tag_id, has_children, is_primary, tint, accent, fallback_image_url, created_at, updated_at FROM tags WHERE value = $1',
       [value]
     );
     return result.rows[0] || null;
@@ -118,10 +124,22 @@ export class TagModel {
     }
 
     const result = await query<Tag>(
-      `INSERT INTO tags (value, display, sort_order, parent_tag_id)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, value, display, sort_order, parent_tag_id, has_children, created_at, updated_at`,
-      [data.value, data.display, data.sort_order, data.parent_tag_id || null]
+      `INSERT INTO tags (value, display, sort_order, parent_tag_id,
+                         is_primary, tint, accent, fallback_image_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, value, display, sort_order, parent_tag_id, has_children,
+                 is_primary, tint, accent, fallback_image_url,
+                 created_at, updated_at`,
+      [
+        data.value,
+        data.display,
+        data.sort_order,
+        data.parent_tag_id || null,
+        data.is_primary ?? false,
+        data.tint ?? null,
+        data.accent ?? null,
+        data.fallback_image_url ?? null,
+      ]
     );
 
     // Update parent's has_children flag if this tag has a parent
@@ -170,6 +188,22 @@ export class TagModel {
       updates.push(`parent_tag_id = $${paramIndex++}`);
       params.push(data.parent_tag_id || null);
     }
+    if (data.is_primary !== undefined) {
+      updates.push(`is_primary = $${paramIndex++}`);
+      params.push(data.is_primary);
+    }
+    if (data.tint !== undefined) {
+      updates.push(`tint = $${paramIndex++}`);
+      params.push(data.tint || null);
+    }
+    if (data.accent !== undefined) {
+      updates.push(`accent = $${paramIndex++}`);
+      params.push(data.accent || null);
+    }
+    if (data.fallback_image_url !== undefined) {
+      updates.push(`fallback_image_url = $${paramIndex++}`);
+      params.push(data.fallback_image_url || null);
+    }
 
     if (updates.length === 0) {
       return oldTag;
@@ -182,7 +216,9 @@ export class TagModel {
       `UPDATE tags
        SET ${updates.join(', ')}
        WHERE id = $${paramIndex}
-       RETURNING id, value, display, sort_order, parent_tag_id, has_children, created_at, updated_at`,
+       RETURNING id, value, display, sort_order, parent_tag_id, has_children,
+                 is_primary, tint, accent, fallback_image_url,
+                 created_at, updated_at`,
       params
     );
 
@@ -252,7 +288,9 @@ export class TagModel {
    */
   static async getPotentialParents(excludeTagId?: string): Promise<Tag[]> {
     let sql = `
-      SELECT id, value, display, sort_order, parent_tag_id, has_children, created_at, updated_at
+      SELECT id, value, display, sort_order, parent_tag_id, has_children,
+             is_primary, tint, accent, fallback_image_url,
+             created_at, updated_at
       FROM tags
       WHERE parent_tag_id IS NULL
     `;
@@ -317,7 +355,9 @@ export class TagModel {
 
       // Return all tags in order
       const result = await client.query<Tag>(`
-        SELECT id, value, display, sort_order, parent_tag_id, has_children, created_at, updated_at
+        SELECT id, value, display, sort_order, parent_tag_id, has_children,
+               is_primary, tint, accent, fallback_image_url,
+               created_at, updated_at
         FROM tags
         ORDER BY sort_order ASC, value ASC
       `);
