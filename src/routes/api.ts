@@ -41,6 +41,7 @@ router.get('/places', async (req: Request, res: Response) => {
       photo_url: place.photo_url ?? null,
       hours_json: place.hours_json ?? null,
       cross_street: place.cross_street ?? null,
+      primary_tag_id: place.primary_tag_id ?? null,
     }));
 
     res.json(response);
@@ -79,6 +80,7 @@ router.get('/places/:id', async (req: Request, res: Response) => {
       crowd_level: place.crowd_level ?? null,
       price_tier: place.price_tier ?? null,
       cross_street: place.cross_street ?? null,
+      primary_tag_id: place.primary_tag_id ?? null,
       photo_url: place.photo_url ?? null,
       photo_credit: place.photo_credit ?? null,
       google_place_id: place.google_place_id ?? null,
@@ -108,16 +110,28 @@ router.get('/tags', async (req: Request, res: Response) => {
           value: p.value,
           display: p.display,
           order: String(p.sort_order),
+          is_primary: p.is_primary,
+          tint: p.tint,
+          accent: p.accent,
+          fallback_image_url: p.fallback_image_url,
           children: p.children.map(c => ({
             value: c.value,
             display: c.display,
             order: String(c.sort_order),
+            is_primary: c.is_primary,
+            tint: c.tint,
+            accent: c.accent,
+            fallback_image_url: c.fallback_image_url,
           })),
         })),
         standalone: structuredRows.standalone.map(s => ({
           value: s.value,
           display: s.display,
           order: String(s.sort_order),
+          is_primary: s.is_primary,
+          tint: s.tint,
+          accent: s.accent,
+          fallback_image_url: s.fallback_image_url,
         })),
       };
       return res.json(response);
@@ -129,6 +143,10 @@ router.get('/tags', async (req: Request, res: Response) => {
       value: t.value,
       display: t.display,
       order: String(t.sort_order),
+      is_primary: t.is_primary,
+      tint: t.tint,
+      accent: t.accent,
+      fallback_image_url: t.fallback_image_url,
     }));
 
     res.json(response);
