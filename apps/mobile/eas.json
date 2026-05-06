@@ -27,7 +27,8 @@
         "EXPO_PUBLIC_API_BASE_URL": "https://eastvillageeverything.nyc",
         "EXPO_PUBLIC_SENTRY_ENVIRONMENT": "production",
         "SENTRY_ORG": "gulati-labs",
-        "SENTRY_PROJECT": "east-village-everything"
+        "SENTRY_PROJECT": "east-village-everything",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     }
   },
