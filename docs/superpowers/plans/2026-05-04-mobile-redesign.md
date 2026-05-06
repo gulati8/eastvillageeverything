@@ -5,6 +5,57 @@
 **Scope:** `apps/mobile/` only. No server, admin, API, or web-public changes.
 **Blocks:** App Store submission of paused run `run_e8c4a91d` (T1.10).
 
+---
+
+## ⚠️ Resume notes (added 2026-05-05) — read before executing any task
+
+This plan was authored for the Justice League factory and is **paused**. The factory is not running. Some of the plan was already executed before the pause; the rest is the work that remains.
+
+**What's already in the codebase** (do not redo, do not touch the test infra task again):
+
+| Plan task | Status |
+|---|---|
+| Task 1 — Delete unreferenced `PlaceListItem.tsx` | ✅ Done by Phase 1 (commit `73f7808`) |
+| New directory-style `PlaceList.tsx` (masthead, eyebrow, search row, filter rail, filter sheet, tab bar) | ✅ In codebase |
+| `FilterRail.tsx`, `FilterSheet.tsx`, `EveListSkeleton.tsx`, `SearchBar.tsx`, `TabBar.tsx`, `PlaceRow.tsx` | ✅ In codebase |
+| `useFilterState`, `transformPlace`, `placeV2Display` | ✅ Rewritten by Phase 1 — see file-ownership note below |
+
+**What remains to do** (the redesign work this plan still describes):
+
+- `Fallback.tsx` component + `fallbackArt.ts` data module (hash-driven typographic art, replaces `PhotoFallback.tsx`)
+- `BookmarkIcon.tsx` (SVG glyph)
+- `ContactRow.tsx` and `ContactRow.test.tsx` (labelled bordered row used in detail)
+- `SpecialsCard.tsx` and `SpecialsCard.test.tsx`
+- Remove `categoryMap.ts` + `category` field from `PlaceV2Display`
+- Schibsted 800 ExtraBold added to `useFontsLoaded`
+- `PlaceDetail.tsx` rewrite per spec
+- `tokens.ts` simplification (drop light theme, drop signal-color boolean param)
+- `ThemeProvider.tsx` simplification (single palette, drop `useColorScheme`)
+- `Skeleton.tsx` — remove light-color fallback
+- `react-test-renderer` install + virtual mocks for `expo-linear-gradient`, `react-native-svg` in `jest.setup.ts`
+
+**File-ownership note — IMPORTANT**
+
+Phase 1 (`docs/superpowers/plans/2026-05-04-eve-testflight-plan.md`) rewrote `transformPlace.ts`, `useFilterState.ts`, `placeV2Display.ts`, and added `deriveFilterSections.ts` plus their tests. **Phase 1 owns those files now.** This redesign plan will tell you to:
+- Delete `category` from `PlaceV2Display` (Architectural Decision #1, Task 4b in this plan)
+- Rewrite `useFilterState` to drop reads of removed fields (Task 4b)
+
+Both are still legitimate work, but the current shape of those files is the **post-Phase-1 shape**, not the shape this plan was written against. Re-read the files before editing — do not re-introduce:
+- chips matching by substring
+- fields hardcoded to `null` in `transformPlace`
+- the fake `require('../data/filterSections')` workaround
+- a static `filterSections.ts` constant (the redesign plan assumes this still exists; it has been deleted, sections now derive from `/api/tags?structured=1`)
+
+**How to resume safely:**
+
+1. Read this section in full.
+2. Read the Phase 1 plan's "Current state" section.
+3. Read each file you're about to modify in its current state on disk — not what this plan says it should look like.
+4. Pick remaining tasks from the list above and execute them one at a time.
+5. The original task numbering below is preserved for traceability but not all tasks apply anymore. Tasks 1, 2 (parts of), and any task that touches `useFilterState`/`transformPlace`/`placeV2Display` need to be re-evaluated against the current code.
+
+---
+
 ## Approach
 
 Single cohesive UI rewrite executed bottom-up: test infra → data plumbing → tokens → primitives (Fallback) → list row → list screen polish → detail screen → final integration sweep. TDD per task; failing test first, then implementation, then commit.

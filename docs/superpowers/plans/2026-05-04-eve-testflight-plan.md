@@ -4,6 +4,42 @@
 
 **Spec:** `docs/superpowers/specs/2026-05-04-eve-testflight-design.md`
 
+---
+
+## Current state (2026-05-05) — read this first
+
+The plan is **paused on the smoke test step**. Build 1.0.0 (2) ships and crashes on launch on a real iPhone. No diagnostic captured yet.
+
+**What's done:**
+- All code work — Tasks 2–18 — committed on branch `phase1-testflight-fixes` (~20 commits).
+- `npm run typecheck` passes clean (server + mobile).
+- Mobile tests 177/178 (1 pre-existing skip).
+- Server-side Playwright tests for rate-limit + pagination written but **never run** (require live server, see Tasks 12 & 13).
+- Local iOS build succeeded twice (`apps/mobile/build-1777993254901.ipa` is the current one — gitignored).
+- Submit to App Store Connect succeeded for both builds.
+- TestFlight group `Team (Expo)` created in App Store Connect; build 1.0.0 (2) attached; Amit added as internal tester.
+- `apps/mobile/eas.json` `submit.production.ios.groups` configured with `Team (Expo)` so future submits auto-attach.
+
+**Where it broke:** the app is installable from TestFlight on a real iPhone but **crashes immediately on open**. No Sentry event captured (or not yet checked). No device log captured (or not yet checked). No Xcode Console output captured.
+
+**To resume — debugging path, in order of speed:**
+1. Check Sentry: https://sentry.io/organizations/gulati-labs/projects/east-village-everything/ — most recent issue should have stack trace + breadcrumbs from the crashing build.
+2. iPhone-side crash log: Settings → Privacy & Security → Analytics & Improvements → Analytics Data → look for `EastVillageEverything-2026-05-05-...crash` or `.ips`. Tap, share to email, paste content.
+3. Live device logs: connect iPhone to Mac via USB, open `Console.app` on Mac, select the device in left sidebar, filter by process `EastVillageEverything`, force-quit and relaunch the app on the device, capture the crash output.
+
+**Top suspects in the code (untested guesses, in declining likelihood):**
+1. `Sentry.wrap(RootLayout)` in `apps/mobile/app/_layout.tsx` — `initSentry()` runs at module load before `Sentry.wrap` evaluates; if the production DSN string in `apps/mobile/eas.json` triggers an init failure, the whole module dies before render.
+2. `useFontsLoaded` in `apps/mobile/src/theme/useFontsLoaded.ts` — pulls in `@expo-google-fonts/*` packages that ship the .ttf assets. Production bundle should include them, but if asset resolution fails on cold start, the splash gate stays up forever (looks like a crash, isn't).
+3. Hermes / native-module conflict on first launch — `react-native-reanimated`, `expo-secure-store`, `@gorhom/bottom-sheet` all ship native code that can crash on initial install if the iOS deployment target / iOS version / Hermes config is mismatched.
+
+**Things that are NOT in scope of this debug:**
+- Phase 2 deferred items (silent input scrubbing, sort-in-JS, transactional tag delete, etc.) — see "Phase 2" section at the bottom.
+- The paused mobile redesign at `docs/superpowers/plans/2026-05-04-mobile-redesign.md`.
+
+**File ownership note for any agent that resumes work in `apps/mobile/`:** Phase 1 owns the data-flow files. Do NOT modify `transformPlace.ts`, `useFilterState.ts`, `placeV2Display.ts`, `deriveFilterSections.ts`, or any of their tests in a way that re-introduces the rot Phase 1 fixed (chips matching by substring, fields hardcoded to `null`, fake `require()` for "circular dep"). If the redesign plan tells you to touch those files, read this section first.
+
+---
+
 **Goal:** Ship a working EVE iOS app to a small private TestFlight beta after fixing the mobile data-flow rot, rate-limiting the public API, polishing nested-tag admin UX, and wiring EAS build env.
 
 **Architecture:** Pure tag-driven mobile filters sourced from `/api/tags?structured=1`; transformPlace stops nulling fields the server returns; server gets rate-limit + pagination + dead-code delete; admin tag UI capped to 2 levels deep; EAS production profile wired with prod API URL.
