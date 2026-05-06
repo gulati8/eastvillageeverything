@@ -23,6 +23,7 @@ export interface PlaceInput {
   cross_street?: string;
   photo_url?: string;
   photo_credit?: string;
+  primary_tag_id?: string | null;
 }
 
 // Normalize phone to digits only
@@ -58,7 +59,7 @@ export class PlaceModel {
         p.created_at, p.updated_at,
         p.lat, p.lng,
         p.pitch, p.perfect, p.insider, p.crowd, p.vibe,
-        p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit,
+        p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit, p.primary_tag_id,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         COALESCE(
           array_agg(t.value ORDER BY t.sort_order) FILTER (WHERE t.value IS NOT NULL),
@@ -113,7 +114,7 @@ export class PlaceModel {
         p.created_at, p.updated_at,
         p.lat, p.lng,
         p.pitch, p.perfect, p.insider, p.crowd, p.vibe,
-        p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit,
+        p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit, p.primary_tag_id,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         COALESCE(
           array_agg(t.value ORDER BY t.sort_order) FILTER (WHERE t.value IS NOT NULL),
@@ -138,9 +139,11 @@ export class PlaceModel {
       // Insert the place
       const insertSql = `
         INSERT INTO places (name, address, phone, url, specials, categories, notes,
-          pitch, perfect, insider, crowd, vibe, crowd_level, price_tier, cross_street, photo_url, photo_credit)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-        RETURNING id, name, address, phone, url, specials, categories, notes, created_at, updated_at
+          pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
+          cross_street, photo_url, photo_credit, primary_tag_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+                $15, $16, $17, $18)
+        RETURNING id
       `;
 
       const placeResult = await client.query(insertSql, [
@@ -160,7 +163,8 @@ export class PlaceModel {
         data.price_tier || null,
         data.cross_street || null,
         validateUrl(data.photo_url),
-        data.photo_credit || null
+        data.photo_credit || null,
+        data.primary_tag_id || null,
       ]);
 
       const place = placeResult.rows[0];
@@ -252,6 +256,10 @@ export class PlaceModel {
       if (data.photo_credit !== undefined) {
         updates.push(`photo_credit = $${paramIndex++}`);
         params.push(data.photo_credit || null);
+      }
+      if (data.primary_tag_id !== undefined) {
+        updates.push(`primary_tag_id = $${paramIndex++}`);
+        params.push(data.primary_tag_id || null);
       }
 
       // Always update updated_at
