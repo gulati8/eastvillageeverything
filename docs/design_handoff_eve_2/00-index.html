@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EVE · Design handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<style>
+  :root { color-scheme: light; }
+  html, body { margin: 0; padding: 0; background: #FBF6EE; color: #1F1A14; }
+  body { font-family: "Source Serif 4", Georgia, serif; padding: 64px 48px; max-width: 880px; margin: 0 auto; }
+  h1 { font-family: "Instrument Serif", serif; font-style: italic; font-weight: 400; font-size: 56px; line-height: 1.0; letter-spacing: -0.02em; margin: 0 0 8px; }
+  h1 .ro { font-style: normal; }
+  .sub { font-family: "Source Serif 4", serif; font-size: 17px; line-height: 1.55; color: #54483A; margin: 0 0 40px; max-width: 640px; }
+  h2 { font-family: "Schibsted Grotesk", sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #8C7E6C; margin: 36px 0 14px; }
+  ol { padding-left: 0; list-style: none; margin: 0; }
+  li { padding: 14px 18px; border-bottom: 1px solid rgba(31,26,20,0.08); display: flex; gap: 18px; align-items: baseline; }
+  li:hover { background: rgba(31,26,20,0.03); }
+  .num { font-family: "Schibsted Grotesk", sans-serif; font-size: 11px; font-weight: 700; color: #8C7E6C; letter-spacing: 0.08em; min-width: 20px; }
+  a { color: #1F1A14; font-family: "Instrument Serif", serif; font-style: italic; font-size: 22px; text-decoration: none; letter-spacing: -0.005em; }
+  a:hover { text-decoration: underline; }
+  .desc { color: #54483A; font-size: 14px; flex: 1; line-height: 1.5; }
+  .pill { font-family: "Schibsted Grotesk", sans-serif; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #F2EADC; color: #54483A; letter-spacing: 0.04em; }
+  .readme { margin-top: 40px; padding: 24px; background: #F2EADC; border-radius: 14px; }
+  .readme strong { color: #B85420; }
+</style>
+</head>
+<body>
+<h1><span style="font-style:italic">East Village</span> <span class="ro">Everything</span></h1>
+<p class="sub">Design handoff package — January 2026. Eight reference screens, source JSX, and a build prompt for Claude Code.</p>
+
+<h2>Mobile</h2>
+<ol>
+  <li><span class="num">01</span><a href="01-mobile-list.html">List feed</a><span class="desc">Light theme, "Tonight" filter active</span><span class="pill">390×812</span></li>
+  <li><span class="num">02</span><a href="02-mobile-list-dark.html">List feed · dark</a><span class="desc">Dark theme variant</span><span class="pill">390×812</span></li>
+  <li><span class="num">03</span><a href="03-mobile-list-filters.html">Filter sheet</a><span class="desc">Tag-tree-derived sections</span><span class="pill">390×812</span></li>
+  <li><span class="num">04</span><a href="04-mobile-detail.html">Place detail</a><span class="desc">Veselka — fully written</span><span class="pill">390×812</span></li>
+  <li><span class="num">05</span><a href="05-mobile-detail-no-editorial.html">Detail · no editorial</a><span class="desc">11th Street Bar — what most places look like today</span><span class="pill">390×812</span></li>
+</ol>
+
+<h2>Admin web</h2>
+<ol>
+  <li><span class="num">06</span><a href="06-admin-places.html">Places list</a><span class="desc">Triage by editorial completeness</span><span class="pill">1280×820</span></li>
+  <li><span class="num">07</span><a href="07-admin-edit-place.html">Edit a place</a><span class="desc">Friend-voice form + live mobile preview</span><span class="pill">1280×820</span></li>
+  <li><span class="num">08</span><a href="08-admin-tags.html">Tags tree</a><span class="desc">Parent/child, primary toggle, fallback image upload</span><span class="pill">1280×820</span></li>
+</ol>
+
+<div class="readme">
+  <strong>Start here →</strong> Open <a href="README.md">README.md</a> for the full build prompt to paste into Claude Code, plus the data model, voice rules, and screen-by-screen specs.
+</div>
+</body>
+</html>
