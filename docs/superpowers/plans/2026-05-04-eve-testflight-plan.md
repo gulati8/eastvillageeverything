@@ -6,35 +6,29 @@
 
 ---
 
-## Current state (2026-05-05) — read this first
+## Current state (2026-05-06) — read this first
 
-The plan is **paused on the smoke test step**. Build 1.0.0 (2) ships and crashes on launch on a real iPhone. No diagnostic captured yet.
+Phase 1 is **shippable**. Build `1.0.0 (6)` is on TestFlight, launches cleanly on iPhone (iOS 26.3.1), and the directory + detail screens render against deployed prod data. Server changes from this branch landed on `main` at `be997d4` and were deployed via the existing GH Action → SSM → EC2 pipeline. The migration ran cleanly; all three new endpoints respond on prod.
 
-**What's done:**
-- All code work — Tasks 2–18 — committed on branch `phase1-testflight-fixes` (~20 commits).
-- `npm run typecheck` passes clean (server + mobile).
-- Mobile tests 177/178 (1 pre-existing skip).
-- Server-side Playwright tests for rate-limit + pagination written but **never run** (require live server, see Tasks 12 & 13).
-- Local iOS build succeeded twice (`apps/mobile/build-1777993254901.ipa` is the current one — gitignored).
-- Submit to App Store Connect succeeded for both builds.
-- TestFlight group `Team (Expo)` created in App Store Connect; build 1.0.0 (2) attached; Amit added as internal tester.
-- `apps/mobile/eas.json` `submit.production.ios.groups` configured with `Team (Expo)` so future submits auto-attach.
+**What was actually wrong** (the first .ips file lied — TurboModule rethrow signature is what an unhandled JS exception looks like to iOS, not the cause):
+1. `react@19.2.5` vs `react-native@0.81.5`'s renderer pinned to `19.1.0` → `Incompatible React versions` thrown at first render (caught only by Mac Console.app).
+2. iOS 26 throws NSException from the keychain layer when `expo-secure-store` is called without explicit `keychainService`.
+3. Mobile expected `/api/tags?structured=1` to return `{parents, standalone}`, but prod was on the legacy flat-array shape because the structured handler hadn't been deployed.
+4. Detail screens 404'd because `GET /api/places/:id` also hadn't been deployed.
+5. `PlaceDetail` had `headerShown:false` with no custom dismiss control, so the 404 state trapped users.
 
-**Where it broke:** the app is installable from TestFlight on a real iPhone but **crashes immediately on open**. No Sentry event captured (or not yet checked). No device log captured (or not yet checked). No Xcode Console output captured.
+**Fixes shipped in build 6 + the prod deploy:**
+- `react` pinned to `19.1.0` (no caret), `react-dom` aligned for strict `npm ci`.
+- `SecureStore` calls in `deviceId.ts` pin `keychainService` to the bundle id.
+- `deriveFilterSections` now returns `[]` defensively for non-structured shapes (legacy flat array, null, missing parents) — avoids a crash if/when prod and mobile drift again.
+- Always-visible back chevron on `PlaceDetail` across loading/success/404/network-error states.
+- Pagination on `/api/places` is opt-in (no `?limit` returns the full set; explicit `?limit` is still clamped to ≤200) — required to avoid silently dropping 252 of 352 places when default-100 was active.
+- Server-side Playwright pagination tests rewritten + 5/5 passing.
+- All other server commits from `5d31eba … 7459c7d` (rate limit, asyncHandler, /admin/api trim, 2-level tag cap, structured tags, detail endpoint, editorial+enrichment migration) deployed.
 
-**To resume — debugging path, in order of speed:**
-1. Check Sentry: https://sentry.io/organizations/gulati-labs/projects/east-village-everything/ — most recent issue should have stack trace + breadcrumbs from the crashing build.
-2. iPhone-side crash log: Settings → Privacy & Security → Analytics & Improvements → Analytics Data → look for `EastVillageEverything-2026-05-05-...crash` or `.ips`. Tap, share to email, paste content.
-3. Live device logs: connect iPhone to Mac via USB, open `Console.app` on Mac, select the device in left sidebar, filter by process `EastVillageEverything`, force-quit and relaunch the app on the device, capture the crash output.
+**Sentry posture:** disabled in production for build 6 (`EXPO_PUBLIC_SENTRY_DSN` removed from `apps/mobile/eas.json:production.env`, plus `SENTRY_DISABLE_AUTO_UPLOAD=true` to silence the build-phase upload). This was a debugging step that turned out to be unnecessary — the React mismatch was the real cause. Re-enabling Sentry is a one-line revert in `eas.json` and will go in build 7.
 
-**Top suspects in the code (untested guesses, in declining likelihood):**
-1. `Sentry.wrap(RootLayout)` in `apps/mobile/app/_layout.tsx` — `initSentry()` runs at module load before `Sentry.wrap` evaluates; if the production DSN string in `apps/mobile/eas.json` triggers an init failure, the whole module dies before render.
-2. `useFontsLoaded` in `apps/mobile/src/theme/useFontsLoaded.ts` — pulls in `@expo-google-fonts/*` packages that ship the .ttf assets. Production bundle should include them, but if asset resolution fails on cold start, the splash gate stays up forever (looks like a crash, isn't).
-3. Hermes / native-module conflict on first launch — `react-native-reanimated`, `expo-secure-store`, `@gorhom/bottom-sheet` all ship native code that can crash on initial install if the iOS deployment target / iOS version / Hermes config is mismatched.
-
-**Things that are NOT in scope of this debug:**
-- Phase 2 deferred items (silent input scrubbing, sort-in-JS, transactional tag delete, etc.) — see "Phase 2" section at the bottom.
-- The paused mobile redesign at `docs/superpowers/plans/2026-05-04-mobile-redesign.md`.
+**Followups (from the in-session design audit, not yet acted on):** light theme + sepia palette to delete (memory says "dark-only, no sepia"); bookmark icon to wire to local persistence or remove; hero collapses to ~120-160px when no `photo_url`; replace emoji contact icons; replace hand-rolled bookmark shape with SVG; eyebrow weight/tracking standardisation; TabBar trims to one working tab; 404 copy phrasing; standalone tags rendering decision (currently dropped — 31 standalone tags on prod, 1 parent). Detail in chat history.
 
 **File ownership note for any agent that resumes work in `apps/mobile/`:** Phase 1 owns the data-flow files. Do NOT modify `transformPlace.ts`, `useFilterState.ts`, `placeV2Display.ts`, `deriveFilterSections.ts`, or any of their tests in a way that re-introduces the rot Phase 1 fixed (chips matching by substring, fields hardcoded to `null`, fake `require()` for "circular dep"). If the redesign plan tells you to touch those files, read this section first.
 
