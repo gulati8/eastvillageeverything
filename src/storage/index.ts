@@ -1,4 +1,7 @@
-import * as fs from 'node:fs/promises';
+import { Disk } from 'flydrive';
+import { FSDriver } from 'flydrive/drivers/fs';
+import { S3Driver } from 'flydrive/drivers/s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import * as path from 'node:path';
 import type { PutObjectOptions, PutObjectResult } from './types.js';
 
@@ -6,7 +9,45 @@ export type { PutObjectOptions, PutObjectResult } from './types.js';
 
 const backend = process.env.STORAGE_BACKEND ?? 'local';
 
-if (backend !== 'local' && backend !== 's3') {
+let disk: Disk;
+let urlFor: (key: string) => string;
+let keyToFullKey: (key: string) => string;
+
+if (backend === 'local') {
+  const localDir = path.resolve(process.env.STORAGE_LOCAL_DIR ?? 'public/uploads');
+  const urlPrefix = (process.env.STORAGE_LOCAL_URL_PREFIX ?? '/uploads').replace(/\/+$/, '');
+
+  disk = new Disk(
+    new FSDriver({
+      location: localDir,
+      visibility: 'public',
+    })
+  );
+
+  urlFor = (key) => `${urlPrefix}/${key}`;
+  keyToFullKey = (key) => key;
+} else if (backend === 's3') {
+  const bucket = process.env.STORAGE_S3_BUCKET;
+  if (!bucket) throw new Error('STORAGE_S3_BUCKET is required when STORAGE_BACKEND=s3');
+
+  const region = process.env.STORAGE_S3_REGION ?? 'us-east-1';
+  const prefix = (process.env.STORAGE_S3_PREFIX ?? '').replace(/^\/+|\/+$/g, '');
+  const urlPattern =
+    process.env.STORAGE_S3_URL_PATTERN ??
+    `https://${bucket}.s3.${region}.amazonaws.com/{key}`;
+
+  const client = new S3Client({ region });
+  disk = new Disk(
+    new S3Driver({
+      client,
+      bucket,
+      visibility: 'public',
+    })
+  );
+
+  urlFor = (key) => urlPattern.replace('{key}', prefix ? `${prefix}/${key}` : key);
+  keyToFullKey = (key) => (prefix ? `${prefix}/${key}` : key);
+} else {
   throw new Error(
     `STORAGE_BACKEND must be 'local' or 's3' (got '${backend}'). Check your .env.`
   );
@@ -14,6 +55,9 @@ if (backend !== 'local' && backend !== 's3') {
 
 /**
  * Write a buffer to storage. Returns a public URL the browser can fetch.
+ *
+ * `key` is the relative path under the storage root (e.g. `tag/abc.jpg`).
+ * For S3, `STORAGE_S3_PREFIX` is prepended automatically.
  */
 export async function putObject(
   body: Buffer,
@@ -24,48 +68,12 @@ export async function putObject(
     throw new Error(`Storage key must not start with '/' (got '${key}')`);
   }
 
-  if (backend === 'local') {
-    const localDir = path.resolve(process.env.STORAGE_LOCAL_DIR ?? 'public/uploads');
-    const urlPrefix = (process.env.STORAGE_LOCAL_URL_PREFIX ?? '/uploads').replace(/\/+$/, '');
-    const dest = path.join(localDir, key);
-    await fs.mkdir(path.dirname(dest), { recursive: true });
-    await fs.writeFile(dest, body);
-    return { url: `${urlPrefix}/${key}`, key };
-  }
+  await disk.put(keyToFullKey(key), body, { contentType, visibility: 'public' });
 
-  // S3 backend — lazy-load flydrive and @aws-sdk to avoid ESM issues when backend is local
-  const { Disk } = await import('flydrive');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { S3Driver } = require('flydrive/drivers/s3') as { S3Driver: any };
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { S3Client } = require('@aws-sdk/client-s3') as { S3Client: any };
-
-  const bucket = process.env.STORAGE_S3_BUCKET;
-  const region = process.env.STORAGE_S3_REGION ?? 'us-east-1';
-  const prefix = (process.env.STORAGE_S3_PREFIX ?? '').replace(/^\/+|\/+$/g, '');
-  const urlPattern =
-    process.env.STORAGE_S3_URL_PATTERN ??
-    `https://${bucket}.s3.${region}.amazonaws.com/{key}`;
-
-  if (!bucket) throw new Error('STORAGE_S3_BUCKET is required when STORAGE_BACKEND=s3');
-
-  const client = new S3Client({ region });
-  const disk = new Disk(
-    new S3Driver({
-      client,
-      bucket,
-      visibility: 'public',
-      urlBuilder: {
-        async generateURL(k: string) {
-          return urlPattern.replace('{key}', k);
-        },
-      },
-    })
-  );
-
-  const fullKey = prefix ? `${prefix}/${key}` : key;
-  await disk.put(fullKey, body, { contentType, visibility: 'public' });
-
-  const urlFor = (k: string) => urlPattern.replace('{key}', prefix ? `${prefix}/${k}` : k);
-  return { url: urlFor(key), key };
+  return {
+    url: urlFor(key),
+    key,
+  };
 }
+
+export { disk };
