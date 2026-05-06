@@ -110,11 +110,14 @@ router.get('/places', asyncHandler(async (req: Request, res: Response) => {
 
 // New place form
 router.get('/places/new', asyncHandler(async (req: Request, res: Response) => {
+  const allTags = await TagModel.findAll();
+  const primaryTags = allTags.filter(t => t.is_primary);
   const { parents, standalone } = await TagModel.findAllStructured();
   res.render('admin/places/form', {
     place: null,
     parents,
     standalone,
+    primaryTags,
     user: req.user,
     errors: []
   });
@@ -133,11 +136,14 @@ router.post('/places', asyncHandler(async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
+    const allTags = await TagModel.findAll();
+    const primaryTags = allTags.filter(t => t.is_primary);
     const { parents, standalone } = await TagModel.findAllStructured();
     return res.render('admin/places/form', {
       place: req.body,
       parents,
       standalone,
+      primaryTags,
       user: req.user,
       errors
     });
@@ -175,12 +181,15 @@ router.get('/places/:id/edit', asyncHandler(async (req: Request, res: Response) 
     return res.status(404).send('Place not found');
   }
 
+  const allTags = await TagModel.findAll();
+  const primaryTags = allTags.filter(t => t.is_primary);
   const { parents, standalone } = await TagModel.findAllStructured();
 
   res.render('admin/places/form', {
     place,
     parents,
     standalone,
+    primaryTags,
     user: req.user,
     errors: []
   });
@@ -199,11 +208,14 @@ router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
+    const allTags = await TagModel.findAll();
+    const primaryTags = allTags.filter(t => t.is_primary);
     const { parents, standalone } = await TagModel.findAllStructured();
     return res.render('admin/places/form', {
       place: { id: getParamId(req.params.id), ...req.body },
       parents,
       standalone,
+      primaryTags,
       user: req.user,
       errors
     });

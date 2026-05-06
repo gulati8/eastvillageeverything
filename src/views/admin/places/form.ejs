@@ -212,6 +212,22 @@
       </div>
 
       <div class="mb-3">
+        <label for="primary_tag_id" class="form-label">Primary tag</label>
+        <select class="form-select" id="primary_tag_id" name="primary_tag_id" style="max-width: 360px;">
+          <option value="">— None —</option>
+          <% primaryTags.forEach(function(t) { %>
+          <option value="<%= t.id %>" <%= place && place.primary_tag_id === t.id ? 'selected' : '' %>>
+            <%= t.display %>
+          </option>
+          <% }); %>
+        </select>
+        <div class="form-text">
+          The headline tag for this place — drives the row meta line and fallback image in the mobile feed.
+          Only tags marked primary-eligible appear here. Manage via <a href="/admin/tags">Tags</a>.
+        </div>
+      </div>
+
+      <div class="mb-3">
         <button type="submit" class="btn btn-primary"><%= place && place.id ? 'Update' : 'Create' %> Place</button>
         <a href="/admin/places" class="btn btn-secondary">Cancel</a>
       </div>
