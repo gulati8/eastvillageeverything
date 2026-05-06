@@ -127,13 +127,14 @@
             <div class="form-text">Hex color for the typographic-fallback hero accent (place name text on tint background). Leave blank for no accent.</div>
           </div>
 
-          <div class="mb-3">
-            <label for="fallback_image_url" class="form-label">Fallback image URL</label>
-            <input type="url" class="form-control" id="fallback_image_url" name="fallback_image_url"
-                   value="<%= tag && tag.fallback_image_url ? tag.fallback_image_url : '' %>"
-                   placeholder="https://...">
-            <div class="form-text">CDN URL shown when a place with this primary tag has no photo. (Image upload UI ships in Phase B; for now paste any URL.)</div>
-          </div>
+          <%- include('../partials/upload-widget', {
+            id: 'fallback_image_url',
+            name: 'fallback_image_url',
+            value: tag && tag.fallback_image_url ? tag.fallback_image_url : '',
+            prefix: 'tag',
+            label: 'Fallback image',
+            help: 'Shown when a place with this primary tag has no photo. Drop an image, click to browse, or paste a URL.',
+          }) %>
         </div>
       </div>
 

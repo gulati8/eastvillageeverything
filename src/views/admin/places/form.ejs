@@ -156,10 +156,14 @@
               </div>
             </div>
             <div class="col-md-12">
-              <div class="mb-3">
-                <label for="photo_url" class="form-label">Photo URL</label>
-                <input type="url" class="form-control" id="photo_url" name="photo_url" value="<%= place ? place.photo_url || '' : '' %>" placeholder="https://...">
-              </div>
+              <%- include('../partials/upload-widget', {
+                id: 'photo_url',
+                name: 'photo_url',
+                value: place && place.photo_url ? place.photo_url : '',
+                prefix: 'place',
+                label: 'Photo',
+                help: 'The hero image for this place. Drop an image, click to browse, or paste a CDN URL.',
+              }) %>
             </div>
           </div>
         </div>
