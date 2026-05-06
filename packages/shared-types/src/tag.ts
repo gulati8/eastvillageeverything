@@ -9,15 +9,30 @@ export interface Tag {
   sort_order: number;
   parent_tag_id: string | null;
   has_children: boolean;
+  is_primary: boolean;
+  tint: string | null;
+  accent: string | null;
+  fallback_image_url: string | null;
   created_at: Date;
   updated_at: Date;
 }
 
-/** API projection of Tag for /api/tags flat response (trimmed, public-safe). */
+/**
+ * API projection of Tag for /api/tags flat response (trimmed, public-safe).
+ *
+ * is_primary / tint / accent / fallback_image_url are exposed publicly so the
+ * mobile client can render fallback heroes and primary-tag pip dots without
+ * a separate admin call. They are optional so older mobile builds that don't
+ * read them stay backwards-compatible.
+ */
 export interface TagSummary {
   value: string;
   display: string;
   order: string;
+  is_primary?: boolean;
+  tint?: string | null;
+  accent?: string | null;
+  fallback_image_url?: string | null;
 }
 
 /** API projection of Tag with nested children — used in structured API responses. */
