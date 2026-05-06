@@ -14,6 +14,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.eastvillageeverything.app",
+      "buildNumber": "3",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
