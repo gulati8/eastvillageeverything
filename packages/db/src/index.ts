@@ -1,2 +1,2 @@
-// Models and pool re-exported here. Populated in Task 5.
-export {};
+export { pool, query, getClient, withTransaction } from './pool.js';
+export * from './models/index.js';

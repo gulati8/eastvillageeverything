@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { PlaceModel, TagModel } from '../models/index.js';
+import { PlaceModel, TagModel } from '@eve/db';
 
 const router = Router();
 

@@ -1,4 +1,4 @@
-import { query, withTransaction } from '../db.js';
+import { query, withTransaction } from '../pool.js';
 import type { PoolClient } from 'pg';
 import type { Place } from '@eve/shared-types';
 

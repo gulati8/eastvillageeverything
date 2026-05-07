@@ -52,4 +52,5 @@ export async function closePool(): Promise<void> {
   await pool.end();
 }
 
+export { pool };
 export default pool;

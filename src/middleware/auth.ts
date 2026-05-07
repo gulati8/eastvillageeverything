@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserPublic } from '../models/user.js';
+import { UserPublic } from '@eve/db';
 
 // Extend Express Session
 declare module 'express-session' {

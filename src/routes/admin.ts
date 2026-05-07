@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
-import { PlaceModel, TagModel, UserModel } from '../models/index.js';
+import { PlaceModel, TagModel, UserModel } from '@eve/db';
 import { requireAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { uploadSingle } from '../middleware/upload.js';

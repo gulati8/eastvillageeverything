@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { query } from '../db.js';
+import { query } from '../pool.js';
 
 export interface User {
   id: string;
