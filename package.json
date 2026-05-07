@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "East Village Everything - Local business directory",
   "main": "dist/src/server.js",
+  "workspaces": ["packages/*", "apps/*"],
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "npm run build:packages && tsc",
+    "build:packages": "npm --workspaces --if-present run build",
+    "dev:packages": "npm --workspaces --if-present run dev",
     "start": "node dist/src/server.js",
     "docker:dev": "docker-compose up",
     "docker:build": "docker-compose build",

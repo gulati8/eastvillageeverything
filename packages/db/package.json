@@ -1,6 +1,6 @@
 {
-  "name": "@eve/shared-types",
-  "version": "0.0.2",
+  "name": "@eve/db",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
@@ -10,7 +10,14 @@
     "dev": "tsc --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@eve/shared-types": "*",
+    "bcryptjs": "^3.0.3",
+    "pg": "^8.13.1"
+  },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/pg": "^8.11.10",
     "typescript": "^5.7.3"
   }
 }
