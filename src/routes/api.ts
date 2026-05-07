@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { PlaceModel, TagModel } from '@eve/db';
-import type { PlacesListResponse, PlaceDetailResponse, TagsFlatResponse, TagsStructuredResponse, TagSummary } from '@eve/shared-types';
+import { PlaceModel, TagModel, NeighborhoodModel } from '@eve/db';
+import type { PlacesListResponse, PlaceDetailResponse, TagsFlatResponse, TagsStructuredResponse, TagSummary, NeighborhoodSummary } from '@eve/shared-types';
 
 const router = Router();
 
@@ -42,6 +42,7 @@ router.get('/places', async (req: Request, res: Response) => {
       hours_json: place.hours_json ?? null,
       cross_street: place.cross_street ?? null,
       primary_tag_id: place.primary_tag_id ?? null,
+      neighborhood_id: place.neighborhood_id,
     }));
 
     res.json(response);
@@ -81,6 +82,7 @@ router.get('/places/:id', async (req: Request, res: Response) => {
       price_tier: place.price_tier ?? null,
       cross_street: place.cross_street ?? null,
       primary_tag_id: place.primary_tag_id ?? null,
+      neighborhood_id: place.neighborhood_id,
       photo_url: place.photo_url ?? null,
       photo_credit: place.photo_credit ?? null,
       google_place_id: place.google_place_id ?? null,
@@ -153,6 +155,23 @@ router.get('/tags', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching tags:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/neighborhoods', async (_req: Request, res: Response) => {
+  try {
+    const rows = await NeighborhoodModel.findAll();
+    const response: NeighborhoodSummary[] = rows.map((n) => ({
+      id: n.id,
+      value: n.value,
+      display: n.display,
+      is_default: n.is_default,
+      order: String(n.sort_order),
+    }));
+    res.json(response);
+  } catch (err) {
+    console.error('GET /api/neighborhoods failed', err);
+    res.status(500).json({ error: 'Internal error' });
   }
 });
 
