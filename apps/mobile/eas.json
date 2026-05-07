@@ -28,8 +28,7 @@
         "EXPO_PUBLIC_SENTRY_DSN": "https://287901cf680df0593157c65337e56667@o4511324193161216.ingest.us.sentry.io/4511324209217536",
         "EXPO_PUBLIC_SENTRY_ENVIRONMENT": "production",
         "SENTRY_ORG": "gulati-labs",
-        "SENTRY_PROJECT": "east-village-everything",
-        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+        "SENTRY_PROJECT": "east-village-everything"
       }
     }
   },
