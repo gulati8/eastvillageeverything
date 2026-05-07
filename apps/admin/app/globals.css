@@ -1,0 +1,29 @@
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-serif/400-italic.css';
+@import '@fontsource/source-serif-4/400.css';
+@import '@fontsource/source-serif-4/400-italic.css';
+@import '@fontsource/schibsted-grotesk/600.css';
+@import '@fontsource/schibsted-grotesk/700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  background: theme('colors.paper');
+  color: theme('colors.ink');
+  font-family: theme('fontFamily.body');
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+  font-family: theme('fontFamily.display');
+  font-style: italic;
+  font-weight: 400;
+}
+
+.ui {
+  font-family: theme('fontFamily.ui');
+  letter-spacing: 0.04em;
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@eve/admin",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/sortable": "^8.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@eve/db": "*",
+    "@eve/design-tokens": "*",
+    "@eve/shared-types": "*",
+    "@eve/storage": "*",
+    "@fontsource/instrument-serif": "^5.0.0",
+    "@fontsource/source-serif-4": "^5.0.0",
+    "@fontsource/schibsted-grotesk": "^5.0.0",
+    "cookie-signature": "^1.2.1",
+    "ioredis": "^5.4.2",
+    "next": "15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/cookie-signature": "^1.1.0",
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.7.3"
+  }
+}
