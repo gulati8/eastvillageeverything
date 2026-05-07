@@ -4,7 +4,7 @@ import { PlaceModel, TagModel, UserModel } from '@eve/db';
 import { requireAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { uploadSingle } from '../middleware/upload.js';
-import { putObject } from '../storage/index.js';
+import { putObject } from '@eve/storage';
 
 const router = Router();
 
