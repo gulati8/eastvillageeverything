@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { createNeighborhoodInline } from '../lib/actions/neighborhoods';
 
 interface Neighborhood { id: string; value: string; display: string; }
 
@@ -11,15 +12,17 @@ interface Props {
 }
 
 export function NeighborhoodPicker({ name, options, initialId }: Props) {
+  const [list, setList] = useState<Neighborhood[]>(options);
   const [selectedId, setSelectedId] = useState(initialId);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
-  const inlineCreateAvailable = false;
+  const [pending, startTransition] = useTransition();
+  const inlineCreateAvailable = true;
 
-  const filtered = options.filter((n) => n.display.toLowerCase().includes(query.toLowerCase()));
-  const exactMatch = options.some((n) => n.display.toLowerCase() === query.trim().toLowerCase());
+  const filtered = list.filter((n) => n.display.toLowerCase().includes(query.toLowerCase()));
+  const exactMatch = list.some((n) => n.display.toLowerCase() === query.trim().toLowerCase());
   const showCreate = query.trim().length > 0 && !exactMatch;
-  const selected = options.find((n) => n.id === selectedId);
+  const selected = list.find((n) => n.id === selectedId);
 
   return (
     <div className="space-y-2 relative">
@@ -57,9 +60,20 @@ export function NeighborhoodPicker({ name, options, initialId }: Props) {
           {showCreate && (
             <button
               type="button"
-              disabled={!inlineCreateAvailable}
+              disabled={!inlineCreateAvailable || pending}
+              onClick={() => {
+                const display = query.trim();
+                startTransition(async () => {
+                  const created = await createNeighborhoodInline(display);
+                  if (created) {
+                    setList((prev) => [...prev, created]);
+                    setSelectedId(created.id);
+                    setQuery('');
+                    setOpen(false);
+                  }
+                });
+              }}
               className="block w-full text-left px-3 py-2 hover:bg-paper text-accent disabled:opacity-50 disabled:cursor-not-allowed"
-              title={inlineCreateAvailable ? '' : 'Coming in Task 20'}
             >
               + Create &quot;{query.trim()}&quot;
             </button>
