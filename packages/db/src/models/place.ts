@@ -24,6 +24,7 @@ export interface PlaceInput {
   photo_url?: string;
   photo_credit?: string;
   primary_tag_id?: string | null;
+  neighborhood_id?: string | null;
 }
 
 // Normalize phone to digits only
@@ -60,9 +61,10 @@ export class PlaceModel {
         p.lat, p.lng,
         p.pitch, p.perfect, p.insider, p.crowd, p.vibe,
         p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit, p.primary_tag_id,
+        p.neighborhood_id,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         COALESCE(
-          array_agg(t.value ORDER BY t.sort_order) FILTER (WHERE t.value IS NOT NULL),
+          array_agg(t.value ORDER BY pt.sort_order, t.sort_order) FILTER (WHERE t.value IS NOT NULL),
           ARRAY[]::varchar[]
         ) as tags
       FROM places p
@@ -115,9 +117,10 @@ export class PlaceModel {
         p.lat, p.lng,
         p.pitch, p.perfect, p.insider, p.crowd, p.vibe,
         p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit, p.primary_tag_id,
+        p.neighborhood_id,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         COALESCE(
-          array_agg(t.value ORDER BY t.sort_order) FILTER (WHERE t.value IS NOT NULL),
+          array_agg(t.value ORDER BY pt.sort_order, t.sort_order) FILTER (WHERE t.value IS NOT NULL),
           ARRAY[]::varchar[]
         ) as tags
       FROM places p
@@ -136,13 +139,24 @@ export class PlaceModel {
    */
   static async create(data: PlaceInput): Promise<Place> {
     return withTransaction(async (client: PoolClient) => {
+      let neighborhoodId = data.neighborhood_id;
+      if (!neighborhoodId) {
+        const defaultRow = await client.query<{ id: string }>(
+          `SELECT id FROM neighborhoods WHERE is_default = true LIMIT 1`
+        );
+        neighborhoodId = defaultRow.rows[0]?.id;
+        if (!neighborhoodId) {
+          throw new Error('No default neighborhood configured');
+        }
+      }
+
       // Insert the place
       const insertSql = `
         INSERT INTO places (name, address, phone, url, specials, categories, notes,
           pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-          cross_street, photo_url, photo_credit, primary_tag_id)
+          cross_street, photo_url, photo_credit, primary_tag_id, neighborhood_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
-                $15, $16, $17, $18)
+                $15, $16, $17, $18, $19)
         RETURNING id
       `;
 
@@ -165,6 +179,7 @@ export class PlaceModel {
         validateUrl(data.photo_url),
         data.photo_credit || null,
         data.primary_tag_id || null,
+        neighborhoodId,
       ]);
 
       const place = placeResult.rows[0];
@@ -261,6 +276,10 @@ export class PlaceModel {
         updates.push(`primary_tag_id = $${paramIndex++}`);
         params.push(data.primary_tag_id || null);
       }
+      if (data.neighborhood_id !== undefined && data.neighborhood_id !== null) {
+        updates.push(`neighborhood_id = $${paramIndex++}`);
+        params.push(data.neighborhood_id);
+      }
 
       // Always update updated_at
       updates.push(`updated_at = NOW()`);
@@ -296,24 +315,24 @@ export class PlaceModel {
   }
 
   /**
-   * Set tags for a place (replaces existing tags)
+   * Set tags for a place (replaces existing tags). The order of tagValues
+   * determines per-place sort_order (0, 1, 2…). The first tag drives the
+   * meta-line headline on the mobile feed.
    */
   private static async setTags(
     client: PoolClient,
     placeId: string,
     tagValues: string[]
   ): Promise<void> {
-    // Remove existing tags
     await client.query('DELETE FROM place_tags WHERE place_id = $1', [placeId]);
 
-    if (tagValues.length === 0) return;
-
-    // Add new tags
-    const insertSql = `
-      INSERT INTO place_tags (place_id, tag_id)
-      SELECT $1, id FROM tags WHERE value = ANY($2)
-    `;
-    await client.query(insertSql, [placeId, tagValues]);
+    for (let i = 0; i < tagValues.length; i++) {
+      await client.query(
+        `INSERT INTO place_tags (place_id, tag_id, sort_order)
+         SELECT $1, t.id, $3 FROM tags t WHERE t.value = $2`,
+        [placeId, tagValues[i], i]
+      );
+    }
   }
 }
 
