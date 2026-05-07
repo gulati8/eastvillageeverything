@@ -28,6 +28,7 @@ export interface Place {
   notes: string | null;
   tags: string[];
   primary_tag_id?: string | null;
+  neighborhood_id: string;
   lat?: number | null;
   lng?: number | null;
   created_at: Date;
@@ -64,6 +65,7 @@ export interface PlaceResponse {
   notes: string | null;
   tags: string[];
   primary_tag_id?: string | null;
+  neighborhood_id?: string;
   lat?: number | null;
   lng?: number | null;
   created_at: string;
