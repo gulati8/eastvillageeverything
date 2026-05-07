@@ -46,6 +46,30 @@ services:
     volumes:
       - redis_data:/data
 
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    environment:
+      DATABASE_URL: postgres://eve:eve_dev_password@postgres:5432/eve_development
+      REDIS_URL: redis://redis:6379
+      SESSION_COOKIE_NAME: connect.sid
+      SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret-change-in-production}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      STORAGE_LOCAL_DIR: public/uploads
+      STORAGE_LOCAL_URL_PREFIX: /uploads
+      STORAGE_S3_BUCKET: ${STORAGE_S3_BUCKET:-}
+      STORAGE_S3_REGION: ${STORAGE_S3_REGION:-us-east-1}
+      STORAGE_S3_PREFIX: ${STORAGE_S3_PREFIX:-public}
+      STORAGE_S3_URL_PATTERN: ${STORAGE_S3_URL_PATTERN:-}
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+      - app
+
 volumes:
   postgres_data:
   redis_data:
