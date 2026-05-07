@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { SortableList } from './SortableList';
+import { createTagInline } from '../lib/actions/tags';
 
 interface Tag { id: string; value: string; display: string; }
 
@@ -14,7 +15,8 @@ interface Props {
 export function TagPicker({ name, allTags, initial }: Props) {
   const [selected, setSelected] = useState<Tag[]>(initial);
   const [query, setQuery] = useState('');
-  const inlineCreateAvailable = false;
+  const [pending, startTransition] = useTransition();
+  const inlineCreateAvailable = true;
 
   const remaining = allTags.filter((t) => !selected.some((s) => s.id === t.id));
   const suggestions = remaining.filter((t) =>
@@ -50,9 +52,18 @@ export function TagPicker({ name, allTags, initial }: Props) {
           {showCreate && (
             <button
               type="button"
-              disabled={!inlineCreateAvailable}
+              disabled={!inlineCreateAvailable || pending}
+              onClick={() => {
+                const display = query.trim();
+                startTransition(async () => {
+                  const created = await createTagInline(display);
+                  if (created) {
+                    setSelected((prev) => [...prev, created]);
+                    setQuery('');
+                  }
+                });
+              }}
               className="block w-full text-left px-3 py-2 hover:bg-paper text-accent disabled:opacity-50 disabled:cursor-not-allowed"
-              title={inlineCreateAvailable ? '' : 'Coming in Task 19'}
             >
               + Create &quot;{query.trim()}&quot;
             </button>
