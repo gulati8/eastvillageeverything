@@ -3,12 +3,18 @@
   "version": "1.0.0",
   "description": "East Village Everything - Local business directory",
   "main": "dist/src/server.js",
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "dev:server": "tsx watch src/server.ts",
+    "dev:admin": "npm --prefix apps/admin run dev",
+    "dev:packages": "npm --workspaces --if-present run dev",
+    "dev:all": "npm run build:packages && concurrently -n db,storage,types,tokens,server,admin -c blue,cyan,gray,magenta,green,yellow \"npm --prefix packages/db run dev\" \"npm --prefix packages/storage run dev\" \"npm --prefix packages/shared-types run dev\" \"npm --prefix packages/design-tokens run dev\" \"npm run dev:server\" \"npm run dev:admin\"",
     "build": "npm run build:packages && tsc",
     "build:packages": "npm --workspaces --if-present run build",
-    "dev:packages": "npm --workspaces --if-present run dev",
     "start": "node dist/src/server.js",
     "docker:dev": "docker-compose up",
     "docker:build": "docker-compose build",
@@ -54,6 +60,7 @@
     "@types/multer": "^2.1.0",
     "@types/node": "^22.10.7",
     "@types/pg": "^8.11.10",
+    "concurrently": "^9.2.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   },
