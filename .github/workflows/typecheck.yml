@@ -22,14 +22,14 @@ jobs:
             apps/mobile/package-lock.json
 
       - name: Install root deps
-        run: npm ci
+        run: npm ci --include-workspace-root
+
+      - name: Typecheck (server)
+        run: npx tsc --noEmit
 
       - name: Install mobile deps
         run: npm ci
         working-directory: apps/mobile
-
-      - name: Typecheck (server)
-        run: npx tsc --noEmit
 
       - name: Typecheck (mobile)
         run: npx tsc --noEmit
