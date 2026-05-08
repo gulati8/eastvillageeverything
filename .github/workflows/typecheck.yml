@@ -24,6 +24,12 @@ jobs:
       - name: Install root deps
         run: npm ci --include-workspace-root
 
+      - name: Build server workspaces
+        run: |
+          npm --workspace @eve/shared-types run build
+          npm --workspace @eve/db run build
+          npm --workspace @eve/storage run build
+
       - name: Typecheck (server)
         run: npx tsc --noEmit
 
