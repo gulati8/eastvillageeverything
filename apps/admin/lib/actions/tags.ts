@@ -8,6 +8,10 @@ function slugify(s: string): string {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
 }
 
+function isValidSlug(value: string): boolean {
+  return /^[a-z0-9-]+$/.test(value);
+}
+
 async function uniqueSlug(base: string): Promise<string> {
   let candidate = base;
   let i = 2;
@@ -19,9 +23,9 @@ async function uniqueSlug(base: string): Promise<string> {
 
 export async function createTag(formData: FormData) {
   const display = String(formData.get('display') ?? '').trim();
-  const valueRaw = String(formData.get('value') ?? '').trim();
-  if (!display) return;
-  const value = await uniqueSlug(valueRaw ? slugify(valueRaw) : slugify(display));
+  const value = String(formData.get('value') ?? '').trim();
+  if (!display || !value || !isValidSlug(value)) return;
+  if (await TagModel.findByValue(value)) return;
   await TagModel.create({ value, display, sort_order: 0 });
   revalidatePath('/tags');
   redirect('/tags');
@@ -30,6 +34,9 @@ export async function createTag(formData: FormData) {
 export async function updateTag(id: string, formData: FormData) {
   const display = String(formData.get('display') ?? '').trim();
   const value = String(formData.get('value') ?? '').trim();
+  if (!display || !value || !isValidSlug(value)) return;
+  const existing = await TagModel.findByValue(value);
+  if (existing && existing.id !== id) return;
   await TagModel.update(id, { display, value });
   revalidatePath('/tags');
   redirect('/tags');

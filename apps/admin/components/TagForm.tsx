@@ -14,10 +14,11 @@ export function TagForm({ action, defaultValues = { display: '', value: '' } }: 
         />
       </label>
       <label className="block">
-        <span className="ui text-xs uppercase text-ink3">Slug (auto from display)</span>
+        <span className="ui text-xs uppercase text-ink3">Slug</span>
         <input
-          name="value" defaultValue={defaultValues.value}
-          placeholder="auto-generated"
+          name="value" required defaultValue={defaultValues.value}
+          pattern="[a-z0-9-]+"
+          placeholder="e.g., happy-hour"
           className="w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent"
         />
       </label>

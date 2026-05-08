@@ -14,6 +14,10 @@ function getParamId(param: string | string[] | undefined): string {
   return param || '';
 }
 
+function queryParamIsOn(value: unknown): boolean {
+  return value === 'on' || (Array.isArray(value) && value.some((item) => item === 'on'));
+}
+
 // =====================================================
 // Authentication Routes
 // =====================================================
@@ -119,6 +123,7 @@ router.get('/places/new', asyncHandler(async (req: Request, res: Response) => {
     parents,
     standalone,
     primaryTags: [],
+    showEditorial: queryParamIsOn(req.query.editorial),
     user: req.user,
     errors: []
   });
@@ -143,6 +148,7 @@ router.post('/places', asyncHandler(async (req: Request, res: Response) => {
       parents,
       standalone,
       primaryTags: [],
+      showEditorial: queryParamIsOn(req.query.editorial),
       user: req.user,
       errors
     });
@@ -186,6 +192,7 @@ router.get('/places/:id/edit', asyncHandler(async (req: Request, res: Response) 
     parents,
     standalone,
     primaryTags: [],
+    showEditorial: queryParamIsOn(req.query.editorial),
     user: req.user,
     errors: []
   });
@@ -210,6 +217,7 @@ router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
       parents,
       standalone,
       primaryTags: [],
+      showEditorial: queryParamIsOn(req.query.editorial),
       user: req.user,
       errors
     });
@@ -265,10 +273,8 @@ router.get('/tags', asyncHandler(async (req: Request, res: Response) => {
 
 // New tag form
 router.get('/tags/new', asyncHandler(async (req: Request, res: Response) => {
-  const potentialParents = await TagModel.getPotentialParents();
   res.render('admin/tags/form', {
     tag: null,
-    potentialParents,
     user: req.user,
     errors: []
   });
@@ -276,32 +282,29 @@ router.get('/tags/new', asyncHandler(async (req: Request, res: Response) => {
 
 // Create tag
 router.post('/tags', asyncHandler(async (req: Request, res: Response) => {
-  const { value, display, sort_order } = req.body;
+  const { value, display } = req.body;
+  const normalizedValue = String(value ?? '').trim();
 
   const errors: string[] = [];
-  if (!value || value.trim() === '') {
-    errors.push('Value is required');
-  }
   if (!display || display.trim() === '') {
     errors.push('Display name is required');
   }
-  if (value && !/^[a-z0-9-]+$/.test(value.trim())) {
-    errors.push('Value must contain only lowercase letters, numbers, and hyphens');
+  if (!normalizedValue) {
+    errors.push('Slug is required');
   }
-
-  // Check for duplicate value
-  if (value) {
-    const existing = await TagModel.findByValue(value.trim());
+  if (normalizedValue && !/^[a-z0-9-]+$/.test(normalizedValue)) {
+    errors.push('Slug must contain only lowercase letters, numbers, and hyphens');
+  }
+  if (normalizedValue) {
+    const existing = await TagModel.findByValue(normalizedValue);
     if (existing) {
-      errors.push('A tag with this value already exists');
+      errors.push('A tag with this slug already exists');
     }
   }
 
   if (errors.length > 0) {
-    const potentialParents = await TagModel.getPotentialParents();
     return res.render('admin/tags/form', {
       tag: req.body,
-      potentialParents,
       user: req.user,
       errors
     });
@@ -309,17 +312,15 @@ router.post('/tags', asyncHandler(async (req: Request, res: Response) => {
 
   try {
     await TagModel.create({
-      value: value.trim(),
+      value: normalizedValue,
       display: display.trim(),
-      sort_order: parseInt(sort_order, 10) || 0,
+      sort_order: 0,
     });
     res.redirect('/admin/tags');
   } catch (err) {
     if (err instanceof Error && err.message.startsWith('Nesting limited')) {
-      const potentialParents = await TagModel.getPotentialParents();
       return res.status(400).render('admin/tags/form', {
         tag: req.body,
-        potentialParents,
         user: req.user,
         errors: [err.message],
       });
@@ -336,11 +337,8 @@ router.get('/tags/:id/edit', asyncHandler(async (req: Request, res: Response) =>
     return res.status(404).send('Tag not found');
   }
 
-  const potentialParents = await TagModel.getPotentialParents();
-
   res.render('admin/tags/form', {
     tag,
-    potentialParents,
     user: req.user,
     errors: []
   });
@@ -348,33 +346,30 @@ router.get('/tags/:id/edit', asyncHandler(async (req: Request, res: Response) =>
 
 // Update tag
 router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
-  const { value, display, sort_order } = req.body;
+  const { value, display } = req.body;
   const tagId = getParamId(req.params.id);
+  const normalizedValue = String(value ?? '').trim();
 
   const errors: string[] = [];
-  if (!value || value.trim() === '') {
-    errors.push('Value is required');
-  }
   if (!display || display.trim() === '') {
     errors.push('Display name is required');
   }
-  if (value && !/^[a-z0-9-]+$/.test(value.trim())) {
-    errors.push('Value must contain only lowercase letters, numbers, and hyphens');
+  if (!normalizedValue) {
+    errors.push('Slug is required');
   }
-
-  // Check for duplicate value (excluding current tag)
-  if (value) {
-    const existing = await TagModel.findByValue(value.trim());
+  if (normalizedValue && !/^[a-z0-9-]+$/.test(normalizedValue)) {
+    errors.push('Slug must contain only lowercase letters, numbers, and hyphens');
+  }
+  if (normalizedValue) {
+    const existing = await TagModel.findByValue(normalizedValue);
     if (existing && existing.id !== tagId) {
-      errors.push('A tag with this value already exists');
+      errors.push('A tag with this slug already exists');
     }
   }
 
   if (errors.length > 0) {
-    const potentialParents = await TagModel.getPotentialParents();
     return res.render('admin/tags/form', {
       tag: { id: tagId, ...req.body },
-      potentialParents,
       user: req.user,
       errors
     });
@@ -383,16 +378,13 @@ router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
   let updated;
   try {
     updated = await TagModel.update(tagId, {
-      value: value.trim(),
+      value: normalizedValue,
       display: display.trim(),
-      sort_order: parseInt(sort_order, 10) || 0,
     });
   } catch (err) {
     if (err instanceof Error && err.message.startsWith('Nesting limited')) {
-      const potentialParents = await TagModel.getPotentialParents();
       return res.status(400).render('admin/tags/form', {
         tag: { id: tagId, ...req.body },
-        potentialParents,
         user: req.user,
         errors: [err.message],
       });

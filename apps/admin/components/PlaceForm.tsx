@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { PhotoUpload } from './PhotoUpload';
 import { TagPicker } from './TagPicker';
 import { NeighborhoodPicker } from './NeighborhoodPicker';
@@ -19,10 +18,10 @@ interface Props {
   allTags: Tag[];
   selectedTags: Tag[];
   neighborhoods: Neighborhood[];
+  showEditorial?: boolean;
 }
 
-export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, neighborhoods }: Props) {
-  const [showEditorial, setShowEditorial] = useState(false);
+export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, neighborhoods, showEditorial = false }: Props) {
   const v = defaultValues;
   const defaultNeighborhood =
     v.neighborhood_id ||
@@ -47,14 +46,6 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
 
       <TextArea label="Specials" name="specials" defaultValue={v.specials ?? ''} rows={3} />
       <TextArea label="Notes" name="notes" defaultValue={v.notes ?? ''} rows={3} />
-
-      <button
-        type="button"
-        onClick={() => setShowEditorial(!showEditorial)}
-        className="ui text-xs uppercase text-ink3 hover:text-ink"
-      >
-        {showEditorial ? '− Hide' : '+ Show'} editorial fields
-      </button>
 
       {showEditorial && (
         <section className="space-y-3 border-l-2 border-hairline pl-4">

@@ -5,8 +5,17 @@ import { DeleteButton } from '../../../../components/DeleteButton';
 import { PlaceModel, TagModel, NeighborhoodModel } from '@eve/db';
 import { updatePlace, deletePlace } from '../../../../lib/actions/places';
 
-export default async function EditPlacePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function EditPlacePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ editorial?: string | string[] }>;
+}) {
+  const [{ id }, resolvedSearchParams] = await Promise.all([params, searchParams]);
+  const safeSearchParams = resolvedSearchParams ?? {};
+  const editorial = safeSearchParams.editorial;
+  const showEditorial = Array.isArray(editorial) ? editorial.includes('on') : editorial === 'on';
   const [place, tags, neighborhoods, allPlaces] = await Promise.all([
     PlaceModel.findById(id),
     TagModel.findAll(),
@@ -61,6 +70,7 @@ export default async function EditPlacePage({ params }: { params: Promise<{ id: 
         allTags={tags.map((t) => ({ id: t.id, value: t.value, display: t.display }))}
         selectedTags={selectedTags.map((t) => ({ id: t.id, value: t.value, display: t.display }))}
         neighborhoods={neighborhoods.map((n) => ({ id: n.id, value: n.value, display: n.display }))}
+        showEditorial={showEditorial}
       />
     </div>
   );
