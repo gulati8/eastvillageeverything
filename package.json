@@ -17,7 +17,7 @@
     "dev:admin": "npm --prefix apps/admin run dev",
     "dev:packages": "npm --workspaces --if-present run dev",
     "dev:all": "npm run build:packages && concurrently -n db,storage,types,tokens,server,admin -c blue,cyan,gray,magenta,green,yellow \"npm --prefix packages/db run dev\" \"npm --prefix packages/storage run dev\" \"npm --prefix packages/shared-types run dev\" \"npm --prefix packages/design-tokens run dev\" \"npm run dev:server\" \"npm run dev:admin\"",
-    "build": "npm run build:packages && tsc",
+    "build": "npm --workspace @eve/shared-types run build && npm run build:packages && tsc",
     "build:packages": "npm --workspaces --if-present run build",
     "start": "node dist/src/server.js",
     "docker:dev": "docker-compose up",

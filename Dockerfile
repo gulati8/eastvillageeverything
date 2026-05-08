@@ -10,6 +10,10 @@ WORKDIR /app
 
 # Install dependencies first (better layer caching)
 COPY package*.json ./
+COPY packages/db/package.json ./packages/db/package.json
+COPY packages/design-tokens/package.json ./packages/design-tokens/package.json
+COPY packages/shared-types/package.json ./packages/shared-types/package.json
+COPY packages/storage/package.json ./packages/storage/package.json
 RUN npm ci
 
 # Copy source and build
@@ -31,10 +35,15 @@ WORKDIR /app
 
 # Copy package files and install production dependencies only
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+COPY packages/db/package.json ./packages/db/package.json
+COPY packages/design-tokens/package.json ./packages/design-tokens/package.json
+COPY packages/shared-types/package.json ./packages/shared-types/package.json
+COPY packages/storage/package.json ./packages/storage/package.json
+RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/packages ./packages
 
 # Copy static assets and views
 COPY public/ ./public/
