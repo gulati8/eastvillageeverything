@@ -5,7 +5,7 @@ const config = getDefaultConfig(__dirname);
 
 const sharedTypesPath = path.resolve(__dirname, '../../packages/shared-types');
 
-config.watchFolders = [sharedTypesPath];
+config.watchFolders = Array.from(new Set([...(config.watchFolders ?? []), sharedTypesPath]));
 
 config.resolver.nodeModulesPaths = [
   path.resolve(__dirname, 'node_modules'),
