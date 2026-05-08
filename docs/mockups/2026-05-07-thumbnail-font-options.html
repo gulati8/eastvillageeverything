@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EVE thumbnail initials font options</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Fraunces:opsz,wght@9..144,800;9..144,900&family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@700;800;900&family=Sora:wght@700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --paper: #16110c;
+      --paper2: #1f1812;
+      --ink: #f5ebda;
+      --ink2: #c4b49c;
+      --ink3: #8b7e69;
+      --line: rgba(245,235,218,0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Schibsted Grotesk", system-ui, sans-serif;
+      padding: 28px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font: italic 48px/0.95 "Instrument Serif", Georgia, serif;
+      letter-spacing: 0;
+    }
+
+    .intro {
+      max-width: 760px;
+      margin: 0 0 26px;
+      color: var(--ink2);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .option {
+      border-top: 1px solid var(--line);
+      padding: 20px 0 22px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .option h2 {
+      margin: 0 0 7px;
+      font-size: 16px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .option p {
+      margin: 0;
+      color: var(--ink3);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .tiles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .sample {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      background: #251810;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.92);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.42);
+    }
+
+    .sample::before,
+    .sample::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .sample::before {
+      width: 92%;
+      height: 92%;
+      top: -20%;
+      left: -18%;
+      background: var(--accent);
+      opacity: 0.72;
+    }
+
+    .sample::after {
+      width: 86%;
+      height: 86%;
+      right: -26%;
+      bottom: -24%;
+      background: var(--shade);
+      opacity: 0.8;
+    }
+
+    .sample span {
+      position: relative;
+      z-index: 1;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    .p1 { --accent: #4a2818; --shade: #14080a; background: #2a160b; }
+    .p2 { --accent: #2a3a26; --shade: #0a140f; background: #16241c; }
+    .p3 { --accent: #3d2a1f; --shade: #120a06; background: #251810; }
+    .p4 { --accent: #3a1a3a; --shade: #0e0820; background: #20102a; }
+    .p5 { --accent: #3a1416; --shade: #0e0408; background: #20080c; }
+
+    .schibsted-800 span {
+      font-family: "Schibsted Grotesk", system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 29px;
+      letter-spacing: 0;
+    }
+
+    .sora span {
+      font-family: "Sora", system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 27px;
+      letter-spacing: 0;
+    }
+
+    .space span {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 31px;
+      letter-spacing: 0;
+    }
+
+    .space-loose span {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 29px;
+      letter-spacing: 0;
+    }
+
+    .space-airy span {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .space-zero span {
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .archivo span {
+      font-family: "Archivo Black", system-ui, sans-serif;
+      font-weight: 400;
+      font-size: 27px;
+      letter-spacing: 0;
+    }
+
+    .fraunces span {
+      font-family: "Fraunces", Georgia, serif;
+      font-weight: 900;
+      font-size: 32px;
+      letter-spacing: 0;
+    }
+
+    .instrument span {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-weight: 400;
+      font-size: 43px;
+      letter-spacing: 0;
+    }
+
+    .row-preview {
+      margin-top: 28px;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+      max-width: 620px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 14px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      padding: 14px 0;
+    }
+
+    .name {
+      font-size: 20px;
+      line-height: 24px;
+      font-weight: 600;
+    }
+
+    .meta {
+      margin-top: 5px;
+      color: var(--ink3);
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 600;
+    }
+
+    .copy {
+      margin-top: 6px;
+      color: var(--ink2);
+      font: 16px/20px "Instrument Serif", Georgia, serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Thumbnail Initials</h1>
+  <p class="intro">
+    Same 72px tile, same background texture, only the initials face changes. The goal is sturdy enough to scan, but not so generic that it feels like a placeholder app icon.
+  </p>
+
+  <section class="option">
+    <div>
+      <h2>Schibsted Grotesk 800</h2>
+      <p>Current family, lighter than the 900 test. Least dependency cost; more controlled but still a little plain.</p>
+    </div>
+    <div class="tiles schibsted-800">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>SSS</span></div>
+      <div class="sample p4"><span>ACB</span></div>
+      <div class="sample p5"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="option">
+    <div>
+      <h2>Sora ExtraBold</h2>
+      <p>Geometric, rounded, friendly. Strong scan value without becoming corporate-heavy.</p>
+    </div>
+    <div class="tiles sora">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>SSS</span></div>
+      <div class="sample p4"><span>ACB</span></div>
+      <div class="sample p5"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="option">
+    <div>
+      <h2>Space Grotesk Bold</h2>
+      <p>Chunky with more character. Feels a little more downtown/editorial than Schibsted.</p>
+    </div>
+    <div class="tiles space">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>SSS</span></div>
+      <div class="sample p4"><span>ACB</span></div>
+      <div class="sample p5"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="option">
+    <div>
+      <h2>Space Grotesk Bold — looser</h2>
+      <p>Slightly smaller with less negative tracking. Still strong, but less packed in the tile.</p>
+    </div>
+    <div class="tiles space-loose">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>SSS</span></div>
+      <div class="sample p4"><span>ACB</span></div>
+      <div class="sample p5"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="option">
+    <div>
+      <h2>Space Grotesk Bold — airy</h2>
+      <p>Smallest and most open. Better breathing room, but less thumb-stopping weight.</p>
+    </div>
+    <div class="tiles space-airy">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>SSS</span></div>
+      <div class="sample p4"><span>ACB</span></div>
+      <div class="sample p5"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="option">
+    <div>
+      <h2>Space Grotesk Bold — letter spacing 0</h2>
+      <p>Zero tracking with a 28px size. Includes wide stress cases to check if the tile can survive worst-case initials.</p>
+    </div>
+    <div class="tiles space-zero">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>WWW</span></div>
+      <div class="sample p4"><span>MMM</span></div>
+      <div class="sample p5"><span>ACB</span></div>
+      <div class="sample p1"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="option">
+    <div>
+      <h2>Archivo Black</h2>
+      <p>Poster-weight and compact. Very legible, but can get loud fast.</p>
+    </div>
+    <div class="tiles archivo">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>SSS</span></div>
+      <div class="sample p4"><span>ACB</span></div>
+      <div class="sample p5"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="option">
+    <div>
+      <h2>Fraunces Black</h2>
+      <p>Serif personality with real mass. Keeps the EVE voice, though three-letter combos get expressive.</p>
+    </div>
+    <div class="tiles fraunces">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>SSS</span></div>
+      <div class="sample p4"><span>ACB</span></div>
+      <div class="sample p5"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="option">
+    <div>
+      <h2>Instrument Serif</h2>
+      <p>Original feel. Beautiful, but too thin when initials are the only payload.</p>
+    </div>
+    <div class="tiles instrument">
+      <div class="sample p1"><span>SB</span></div>
+      <div class="sample p2"><span>SAH</span></div>
+      <div class="sample p3"><span>SSS</span></div>
+      <div class="sample p4"><span>ACB</span></div>
+      <div class="sample p5"><span>BBN</span></div>
+    </div>
+  </section>
+
+  <section class="row-preview">
+    <h2>Row Context: Space Grotesk</h2>
+    <div class="row">
+      <div class="sample p1 space"><span>SB</span></div>
+      <div>
+        <div class="name">11th Street Bar</div>
+        <div class="meta">510 E 11th St</div>
+        <div class="copy">No Happy hour</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="sample p4 space"><span>ACB</span></div>
+      <div>
+        <div class="name">Alphabet City Beer Co.</div>
+        <div class="meta">96 Ave. C</div>
+        <div class="copy">No Happy Hour</div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

@@ -113,14 +113,12 @@ router.get('/places', asyncHandler(async (req: Request, res: Response) => {
 
 // New place form
 router.get('/places/new', asyncHandler(async (req: Request, res: Response) => {
-  const allTags = await TagModel.findAll();
-  const primaryTags = allTags.filter(t => t.is_primary);
   const { parents, standalone } = await TagModel.findAllStructured();
   res.render('admin/places/form', {
     place: null,
     parents,
     standalone,
-    primaryTags,
+    primaryTags: [],
     user: req.user,
     errors: []
   });
@@ -130,7 +128,7 @@ router.get('/places/new', asyncHandler(async (req: Request, res: Response) => {
 router.post('/places', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-    cross_street, photo_url, photo_credit, primary_tag_id
+    cross_street, photo_url, photo_credit
   } = req.body;
 
   const errors: string[] = [];
@@ -139,14 +137,12 @@ router.post('/places', asyncHandler(async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
-    const allTags = await TagModel.findAll();
-    const primaryTags = allTags.filter(t => t.is_primary);
     const { parents, standalone } = await TagModel.findAllStructured();
     return res.render('admin/places/form', {
       place: req.body,
       parents,
       standalone,
-      primaryTags,
+      primaryTags: [],
       user: req.user,
       errors
     });
@@ -171,7 +167,6 @@ router.post('/places', asyncHandler(async (req: Request, res: Response) => {
     cross_street: cross_street?.trim() || undefined,
     photo_url: photo_url?.trim() || undefined,
     photo_credit: photo_credit?.trim() || undefined,
-    primary_tag_id: primary_tag_id || null,
   });
 
   res.redirect('/admin/places');
@@ -184,15 +179,13 @@ router.get('/places/:id/edit', asyncHandler(async (req: Request, res: Response) 
     return res.status(404).send('Place not found');
   }
 
-  const allTags = await TagModel.findAll();
-  const primaryTags = allTags.filter(t => t.is_primary);
   const { parents, standalone } = await TagModel.findAllStructured();
 
   res.render('admin/places/form', {
     place,
     parents,
     standalone,
-    primaryTags,
+    primaryTags: [],
     user: req.user,
     errors: []
   });
@@ -202,7 +195,7 @@ router.get('/places/:id/edit', asyncHandler(async (req: Request, res: Response) 
 router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-    cross_street, photo_url, photo_credit, primary_tag_id
+    cross_street, photo_url, photo_credit
   } = req.body;
 
   const errors: string[] = [];
@@ -211,14 +204,12 @@ router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
-    const allTags = await TagModel.findAll();
-    const primaryTags = allTags.filter(t => t.is_primary);
     const { parents, standalone } = await TagModel.findAllStructured();
     return res.render('admin/places/form', {
       place: { id: getParamId(req.params.id), ...req.body },
       parents,
       standalone,
-      primaryTags,
+      primaryTags: [],
       user: req.user,
       errors
     });
@@ -243,7 +234,6 @@ router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
     cross_street: cross_street?.trim() || undefined,
     photo_url: photo_url?.trim() || undefined,
     photo_credit: photo_credit?.trim() || undefined,
-    primary_tag_id: primary_tag_id || null,
   });
 
   if (!updated) {
@@ -286,8 +276,7 @@ router.get('/tags/new', asyncHandler(async (req: Request, res: Response) => {
 
 // Create tag
 router.post('/tags', asyncHandler(async (req: Request, res: Response) => {
-  const { value, display, sort_order, parent_tag_id,
-          is_primary, tint, accent, fallback_image_url } = req.body;
+  const { value, display, sort_order } = req.body;
 
   const errors: string[] = [];
   if (!value || value.trim() === '') {
@@ -323,11 +312,6 @@ router.post('/tags', asyncHandler(async (req: Request, res: Response) => {
       value: value.trim(),
       display: display.trim(),
       sort_order: parseInt(sort_order, 10) || 0,
-      parent_tag_id: parent_tag_id || null,
-      is_primary: is_primary === 'on' || is_primary === true || is_primary === '1',
-      tint: tint || null,
-      accent: accent || null,
-      fallback_image_url: fallback_image_url || null,
     });
     res.redirect('/admin/tags');
   } catch (err) {
@@ -352,8 +336,7 @@ router.get('/tags/:id/edit', asyncHandler(async (req: Request, res: Response) =>
     return res.status(404).send('Tag not found');
   }
 
-  // Get potential parents, excluding self and children
-  const potentialParents = await TagModel.getPotentialParents(tagId);
+  const potentialParents = await TagModel.getPotentialParents();
 
   res.render('admin/tags/form', {
     tag,
@@ -365,8 +348,7 @@ router.get('/tags/:id/edit', asyncHandler(async (req: Request, res: Response) =>
 
 // Update tag
 router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
-  const { value, display, sort_order, parent_tag_id,
-          is_primary, tint, accent, fallback_image_url } = req.body;
+  const { value, display, sort_order } = req.body;
   const tagId = getParamId(req.params.id);
 
   const errors: string[] = [];
@@ -389,7 +371,7 @@ router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
   }
 
   if (errors.length > 0) {
-    const potentialParents = await TagModel.getPotentialParents(tagId);
+    const potentialParents = await TagModel.getPotentialParents();
     return res.render('admin/tags/form', {
       tag: { id: tagId, ...req.body },
       potentialParents,
@@ -404,15 +386,10 @@ router.post('/tags/:id', asyncHandler(async (req: Request, res: Response) => {
       value: value.trim(),
       display: display.trim(),
       sort_order: parseInt(sort_order, 10) || 0,
-      parent_tag_id: parent_tag_id || null,
-      is_primary: is_primary === 'on' || is_primary === true || is_primary === '1',
-      tint: tint || null,
-      accent: accent || null,
-      fallback_image_url: fallback_image_url || null,
     });
   } catch (err) {
     if (err instanceof Error && err.message.startsWith('Nesting limited')) {
-      const potentialParents = await TagModel.getPotentialParents(tagId);
+      const potentialParents = await TagModel.getPotentialParents();
       return res.status(400).render('admin/tags/form', {
         tag: { id: tagId, ...req.body },
         potentialParents,
@@ -457,12 +434,11 @@ router.post('/tags/:id/delete', asyncHandler(async (req: Request, res: Response)
 // CSRF-protected via the token round-tripped through the EJS template
 // (`<%= csrfToken %>`) and sent as `x-csrf-token` header by the fetch caller.
 router.patch('/api/tags/:id', asyncHandler(async (req: Request, res: Response) => {
-  const { value, display, sort_order, parent_tag_id } = req.body;
+  const { value, display, sort_order } = req.body;
   const tag = await TagModel.update(getParamId(req.params.id), {
     ...(value !== undefined && { value }),
     ...(display !== undefined && { display }),
     ...(sort_order !== undefined && { sort_order: parseInt(sort_order, 10) || 0 }),
-    ...(parent_tag_id !== undefined && { parent_tag_id: parent_tag_id || null }),
   });
   if (!tag) {
     return res.status(404).json({ error: 'Tag not found' });

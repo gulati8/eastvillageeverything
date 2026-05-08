@@ -1,41 +1,53 @@
 import type { PlaceResponse } from '@eve/shared-types';
-import type { PlaceV2Display, CrowdLevel, PriceTier } from './placeV2Display';
-import { inferCategory } from './categoryMap';
+import type { HoursSummary, PlaceV2Display } from './placeV2Display';
 
-function isCrowdLevel(v: unknown): v is CrowdLevel {
-  return v === 'Quiet' || v === 'Light' || v === 'Steady' || v === 'Filling up' || v === 'Booked till 11';
+function normalizeString(v: string | null | undefined): string | null {
+  const trimmed = v?.trim();
+  return trimmed ? trimmed : null;
 }
 
-function isPriceTier(v: unknown): v is PriceTier {
-  return v === '$' || v === '$$' || v === '$$$';
+function summarizeHours(p: PlaceResponse): HoursSummary | null {
+  const hoursJson = p.hours_json ?? null;
+  if (!hoursJson) return null;
+
+  const weekdayDescriptions = hoursJson.weekdayDescriptions;
+  const label = Array.isArray(weekdayDescriptions) && weekdayDescriptions.length > 0
+    ? weekdayDescriptions[new Date().getDay()] ?? null
+    : null;
+
+  return {
+    openNow: null,
+    label,
+  };
 }
 
 export function transformPlace(p: PlaceResponse): PlaceV2Display {
-  const firstLine = p.categories ? p.categories.split('\n')[0].trim() || null : null;
+  const tags = Array.isArray(p.tags) ? p.tags : [];
 
   return {
     key: p.key,
     name: p.name,
-    kind: firstLine,
-    category: inferCategory(p.categories),
     street: p.address ?? null,
     cross: p.cross_street ?? null,
-    tags: Array.isArray(p.tags) ? p.tags : [],
+    tags,
     phone: p.phone ?? null,
     url: p.url ?? null,
     lat: p.lat ?? null,
     lng: p.lng ?? null,
     photo: p.photo_url ?? null,
     photoCredit: p.photo_credit ?? null,
+    specials: p.specials ?? null,
+    notes: p.notes ?? null,
     pitch: p.pitch ?? null,
     perfect: p.perfect ?? null,
     insider: p.insider ?? null,
     crowd: p.crowd ?? null,
     vibe: p.vibe ?? null,
-    crowdLevel: isCrowdLevel(p.crowd_level) ? p.crowd_level : null,
-    priceTier: isPriceTier(p.price_tier) ? p.price_tier : null,
-    hours: null,        // hours derivation deferred to a later phase
-    open: null,         // not derived in Phase 1
+    crowdLevel: normalizeString(p.crowd_level),
+    priceTier: normalizeString(p.price_tier),
+    googlePriceLevel: p.google_price_level ?? null,
+    hours: summarizeHours(p),
+    hoursJson: p.hours_json ?? null,
     distance: null,     // not derived in Phase 1
     closesIn: null,     // not derived in Phase 1
     signal: null,       // not derived in Phase 1

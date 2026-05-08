@@ -1,7 +1,6 @@
-export type CategoryKey = 'dive' | 'pub' | 'coffee' | 'diner' | 'punk' | 'cocktail';
+import type { HoursJson } from '@eve/shared-types';
+
 export type SignalKind = 'happy' | 'closing' | 'music' | 'walkin' | 'always';
-export type CrowdLevel = 'Quiet' | 'Light' | 'Steady' | 'Filling up' | 'Booked till 11';
-export type PriceTier = '$' | '$$' | '$$$';
 export type SortMode = 'smart' | 'nearest' | 'closing' | 'az';
 
 export interface PlaceSignal {
@@ -11,18 +10,23 @@ export interface PlaceSignal {
   eta?: string;
 }
 
+export interface HoursSummary {
+  openNow: boolean | null;
+  label: string | null;
+}
+
 export interface PlaceV2Display {
   key: string;         // UUID from API (PlaceResponse.key)
   name: string;
-  kind: string | null; // "Dive bar", "Irish pub", etc.
-  category: CategoryKey;
   street: string | null;
   cross: string | null;
-  hours: string | null;
-  open: boolean | null;
+  hours: HoursSummary | null;
+  hoursJson: HoursJson | null;
   vibe: string | null;
   photo: string | null;
   photoCredit: string | null;
+  specials: string | null;
+  notes: string | null;
   pitch: string | null;
   perfect: string | null;
   tags: string[];
@@ -31,8 +35,9 @@ export interface PlaceV2Display {
   distance: string | null;
   closesIn: string | null;
   signal: PlaceSignal | null;
-  crowdLevel: CrowdLevel | null;
-  priceTier: PriceTier | null;
+  crowdLevel: string | null;
+  priceTier: string | null;
+  googlePriceLevel: number | null;
   phone: string | null;
   url: string | null;
   lat: number | null;

@@ -24,9 +24,7 @@ export function TabBar({ activeTab = 'tonight' }: TabBarProps) {
   const totalHeight = TAB_HEIGHT + insets.bottom;
   const blurTint = isDark ? 'dark' : 'light';
 
-  // Paper color at 92% opacity as solid fallback
-  const paperHex = colors.paper;
-  const fallbackBg = paperHex + 'EB'; // 0xEB = ~92% of 255
+  const fallbackBg = colors.paper + 'FA';
 
   return (
     <View
@@ -35,6 +33,7 @@ export function TabBar({ activeTab = 'tonight' }: TabBarProps) {
         {
           height: totalHeight,
           borderTopColor: colors.line,
+          backgroundColor: colors.paper,
         },
       ]}
       pointerEvents="box-none"
@@ -45,11 +44,9 @@ export function TabBar({ activeTab = 'tonight' }: TabBarProps) {
         intensity={12}
         style={StyleSheet.absoluteFill}
       />
-      {/* Solid fallback behind blur (also serves as fallback if BlurView is transparent) */}
       <View
         style={[
           StyleSheet.absoluteFill,
-          styles.fallback,
           { backgroundColor: fallbackBg },
         ]}
         pointerEvents="none"
@@ -62,7 +59,7 @@ export function TabBar({ activeTab = 'tonight' }: TabBarProps) {
           {
             paddingTop: 8,
             paddingHorizontal: 22,
-            paddingBottom: insets.bottom,
+            paddingBottom: insets.bottom + 2,
           },
         ]}
       >
@@ -123,9 +120,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     borderTopWidth: 1,
     overflow: 'hidden',
-  },
-  fallback: {
-    zIndex: -1,
   },
   row: {
     flex: 1,

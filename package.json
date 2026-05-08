@@ -7,6 +7,10 @@
     "packages/*",
     "apps/*"
   ],
+  "overrides": {
+    "react-native": "0.81.5",
+    "react-native-worklets": "0.5.1"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "dev:server": "tsx watch src/server.ts",
@@ -61,6 +65,8 @@
     "@types/node": "^22.10.7",
     "@types/pg": "^8.11.10",
     "concurrently": "^9.2.1",
+    "react-native": "0.81.5",
+    "react-native-worklets": "0.5.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   },

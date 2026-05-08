@@ -58,7 +58,7 @@ export function FilterRail({
   const sortLabel = SORT_LABELS[activeSort];
 
   return (
-    <View>
+    <View style={styles.container}>
       {/* Chip scroll row */}
       <ScrollView
         ref={scrollRef}
@@ -166,28 +166,32 @@ export function FilterRail({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    marginTop: 12,
+  },
   scrollContent: {
     paddingHorizontal: 22,
     gap: 8,
     alignItems: 'center',
   },
   chip: {
-    paddingVertical: 8,
+    height: 32,
     paddingHorizontal: 14,
     borderRadius: 999,
-    minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
   },
   chipText: {
     fontSize: 13,
+    lineHeight: 16,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 22,
-    marginTop: 10,
+    marginTop: 8,
+    marginBottom: 4,
   },
   metaText: {
     fontSize: 11,

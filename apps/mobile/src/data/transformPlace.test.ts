@@ -56,14 +56,14 @@ describe('transformPlace', () => {
     expect(out.crowdLevel).toBeNull();
   });
 
-  it('coerces invalid crowd_level to null', () => {
+  it('passes through crowd_level as optional display text', () => {
     const out = transformPlace({ ...baseInput, crowd_level: 'unknown' });
-    expect(out.crowdLevel).toBeNull();
+    expect(out.crowdLevel).toBe('unknown');
   });
 
-  it('coerces invalid price_tier to null', () => {
+  it('passes through price_tier as optional display text', () => {
     const out = transformPlace({ ...baseInput, price_tier: '$$$$' });
-    expect(out.priceTier).toBeNull();
+    expect(out.priceTier).toBe('$$$$');
   });
 
   it('passes through tags array', () => {
@@ -71,13 +71,9 @@ describe('transformPlace', () => {
     expect(out.tags).toEqual(['dive', 'beer']);
   });
 
-  it('extracts kind from first line of categories', () => {
+  it('ignores legacy categories', () => {
     const out = transformPlace({ ...baseInput, categories: 'Cocktail bar\nLate night' });
-    expect(out.kind).toBe('Cocktail bar');
-  });
-
-  it('returns null kind when categories is null', () => {
-    const out = transformPlace({ ...baseInput, categories: null });
-    expect(out.kind).toBeNull();
+    expect(out).not.toHaveProperty('kind');
+    expect(out.tags).toEqual(['dive', 'beer']);
   });
 });

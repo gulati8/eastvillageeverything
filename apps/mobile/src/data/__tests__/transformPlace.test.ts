@@ -45,14 +45,10 @@ describe('transformPlace', () => {
       expect(result.street).toBe('507 E 5th St');
     });
 
-    it('maps first line of categories → kind', () => {
+    it('ignores legacy categories', () => {
       const result = transformPlace(makePlaceResponse({ categories: 'Dive bar\nIrish pub' }));
-      expect(result.kind).toBe('Dive bar');
-    });
-
-    it('maps categories → category via inferCategory', () => {
-      const result = transformPlace(makePlaceResponse({ categories: 'Cocktail bar' }));
-      expect(result.category).toBe('cocktail');
+      expect(result).not.toHaveProperty('kind');
+      expect(result.tags).toEqual(['happy', 'walkin']);
     });
 
     it('maps tags → tags', () => {
@@ -83,22 +79,12 @@ describe('transformPlace', () => {
       expect(result.street).toBeNull();
     });
 
-    it('sets kind to null when categories is null', () => {
-      const result = transformPlace(makePlaceResponse({ categories: null }));
-      expect(result.kind).toBeNull();
-    });
-
-    it('defaults category to "dive" when categories is null', () => {
-      const result = transformPlace(makePlaceResponse({ categories: null }));
-      expect(result.category).toBe('dive');
-    });
-
-    it('defaults category to "dive" when categories is undefined', () => {
+    it('does not derive display fields from undefined categories', () => {
       const input = makePlaceResponse();
       // @ts-expect-error testing undefined at runtime
       input.categories = undefined;
       const result = transformPlace(input);
-      expect(result.category).toBe('dive');
+      expect(result).not.toHaveProperty('kind');
     });
 
     it('sets tags to [] when tags is an empty array', () => {
@@ -132,52 +118,65 @@ describe('transformPlace', () => {
   });
 
   describe('enrichment fields', () => {
-    it('sets photo to null', () => {
-      expect(transformPlace(makePlaceResponse()).photo).toBeNull();
+    it('maps photo_url to photo', () => {
+      expect(transformPlace(makePlaceResponse({ photo_url: 'https://img.example.com/p.jpg' })).photo)
+        .toBe('https://img.example.com/p.jpg');
     });
 
-    it('sets photoCredit to null', () => {
-      expect(transformPlace(makePlaceResponse()).photoCredit).toBeNull();
+    it('maps photo_credit to photoCredit', () => {
+      expect(transformPlace(makePlaceResponse({ photo_credit: 'Amit' })).photoCredit).toBe('Amit');
     });
 
-    it('sets pitch to null', () => {
-      expect(transformPlace(makePlaceResponse()).pitch).toBeNull();
+    it('maps specials', () => {
+      expect(transformPlace(makePlaceResponse({ specials: '$5 beer' })).specials).toBe('$5 beer');
     });
 
-    it('sets perfect to null', () => {
-      expect(transformPlace(makePlaceResponse()).perfect).toBeNull();
+    it('maps notes', () => {
+      expect(transformPlace(makePlaceResponse({ notes: 'Cash only' })).notes).toBe('Cash only');
     });
 
-    it('sets insider to null', () => {
-      expect(transformPlace(makePlaceResponse()).insider).toBeNull();
+    it('maps pitch', () => {
+      expect(transformPlace(makePlaceResponse({ pitch: 'A real dive.' })).pitch).toBe('A real dive.');
     });
 
-    it('sets crowd to null', () => {
-      expect(transformPlace(makePlaceResponse()).crowd).toBeNull();
+    it('maps perfect', () => {
+      expect(transformPlace(makePlaceResponse({ perfect: 'you want noise' })).perfect).toBe('you want noise');
     });
 
-    it('sets vibe to null', () => {
-      expect(transformPlace(makePlaceResponse()).vibe).toBeNull();
+    it('maps insider', () => {
+      expect(transformPlace(makePlaceResponse({ insider: 'sit at the bar' })).insider).toBe('sit at the bar');
+    });
+
+    it('maps crowd', () => {
+      expect(transformPlace(makePlaceResponse({ crowd: 'locals' })).crowd).toBe('locals');
+    });
+
+    it('maps vibe', () => {
+      expect(transformPlace(makePlaceResponse({ vibe: 'loud · dark' })).vibe).toBe('loud · dark');
     });
 
     it('sets signal to null', () => {
       expect(transformPlace(makePlaceResponse()).signal).toBeNull();
     });
 
-    it('sets crowdLevel to null', () => {
-      expect(transformPlace(makePlaceResponse()).crowdLevel).toBeNull();
+    it('maps crowdLevel', () => {
+      expect(transformPlace(makePlaceResponse({ crowd_level: 'Steady' })).crowdLevel).toBe('Steady');
     });
 
-    it('sets priceTier to null', () => {
-      expect(transformPlace(makePlaceResponse()).priceTier).toBeNull();
+    it('maps priceTier', () => {
+      expect(transformPlace(makePlaceResponse({ price_tier: '$$' })).priceTier).toBe('$$');
     });
 
     it('sets hours to null', () => {
       expect(transformPlace(makePlaceResponse()).hours).toBeNull();
     });
 
-    it('sets open to null', () => {
-      expect(transformPlace(makePlaceResponse()).open).toBeNull();
+    it('maps hoursJson', () => {
+      const hours_json = {
+        periods: [],
+        weekdayDescriptions: ['Sun: closed'],
+      };
+      expect(transformPlace(makePlaceResponse({ hours_json })).hoursJson).toBe(hours_json);
     });
 
     it('sets distance to null', () => {
@@ -188,8 +187,12 @@ describe('transformPlace', () => {
       expect(transformPlace(makePlaceResponse()).closesIn).toBeNull();
     });
 
-    it('sets cross to null', () => {
-      expect(transformPlace(makePlaceResponse()).cross).toBeNull();
+    it('maps cross', () => {
+      expect(transformPlace(makePlaceResponse({ cross_street: 'btwn A & B' })).cross).toBe('btwn A & B');
+    });
+
+    it('maps googlePriceLevel', () => {
+      expect(transformPlace(makePlaceResponse({ google_price_level: 2 })).googlePriceLevel).toBe(2);
     });
   });
 
@@ -209,12 +212,11 @@ describe('transformPlace', () => {
       expect(() => transformPlace(input)).not.toThrow();
     });
 
-    it('uses only the first line of a multi-line categories string for kind', () => {
+    it('does not use multi-line categories for mobile display', () => {
       const result = transformPlace(
         makePlaceResponse({ categories: 'Irish pub\nLive music\nCash only' }),
       );
-      expect(result.kind).toBe('Irish pub');
-      expect(result.category).toBe('pub');
+      expect(result).not.toHaveProperty('kind');
     });
   });
 });

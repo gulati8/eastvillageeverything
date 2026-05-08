@@ -17,7 +17,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import { usePlacesList } from '../api/places';
 import { useTagsStructured } from '../api/tags';
 import { transformPlace } from '../data/transformPlace';
-import { deriveFilterSections } from '../data/deriveFilterSections';
+import { deriveFilterSections, filterSectionsForPlaces } from '../data/deriveFilterSections';
 import { useFilterState } from '../state/useFilterState';
 import { PlaceRow } from '../components/PlaceRow';
 import { SearchBar } from '../components/SearchBar';
@@ -81,8 +81,8 @@ export function PlaceList() {
   // Tags taxonomy for server-driven filter sections
   const { data: tagsData } = useTagsStructured();
   const filterSections = React.useMemo(
-    () => (tagsData ? deriveFilterSections(tagsData) : []),
-    [tagsData],
+    () => (tagsData ? filterSectionsForPlaces(deriveFilterSections(tagsData), allPlaces) : []),
+    [allPlaces, tagsData],
   );
 
   // Filter state
@@ -216,18 +216,10 @@ export function PlaceList() {
         <Text
           style={[
             styles.mastheadTitle,
-            { color: colors.ink, fontFamily: typography.display.fontFamily },
+            { color: colors.ink, fontFamily: typography.displayItalic.fontFamily },
           ]}
         >
-          <Text
-            style={[
-              styles.mastheadCount,
-              { fontFamily: typography.displayItalic.fontFamily },
-            ]}
-          >
-            {totalCount} spots
-          </Text>
-          {'.'}
+          East Village Everything
         </Text>
       </View>
 
@@ -246,7 +238,7 @@ export function PlaceList() {
           style={[
             styles.filterButton,
             {
-              backgroundColor: colors.card,
+              backgroundColor: colors.paper2,
               borderColor: colors.line,
             },
           ]}
@@ -357,11 +349,6 @@ const styles = StyleSheet.create({
     lineHeight: 38,
     marginBottom: 0,
   },
-  mastheadCount: {
-    fontSize: 32,
-    letterSpacing: -0.64,
-    fontStyle: 'italic',
-  },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -410,6 +397,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 22,
-    paddingBottom: 100,
+    paddingTop: 2,
+    paddingBottom: 128,
   },
 });

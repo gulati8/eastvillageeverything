@@ -22,7 +22,7 @@ export function SearchBar({ value, onChangeText, onSubmit }: Props) {
       style={[
         styles.container,
         {
-          backgroundColor: colors.card,
+          backgroundColor: colors.paper2,
           borderColor: colors.line,
           borderRadius: radii.pill,
         },
@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: 40,
-    minHeight: 44,
     borderWidth: 1,
     paddingHorizontal: 14,
   },
@@ -84,6 +83,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 13,
+    lineHeight: 18,
     // height must fill the container; padding 0 avoids Android default padding
     paddingVertical: 0,
   },

@@ -92,8 +92,8 @@ function matchesAllSections(
 }
 
 /**
- * Apply text search: filter by name and kind containing searchQuery
- * (case-insensitive substring).
+ * Apply text search: filter by name, address, and tag values containing
+ * searchQuery (case-insensitive substring).
  */
 function applySearch(places: PlaceV2Display[], searchQuery: string): PlaceV2Display[] {
   if (!searchQuery.trim()) return places;
@@ -101,7 +101,8 @@ function applySearch(places: PlaceV2Display[], searchQuery: string): PlaceV2Disp
   return places.filter(
     (p) =>
       p.name.toLowerCase().includes(lower) ||
-      (p.kind !== null && p.kind.toLowerCase().includes(lower)),
+      (p.street !== null && p.street.toLowerCase().includes(lower)) ||
+      p.tags.some((tag) => tag.toLowerCase().includes(lower)),
   );
 }
 

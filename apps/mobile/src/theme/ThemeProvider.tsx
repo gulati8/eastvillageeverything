@@ -1,7 +1,5 @@
 import React, { createContext, useMemo } from 'react';
-import { useColorScheme } from 'react-native';
 import {
-  lightColors,
   darkColors,
   spacing,
   radii,
@@ -27,12 +25,12 @@ export interface ThemeContextValue {
 }
 
 export const ThemeContext = createContext<ThemeContextValue>({
-  colors: lightColors,
+  colors: darkColors,
   spacing,
   radii,
   typography,
-  signalColors: (kind) => getSignalColors(kind, false),
-  isDark: false,
+  signalColors: (kind) => getSignalColors(kind, true),
+  isDark: true,
 });
 
 interface ThemeProviderProps {
@@ -40,19 +38,16 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
   const value = useMemo<ThemeContextValue>(
     () => ({
-      colors: isDark ? darkColors : lightColors,
+      colors: darkColors,
       spacing,
       radii,
       typography,
-      signalColors: (kind: SignalKind) => getSignalColors(kind, isDark),
-      isDark,
+      signalColors: (kind: SignalKind) => getSignalColors(kind, true),
+      isDark: true,
     }),
-    [isDark],
+    [],
   );
 
   return (
