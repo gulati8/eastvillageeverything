@@ -19,11 +19,12 @@ import { useTagsStructured } from '../api/tags';
 import { transformPlace } from '../data/transformPlace';
 import { deriveFilterSections, filterSectionsForPlaces } from '../data/deriveFilterSections';
 import { useFilterState } from '../state/useFilterState';
+import { useSavedPlaces } from '../state/useSavedPlaces';
 import { PlaceRow } from '../components/PlaceRow';
 import { SearchBar } from '../components/SearchBar';
 import { FilterRail } from '../components/FilterRail';
 import { FilterSheet } from '../components/FilterSheet';
-import { TabBar } from '../components/TabBar';
+import { TabBar, type TabKey } from '../components/TabBar';
 import { EveListSkeleton } from '../components/EveListSkeleton';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
@@ -68,6 +69,8 @@ export function PlaceList() {
   const { colors, typography, radii } = useTheme();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const listRef = useRef<FlatList<PlaceV2Display>>(null);
+  const [activeTab, setActiveTab] = React.useState<TabKey>('home');
+  const { savedPlaceKeys, toggleSavedPlace } = useSavedPlaces();
 
   // Data fetch — no tag param, all filtering is client-side
   const { data: rawData, isLoading, isError, refetch } = usePlacesList();
@@ -102,10 +105,20 @@ export function PlaceList() {
     railChips,
   } = useFilterState(allPlaces, filterSections);
 
-  // Filtered + sorted places for the list
-  const displayPlaces = React.useMemo(
+  // Filtered + sorted places for the Home list
+  const filteredPlaces = React.useMemo(
     () => applyFilters(allPlaces),
     [applyFilters, allPlaces],
+  );
+
+  // Home and Saved share the same row formatting; Saved narrows to saved IDs.
+  const displayPlaces = React.useMemo(
+    () => (
+      activeTab === 'saved'
+        ? filteredPlaces.filter((place) => savedPlaceKeys.has(place.key))
+        : filteredPlaces
+    ),
+    [activeTab, filteredPlaces, savedPlaceKeys],
   );
 
   // Pull-to-refresh
@@ -171,6 +184,12 @@ export function PlaceList() {
     [toggleFilter],
   );
 
+  const handleTabPress = useCallback((tab: TabKey) => {
+    if (tab === 'home' || tab === 'saved') {
+      setActiveTab(tab);
+    }
+  }, []);
+
   // ---------------------------------------------------------------------------
   // Render helpers
   // ---------------------------------------------------------------------------
@@ -182,10 +201,12 @@ export function PlaceList() {
       <PlaceRow
         place={item}
         isLast={index === displayPlaces.length - 1}
+        isSaved={savedPlaceKeys.has(item.key)}
         onPress={() => router.push(`/place/${item.key}`)}
+        onSave={() => toggleSavedPlace(item.key)}
       />
     ),
-    [displayPlaces.length],
+    [displayPlaces.length, savedPlaceKeys, toggleSavedPlace],
   );
 
   // ---------------------------------------------------------------------------
@@ -196,6 +217,20 @@ export function PlaceList() {
   const isLoadingInitial = isLoading && !hasData;
   const isErrorNoData = isError && !hasData;
   const isEmpty = !isLoadingInitial && !isErrorNoData && displayPlaces.length === 0;
+  const isSavedTabEmpty = activeTab === 'saved' && savedPlaceKeys.size === 0;
+  const emptyState = isSavedTabEmpty
+    ? {
+        title: 'No saved places yet.',
+        subtitle: 'Bookmark a spot from Home and it will show up here.',
+        actionLabel: 'Go to Home',
+        onReset: () => setActiveTab('home'),
+      }
+    : {
+        title: undefined,
+        subtitle: undefined,
+        actionLabel: undefined,
+        onReset: clearFilters,
+      };
 
   // ---------------------------------------------------------------------------
   // Render
@@ -290,7 +325,12 @@ export function PlaceList() {
         {isErrorNoData && <ErrorState />}
 
         {isEmpty && (
-          <EmptyState onReset={clearFilters} />
+          <EmptyState
+            onReset={emptyState.onReset}
+            title={emptyState.title}
+            subtitle={emptyState.subtitle}
+            actionLabel={emptyState.actionLabel}
+          />
         )}
 
         {!isLoadingInitial && !isErrorNoData && !isEmpty && (
@@ -321,7 +361,7 @@ export function PlaceList() {
       />
 
       {/* 6. TabBar */}
-      <TabBar activeTab="tonight" />
+      <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
     </View>
   );
 }

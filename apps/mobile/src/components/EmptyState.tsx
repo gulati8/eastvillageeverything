@@ -4,9 +4,17 @@ import { useTheme } from '../theme/useTheme';
 
 type Props = {
   onReset: () => void;
+  title?: string;
+  subtitle?: string;
+  actionLabel?: string;
 };
 
-export function EmptyState({ onReset }: Props) {
+export function EmptyState({
+  onReset,
+  title = "Nothing’s matching that vibe right now.",
+  subtitle = "Try a different mood — or pull down to check again.",
+  actionLabel = 'Show me everything',
+}: Props) {
   const { colors, typography } = useTheme();
 
   return (
@@ -17,7 +25,7 @@ export function EmptyState({ onReset }: Props) {
           { color: colors.ink, fontFamily: typography.displayItalic.fontFamily },
         ]}
       >
-        {"Nothing’s matching that vibe right now."}
+        {title}
       </Text>
       <Text
         style={[
@@ -25,13 +33,13 @@ export function EmptyState({ onReset }: Props) {
           { color: colors.ink2, fontFamily: typography.body.fontFamily },
         ]}
       >
-        {"Try a different mood — or pull down to check again."}
+        {subtitle}
       </Text>
       <Pressable
         onPress={onReset}
         style={[styles.button, { backgroundColor: colors.ink }]}
         accessibilityRole="button"
-        accessibilityLabel="Show me everything"
+        accessibilityLabel={actionLabel}
       >
         <Text
           style={[
@@ -39,7 +47,7 @@ export function EmptyState({ onReset }: Props) {
             { color: colors.paper, fontFamily: typography.ui600.fontFamily },
           ]}
         >
-          {"Show me everything"}
+          {actionLabel}
         </Text>
       </Pressable>
     </View>

@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Pressable,
+  type GestureResponderEvent,
   StyleSheet,
   Text,
   View,
@@ -15,6 +16,7 @@ import { BookmarkIcon } from '../icons/BookmarkIcon';
 interface PlaceRowProps {
   place: PlaceV2Display;
   isLast?: boolean;
+  isSaved?: boolean;
   onPress: () => void;
   onSave?: () => void;
 }
@@ -23,12 +25,13 @@ function collapseText(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
 }
 
-export function PlaceRow({ place, isLast = false, onPress, onSave }: PlaceRowProps) {
+export function PlaceRow({ place, isLast = false, isSaved = false, onPress, onSave }: PlaceRowProps) {
   const { colors, typography } = useTheme();
 
   const specialsExcerpt = place.specials != null ? collapseText(place.specials) : null;
 
-  function handleSave() {
+  function handleSave(event: GestureResponderEvent) {
+    event.stopPropagation();
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onSave?.();
   }
@@ -67,8 +70,10 @@ export function PlaceRow({ place, isLast = false, onPress, onSave }: PlaceRowPro
             onPress={handleSave}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             style={styles.bookmarkTouchable}
+            accessibilityRole="button"
+            accessibilityLabel={isSaved ? `Remove ${place.name} from saved places` : `Save ${place.name}`}
           >
-            <BookmarkIcon color={colors.ink3} />
+            <BookmarkIcon color={isSaved ? colors.accent : colors.ink3} filled={isSaved} />
           </Pressable>
         </View>
 
