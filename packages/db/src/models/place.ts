@@ -49,9 +49,25 @@ function validateUrl(url: string | undefined): string | null {
 
 export class PlaceModel {
   /**
-   * Find all places, optionally filtered by tag
+   * Find all places, optionally filtered by tag and/or free-text query.
+   *
+   * When `q` is provided and non-empty after trim, the query adds a LEFT JOIN
+   * to `neighborhoods` and an OR'd condition group that covers:
+   *   (a) The GIN-indexed expression on the places row itself — name, address,
+   *       cross_street, categories, notes. The COALESCE expression here MUST
+   *       remain byte-identical to the index DDL in
+   *       migrations/1706457600008_places-search-trgm.js so the planner can use
+   *       the trigram index.
+   *   (b) neighborhoods.display (separate OR-branch — NOT in the indexed
+   *       expression, as including it there would break the index alignment).
+   *   (c) Tag value/display via subquery on place_tags + tags.
+   *
+   * `tag` and `q` are AND-composed via a conditions array.
    */
-  static async findAll(options?: { tag?: string; limit?: number; offset?: number }): Promise<Place[]> {
+  static async findAll(options?: { tag?: string; q?: string; limit?: number; offset?: number }): Promise<Place[]> {
+    const trimmedQ = options?.q?.trim() ?? '';
+    const hasQ = trimmedQ.length > 0;
+
     let sql = `
       SELECT
         p.id, p.name, p.address, p.phone, p.url,
@@ -72,20 +88,78 @@ export class PlaceModel {
     `;
 
     const params: string[] = [];
+    const conditions: string[] = [];
 
     if (options?.tag) {
-      sql += `
-        WHERE p.id IN (
+      params.push(options.tag);
+      conditions.push(`p.id IN (
           SELECT pt2.place_id FROM place_tags pt2
           JOIN tags t2 ON pt2.tag_id = t2.id
-          WHERE t2.value = $1
+          WHERE t2.value = $${params.length}
+        )`);
+    }
+
+    if (hasQ) {
+      // Add the neighborhoods join for the n.display OR-branch (branch b).
+      sql += `
+      LEFT JOIN neighborhoods n ON p.neighborhood_id = n.id`;
+
+      // Escape LIKE metacharacters so user-supplied text is treated as literals.
+      // Parameterisation stops SQL injection but ILIKE/LIKE still interpret '%'
+      // and '_' inside the bound value as wildcards. We escape '\' first (the
+      // chosen escape character), then '%', then '_', and tell Postgres about
+      // the escape character via an explicit ESCAPE '\\' clause on each ILIKE.
+      // The ESCAPE clause attaches to the right-hand pattern only — the
+      // left-hand indexed expression (branch a) is unchanged and stays
+      // byte-identical to the GIN index DDL in the migration.
+      const escapedQ = trimmedQ
+        .replace(/\\/g, '\\\\')
+        .replace(/%/g, '\\%')
+        .replace(/_/g, '\\_');
+      params.push(escapedQ);
+      const qParam = `$${params.length}`;
+
+      // Three OR-branches — deliberately NOT collapsed into one concatenation:
+      //   (a) The indexed expression on places — must match the GIN index DDL
+      //       exactly (same column order, same separator, same COALESCE defaults).
+      //       The ESCAPE clause is on the pattern (right-hand side) only, so
+      //       the indexed left-hand expression stays identical to the DDL.
+      //   (b) neighborhoods.display — separate branch; including it in (a) would
+      //       break index alignment with places_search_trgm_idx.
+      //   (c) Tag value/display — subquery over the many-to-many join.
+      conditions.push(`(
+        (
+          COALESCE(p.name,'') || ' ' ||
+          COALESCE(p.address,'') || ' ' ||
+          COALESCE(p.cross_street,'') || ' ' ||
+          COALESCE(p.categories,'') || ' ' ||
+          COALESCE(p.notes,'')
+        ) ILIKE '%' || ${qParam} || '%' ESCAPE '\\'
+        OR n.display ILIKE '%' || ${qParam} || '%' ESCAPE '\\'
+        OR p.id IN (
+          SELECT pt2.place_id FROM place_tags pt2
+          JOIN tags t2 ON pt2.tag_id = t2.id
+          WHERE t2.value ILIKE '%' || ${qParam} || '%' ESCAPE '\\'
+             OR t2.display ILIKE '%' || ${qParam} || '%' ESCAPE '\\'
         )
-      `;
-      params.push(options.tag);
+      )`);
+    }
+
+    if (conditions.length > 0) {
+      sql += `
+      WHERE ${conditions.join(' AND ')}`;
+    }
+
+    // Add n.display to GROUP BY only when the neighborhood join is present.
+    if (hasQ) {
+      sql += `
+      GROUP BY p.id, n.display`;
+    } else {
+      sql += `
+      GROUP BY p.id`;
     }
 
     sql += `
-      GROUP BY p.id
       ORDER BY p.name ASC
     `;
 

@@ -154,6 +154,56 @@ docker-compose -f docker-compose.prod.yml run --rm certbot renew --force-renewal
 docker-compose -f docker-compose.prod.yml restart nginx
 ```
 
+## Migration notes
+
+### Migration 1706457600008 — pg_trgm extension and GIN index (places search)
+
+This migration enables the `pg_trgm` PostgreSQL contrib extension and creates a
+GIN trigram expression index on the `places` table to support the admin places
+search feature. It has two requirements that differ from ordinary migrations.
+
+**Privilege requirement.** `CREATE EXTENSION` requires the database role running
+the migration to hold `CREATE` privilege on the database (or be a superuser /
+`rds_superuser`-equivalent). The application's normal DB role may not have this.
+If `npm run migrate` fails with `ERROR: permission denied to create extension`,
+run the extension step once as the DB owner:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+```
+
+Then re-run `npm run migrate` with the application role — the `IF NOT EXISTS`
+guard makes the extension step a no-op and the index creation will proceed.
+
+**Idempotency.** Both DDL statements use `IF NOT EXISTS` guards:
+- `CREATE EXTENSION IF NOT EXISTS pg_trgm` — safe to apply on any Postgres
+  instance that already has pg_trgm installed.
+- `CREATE INDEX IF NOT EXISTS places_search_trgm_idx …` — safe to re-run if
+  the migration is applied twice.
+
+**Rollback.** `down()` drops the index and then attempts to drop the extension:
+
+```bash
+npm run migrate:down
+```
+
+If `pg_trgm` is in use by another object in the database, `DROP EXTENSION` will
+fail without `CASCADE` — that is the intended safe behavior. In that case,
+drop the index manually and leave the extension installed:
+
+```sql
+DROP INDEX IF EXISTS places_search_trgm_idx;
+-- Leave the extension; it is used by another object.
+```
+
+The application code works without the index (searches fall back to a
+sequential scan); it does not work without the extension at all if a search
+query is active. If you need a clean rollback, revert the application code
+(see `docs/admin-places-search.md`) at the same time.
+
+**No new npm dependencies.** `pg_trgm` ships with Postgres core (contrib). No
+`package.json` changes are required.
+
 ## Rollback
 
 If issues occur after deployment:
