@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EVE Admin Enriched Content Mockups</title>
+  <style>
+    :root {
+      --paper: #fbf6ee;
+      --paper2: #f2eadc;
+      --paper3: #fffaf3;
+      --ink: #1f1a14;
+      --ink2: #54483a;
+      --ink3: #8c7e6c;
+      --line: rgba(31, 26, 20, 0.11);
+      --accent: #e07b3f;
+      --green: #3f7a58;
+      --red: #a84f3d;
+      --gold: #a06d25;
+      --blue: #426d8c;
+      --shadow: 0 18px 50px rgba(31, 26, 20, 0.13);
+      --display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+      --body: "Source Serif 4", Georgia, serif;
+      --ui: "Schibsted Grotesk", Inter, system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+    img { display: block; max-width: 100%; }
+    button, input, textarea { font: inherit; }
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+    .hero {
+      min-height: 220px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 32px;
+      align-items: end;
+      padding: 34px 0 26px;
+      border-bottom: 1px solid var(--line);
+    }
+    .eyebrow, .ui {
+      font-family: var(--ui);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    h1, h2, h3 {
+      font-family: var(--display);
+      font-weight: 400;
+      font-style: italic;
+      margin: 0;
+      letter-spacing: 0;
+    }
+    h1 { font-size: 58px; line-height: 0.96; max-width: 680px; }
+    h2 { font-size: 36px; line-height: 1; }
+    h3 { font-size: 26px; line-height: 1.08; }
+    p { margin: 0; color: var(--ink2); font-size: 17px; line-height: 1.45; }
+    .hero-note {
+      background: var(--paper2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .tracker {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 24px 0 38px;
+    }
+    .track-item {
+      background: var(--paper3);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 106px;
+    }
+    .track-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--ink);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 26px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(224, 123, 63, 0.12);
+      color: var(--accent);
+      font: 700 11px/1 var(--ui);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .mockup-section {
+      margin: 42px 0 72px;
+      border-top: 1px solid var(--line);
+      padding-top: 30px;
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 22px;
+    }
+    .section-head p { max-width: 720px; margin-top: 8px; }
+    .devices {
+      display: grid;
+      grid-template-columns: minmax(720px, 1fr) 390px;
+      gap: 24px;
+      align-items: start;
+    }
+    .device-label {
+      font: 700 11px/1 var(--ui);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin: 0 0 8px;
+    }
+    .desktop-frame,
+    .phone-frame {
+      background: var(--paper3);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .desktop-frame {
+      border-radius: 10px;
+      min-height: 760px;
+    }
+    .phone-shell {
+      border-radius: 34px;
+      padding: 12px;
+      background: #16120f;
+      box-shadow: var(--shadow);
+    }
+    .phone-frame {
+      border-radius: 24px;
+      min-height: 760px;
+      max-height: 760px;
+      overflow: hidden;
+      position: relative;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 96px;
+      height: 24px;
+      border-radius: 999px;
+      background: #16120f;
+      z-index: 5;
+    }
+    .admin-top {
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(251, 246, 238, 0.88);
+    }
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .brand b {
+      font-family: var(--display);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 28px;
+    }
+    .brand span, .top-actions span {
+      font: 700 11px/1 var(--ui);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ink3);
+    }
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .icon-btn, .btn {
+      border: 1px solid var(--line);
+      background: var(--paper3);
+      color: var(--ink);
+      border-radius: 8px;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 12px;
+      font: 700 12px/1 var(--ui);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-accent { background: var(--accent); color: white; border-color: transparent; }
+    .btn-ghost { background: transparent; }
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      min-height: 698px;
+    }
+    .side-nav {
+      border-right: 1px solid var(--line);
+      padding: 20px 14px;
+      background: var(--paper2);
+    }
+    .nav-item {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      border-radius: 8px;
+      color: var(--ink2);
+      font: 700 12px/1 var(--ui);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .nav-item.active { background: var(--paper3); color: var(--ink); }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      flex: 0 0 auto;
+    }
+    .content {
+      padding: 26px;
+    }
+    .place-titlebar {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+    .place-titlebar h2 { margin-bottom: 6px; }
+    .safe-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .safe {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font: 700 11px/1 var(--ui);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ink2);
+      background: var(--paper);
+    }
+    .safe.good { color: var(--green); background: rgba(63, 122, 88, 0.1); }
+    .safe.warn { color: var(--gold); background: rgba(160, 109, 37, 0.11); }
+    .edit-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 20px;
+      align-items: start;
+    }
+    .stack { display: grid; gap: 14px; }
+    .panel {
+      background: var(--paper3);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .panel-title {
+      font: 700 13px/1 var(--ui);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--ink3);
+      font: 700 11px/1 var(--ui);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    input, textarea, .fake-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink);
+      padding: 11px 12px;
+      min-height: 42px;
+      font-family: var(--body);
+      font-size: 15px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    textarea { min-height: 84px; resize: none; line-height: 1.35; }
+    .photo-editor {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .photo-preview {
+      min-height: 170px;
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(31,26,20,0.08), rgba(31,26,20,0.25)),
+        url("../../public/img/SecondAve.jpg") center/cover;
+      position: relative;
+    }
+    .crop-lines::before,
+    .crop-lines::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px solid rgba(255,255,255,0.62);
+      border-radius: 6px;
+    }
+    .crop-lines::after {
+      inset: 36px 18px;
+      border-style: dashed;
+      opacity: 0.7;
+    }
+    .upload-actions {
+      display: grid;
+      gap: 10px;
+    }
+    .upload-help {
+      color: var(--ink3);
+      font-size: 14px;
+      line-height: 1.32;
+      margin-top: 2px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 11px;
+      background: var(--paper2);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      font: 700 12px/1 var(--ui);
+      color: var(--ink2);
+    }
+    .drag { color: var(--ink3); font-size: 13px; }
+    .readiness {
+      display: grid;
+      gap: 10px;
+    }
+    .readiness-row {
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      gap: 9px;
+      align-items: center;
+      min-height: 38px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .check {
+      width: 21px;
+      height: 21px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(63, 122, 88, 0.12);
+      color: var(--green);
+      font: 900 13px/1 var(--ui);
+    }
+    .check.warn { background: rgba(160, 109, 37, 0.13); color: var(--gold); }
+    .readiness-row b {
+      font: 700 12px/1 var(--ui);
+      letter-spacing: 0.02em;
+      color: var(--ink);
+    }
+    .readiness-row small {
+      font: 700 10px/1 var(--ui);
+      color: var(--ink3);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .ai-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .ai-btn { color: var(--blue); background: rgba(66,109,140,0.1); }
+    .phone-admin {
+      padding-top: 44px;
+      background: var(--paper);
+      min-height: 760px;
+    }
+    .phone-top {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(251,246,238,0.92);
+    }
+    .phone-title {
+      font: 700 13px/1 var(--ui);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .phone-scroll {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+    .phone-scroll h2 {
+      font-size: 34px;
+      margin: 2px 0 4px;
+    }
+    .phone-field-grid {
+      display: grid;
+      gap: 10px;
+    }
+    .phone-photo {
+      height: 208px;
+      border-radius: 10px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(31,26,20,0.05), rgba(31,26,20,0.31)),
+        url("../../public/img/SecondAve.jpg") center/cover;
+      position: relative;
+    }
+    .bottom-save {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 12px 16px 18px;
+      background: rgba(251,246,238,0.94);
+      border-top: 1px solid var(--line);
+    }
+    .bottom-save .btn { width: 100%; }
+
+    /* Mockup 2 */
+    .wizard-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 698px;
+    }
+    .steps {
+      background: var(--paper2);
+      border-right: 1px solid var(--line);
+      padding: 22px;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .step-no {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: var(--paper3);
+      display: grid;
+      place-items: center;
+      font: 700 12px/1 var(--ui);
+      color: var(--ink2);
+    }
+    .step.active .step-no { background: var(--ink); color: var(--paper); }
+    .step b { font: 700 12px/1.2 var(--ui); text-transform: uppercase; letter-spacing: 0.04em; }
+    .step span { display: block; color: var(--ink3); margin-top: 4px; font-size: 13px; line-height: 1.25; }
+    .wizard-main {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      padding: 28px;
+    }
+    .large-photo {
+      height: 260px;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(31,26,20,0.02), rgba(31,26,20,0.35)),
+        url("../../public/img/SecondAve.jpg") center/cover;
+      position: relative;
+      overflow: hidden;
+    }
+    .photo-tools {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .photo-tools .btn { background: rgba(251,246,238,0.94); }
+    .copy-card {
+      background: var(--paper2);
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid var(--line);
+    }
+    .copy-card p {
+      font-size: 15px;
+      color: var(--ink2);
+    }
+    .source-box {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .source-box .fake-input { min-height: 72px; color: var(--ink2); }
+    .segmented {
+      display: flex;
+      background: var(--paper2);
+      border-radius: 9px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .segmented span {
+      flex: 1;
+      min-height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      font: 700 11px/1 var(--ui);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--ink3);
+    }
+    .segmented span.active { background: var(--paper3); color: var(--ink); }
+
+    /* Mockup 3 */
+    .preview-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      min-height: 698px;
+    }
+    .preview-editor {
+      padding: 26px;
+      border-right: 1px solid var(--line);
+    }
+    .mobile-preview-pane {
+      padding: 24px;
+      background: var(--paper2);
+    }
+    .app-card {
+      width: 100%;
+      border-radius: 28px;
+      background: #1f1a14;
+      color: var(--paper);
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(31,26,20,0.18);
+    }
+    .app-hero {
+      height: 240px;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.68)),
+        url("../../public/img/SecondAve.jpg") center/cover;
+      display: flex;
+      align-items: end;
+      padding: 18px;
+    }
+    .app-hero h3 {
+      color: var(--paper);
+      font-size: 32px;
+    }
+    .app-body {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      background: #1f1a14;
+    }
+    .app-special {
+      border-radius: 10px;
+      padding: 14px;
+      background: #2a2520;
+      color: #fbf6ee;
+    }
+    .app-special .ui { color: #f09060; font-size: 10px; margin-bottom: 8px; }
+    .app-special p { color: #c9beab; font-size: 15px; }
+    .app-row {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 12px;
+      border-top: 1px solid rgba(251,246,238,0.1);
+      padding-top: 12px;
+      font-size: 14px;
+      color: #c9beab;
+    }
+    .app-row b {
+      font: 700 10px/1 var(--ui);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8c7e6c;
+    }
+    .split-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 1180px) {
+      .devices { grid-template-columns: 1fr; }
+      .phone-shell { width: 390px; max-width: 100%; }
+      .tracker { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 760px) {
+      .page { padding: 18px; }
+      .hero { grid-template-columns: 1fr; }
+      h1 { font-size: 42px; }
+      .tracker { grid-template-columns: 1fr; }
+      .section-head { grid-template-columns: 1fr; }
+      .desktop-frame { overflow-x: auto; }
+      .desktop-frame > * { min-width: 980px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Admin enriched content mockups</div>
+        <h1>Three proposals for the place editor Nicholas will actually use.</h1>
+      </div>
+      <div class="hero-note">
+        <p>These mockups keep the old web directory safe while preparing content for the richer mobile app. Images are upload/camera/library only, resized and cropped by the system. AI text is generated into editable fields, never auto-published.</p>
+      </div>
+    </section>
+
+    <section class="tracker">
+      <div class="track-item">
+        <div class="track-title ui">Image input <span class="pill">Required</span></div>
+        <p>Take photo, choose from library, or upload file. No URL field in the editor.</p>
+      </div>
+      <div class="track-item">
+        <div class="track-title ui">Image processing <span class="pill">Phase 2</span></div>
+        <p>Crop presets for list thumbnail and detail hero. Save processed variants.</p>
+      </div>
+      <div class="track-item">
+        <div class="track-title ui">AI text <span class="pill">Phase 2</span></div>
+        <p>Generate pitch, perfect-for, insider tip, vibe, and crowd. Nicholas edits before save.</p>
+      </div>
+      <div class="track-item">
+        <div class="track-title ui">Compatibility <span class="pill">Always</span></div>
+        <p>New fields stay optional. Existing web and mobile must fall back gracefully.</p>
+      </div>
+    </section>
+
+    <section class="mockup-section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Option 1</div>
+          <h2>Readiness Sidebar</h2>
+          <p>A familiar edit form with a permanent safety/readiness panel. This is the most practical first build: clear, fast, mobile-friendly, and hard to accidentally break data.</p>
+        </div>
+        <span class="pill">Recommended</span>
+      </div>
+
+      <div class="devices">
+        <div>
+          <div class="device-label">Desktop</div>
+          <div class="desktop-frame">
+            <div class="admin-top">
+              <div class="brand"><b>EVE Admin</b><span>Places</span></div>
+              <div class="top-actions"><button class="btn btn-ghost">Preview old web</button><button class="btn btn-primary">Save</button></div>
+            </div>
+            <div class="admin-layout">
+              <nav class="side-nav">
+                <div class="nav-item active"><span class="dot"></span>Places</div>
+                <div class="nav-item">Tags</div>
+                <div class="nav-item">Neighborhoods</div>
+                <div class="nav-item">Uploads</div>
+              </nav>
+              <div class="content">
+                <div class="place-titlebar">
+                  <div>
+                    <h2>Edit: Cafe Mogador</h2>
+                    <p>All enriched fields are optional. Save is blocked only for unsafe basics.</p>
+                    <div class="safe-strip">
+                      <span class="safe good">Old web safe</span>
+                      <span class="safe good">Mobile safe</span>
+                      <span class="safe warn">Needs editorial polish</span>
+                    </div>
+                  </div>
+                  <button class="btn btn-accent">Generate missing text</button>
+                </div>
+
+                <div class="edit-grid">
+                  <div class="stack">
+                    <section class="panel">
+                      <div class="panel-head"><div class="panel-title">Basics</div></div>
+                      <div class="field-grid">
+                        <label>Name<input value="Cafe Mogador" /></label>
+                        <label>Neighborhood<input value="East Village" /></label>
+                        <label>Address<input value="101 St Marks Pl" /></label>
+                        <label>Cross street<input value="First Ave" /></label>
+                        <label>Phone<input value="2126772226" /></label>
+                        <label>Website<input value="cafemogador.com" /></label>
+                      </div>
+                    </section>
+
+                    <section class="panel">
+                      <div class="panel-head">
+                        <div class="panel-title">Photo</div>
+                        <span class="safe good">Auto crop enabled</span>
+                      </div>
+                      <div class="photo-editor">
+                        <div class="photo-preview crop-lines"></div>
+                        <div class="upload-actions">
+                          <button class="btn btn-primary">Take photo</button>
+                          <button class="btn">Choose from library</button>
+                          <button class="btn">Upload image file</button>
+                          <p class="upload-help">System creates list thumbnail and detail hero crops. Original is retained for re-cropping.</p>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="panel">
+                      <div class="panel-head"><div class="panel-title">Tags in mobile order</div><button class="btn">Add tags</button></div>
+                      <div class="chips">
+                        <span class="chip"><span class="drag">⋮⋮</span> Moroccan</span>
+                        <span class="chip"><span class="drag">⋮⋮</span> Dinner</span>
+                        <span class="chip"><span class="drag">⋮⋮</span> Date Night</span>
+                        <span class="chip"><span class="drag">⋮⋮</span> Brunch</span>
+                      </div>
+                    </section>
+
+                    <section class="panel">
+                      <div class="panel-head"><div class="panel-title">Editorial for mobile</div></div>
+                      <div class="stack">
+                        <div class="ai-row"><label>Pitch<textarea>Warm, steady, and always useful when you want dinner that feels like a real neighborhood ritual.</textarea></label><button class="btn ai-btn">Generate AI text</button></div>
+                        <div class="ai-row"><label>Perfect for<input value="a relaxed dinner before a downtown night" /></label><button class="btn ai-btn">Generate</button></div>
+                        <div class="ai-row"><label>Insider tip<input value="Go early if you want a quieter table." /></label><button class="btn ai-btn">Generate</button></div>
+                      </div>
+                    </section>
+                  </div>
+
+                  <aside class="panel">
+                    <div class="panel-head"><div class="panel-title">Readiness</div></div>
+                    <div class="readiness">
+                      <div class="readiness-row"><span class="check">✓</span><b>Required basics</b><small>Good</small></div>
+                      <div class="readiness-row"><span class="check">✓</span><b>Old web fallback</b><small>Good</small></div>
+                      <div class="readiness-row"><span class="check">✓</span><b>Photo</b><small>Good</small></div>
+                      <div class="readiness-row"><span class="check">✓</span><b>Tags ordered</b><small>Good</small></div>
+                      <div class="readiness-row"><span class="check warn">!</span><b>Hours data</b><small>Missing</small></div>
+                      <div class="readiness-row"><span class="check warn">!</span><b>Editorial</b><small>Draft</small></div>
+                    </div>
+                  </aside>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="device-label">Mobile</div>
+          <div class="phone-shell">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-admin">
+                <div class="phone-top"><span class="phone-title">Edit place</span><button class="icon-btn">Save</button></div>
+                <div class="phone-scroll">
+                  <h2>Cafe Mogador</h2>
+                  <div class="safe-strip"><span class="safe good">Old web safe</span><span class="safe warn">Editorial draft</span></div>
+                  <section class="panel">
+                    <div class="panel-title">Readiness</div>
+                    <div class="readiness" style="margin-top:12px">
+                      <div class="readiness-row"><span class="check">✓</span><b>Basics</b><small>Good</small></div>
+                      <div class="readiness-row"><span class="check">✓</span><b>Photo</b><small>Good</small></div>
+                      <div class="readiness-row"><span class="check warn">!</span><b>Hours</b><small>Missing</small></div>
+                    </div>
+                  </section>
+                  <section class="panel">
+                    <div class="panel-title">Basics</div>
+                    <div class="phone-field-grid" style="margin-top:12px">
+                      <label>Name<input value="Cafe Mogador" /></label>
+                      <label>Address<input value="101 St Marks Pl" /></label>
+                      <label>Phone<input value="2126772226" /></label>
+                    </div>
+                  </section>
+                  <section class="panel">
+                    <div class="panel-head"><div class="panel-title">Photo</div></div>
+                    <div class="phone-photo crop-lines"></div>
+                    <div class="upload-actions" style="margin-top:12px">
+                      <button class="btn btn-primary">Take photo</button>
+                      <button class="btn">Choose from library</button>
+                    </div>
+                  </section>
+                  <section class="panel">
+                    <div class="panel-title">Editorial</div>
+                    <label style="margin-top:12px">Pitch<textarea>Warm, steady, and always useful...</textarea></label>
+                    <button class="btn ai-btn" style="margin-top:10px;width:100%">Generate AI text</button>
+                  </section>
+                </div>
+                <div class="bottom-save"><button class="btn btn-primary">Save changes</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mockup-section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Option 2</div>
+          <h2>Guided Content Flow</h2>
+          <p>A step-based editor for non-technical content work. Better when Nicholas is creating a new place from scratch on his phone, but slower for quick edits.</p>
+        </div>
+        <span class="pill">Good for new places</span>
+      </div>
+
+      <div class="devices">
+        <div>
+          <div class="device-label">Desktop</div>
+          <div class="desktop-frame">
+            <div class="admin-top">
+              <div class="brand"><b>EVE Admin</b><span>Guided edit</span></div>
+              <div class="top-actions"><button class="btn">Exit guide</button><button class="btn btn-primary">Save draft</button></div>
+            </div>
+            <div class="wizard-layout">
+              <aside class="steps">
+                <div class="step"><div class="step-no">1</div><div><b>Basics</b><span>Name, address, contact. Blocks save if unsafe.</span></div></div>
+                <div class="step active"><div class="step-no">2</div><div><b>Photo</b><span>Take, choose, upload, crop.</span></div></div>
+                <div class="step"><div class="step-no">3</div><div><b>Tags</b><span>Choose and order the mobile headline tags.</span></div></div>
+                <div class="step"><div class="step-no">4</div><div><b>Editorial</b><span>Generate drafts, then edit by hand.</span></div></div>
+                <div class="step"><div class="step-no">5</div><div><b>Review</b><span>Old web and mobile compatibility check.</span></div></div>
+              </aside>
+              <div class="wizard-main">
+                <div class="stack">
+                  <div>
+                    <h2>Photo for Cafe Mogador</h2>
+                    <p>Upload once. The system prepares the shapes the app needs.</p>
+                  </div>
+                  <div class="large-photo crop-lines">
+                    <div class="photo-tools">
+                      <button class="btn">Take photo</button>
+                      <button class="btn">Choose library</button>
+                      <button class="btn">Upload file</button>
+                    </div>
+                  </div>
+                  <div class="segmented"><span class="active">Detail hero</span><span>List thumb</span><span>Original</span></div>
+                  <section class="panel">
+                    <div class="panel-title">Crop behavior</div>
+                    <p style="margin-top:10px">Default crop uses the center of the image. Nicholas can drag the focal area if faces, storefront signs, or food should stay visible.</p>
+                  </section>
+                </div>
+                <aside class="copy-card">
+                  <div class="panel-title">Why this step exists</div>
+                  <p style="margin-top:10px">The mobile design needs consistent images. The admin should hide file-size, aspect-ratio, and crop details unless Nicholas needs to adjust the result.</p>
+                  <div class="source-box">
+                    <label>Generated file set<div class="fake-input">original.jpg<br>hero-1200.webp<br>thumb-360.webp</div></label>
+                  </div>
+                </aside>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="device-label">Mobile</div>
+          <div class="phone-shell">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-admin">
+                <div class="phone-top"><span class="phone-title">Step 2 of 5</span><button class="icon-btn">Next</button></div>
+                <div class="phone-scroll">
+                  <h2>Add photo</h2>
+                  <p>Use camera, library, or file upload. We make the crops.</p>
+                  <div class="phone-photo crop-lines"></div>
+                  <div class="upload-actions">
+                    <button class="btn btn-primary">Take photo</button>
+                    <button class="btn">Choose from library</button>
+                    <button class="btn">Upload file</button>
+                  </div>
+                  <section class="panel">
+                    <div class="panel-title">Crop preview</div>
+                    <div class="segmented" style="margin-top:12px"><span class="active">Hero</span><span>Thumb</span></div>
+                    <p style="margin-top:12px">Drag the photo if the storefront sign is cut off.</p>
+                  </section>
+                </div>
+                <div class="bottom-save"><button class="btn btn-primary">Next: tags</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mockup-section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Option 3</div>
+          <h2>Preview Studio</h2>
+          <p>A content editor with a persistent mobile preview. Useful later, once the content model is stable. It is more expensive to build and easier to overdo.</p>
+        </div>
+        <span class="pill">Phase later</span>
+      </div>
+
+      <div class="devices">
+        <div>
+          <div class="device-label">Desktop</div>
+          <div class="desktop-frame">
+            <div class="admin-top">
+              <div class="brand"><b>EVE Admin</b><span>Preview studio</span></div>
+              <div class="top-actions"><button class="btn">Old web check</button><button class="btn btn-primary">Save</button></div>
+            </div>
+            <div class="preview-layout">
+              <div class="preview-editor">
+                <div class="place-titlebar">
+                  <div>
+                    <h2>Cafe Mogador</h2>
+                    <p>Edit on the left. The app preview updates on the right.</p>
+                  </div>
+                </div>
+                <div class="stack">
+                  <section class="panel">
+                    <div class="panel-head"><div class="panel-title">Mobile hero</div><button class="btn">Replace image</button></div>
+                    <div class="split-fields">
+                      <label>Photo credit<input value="Nicholas Morgenstern" /></label>
+                      <label>Primary tag<input value="Moroccan" /></label>
+                    </div>
+                  </section>
+                  <section class="panel">
+                    <div class="panel-head"><div class="panel-title">Editorial copy</div><button class="btn ai-btn">Generate all</button></div>
+                    <div class="stack">
+                      <div class="ai-row"><label>Pitch<textarea>Warm, steady, and always useful when you want dinner that feels like a real neighborhood ritual.</textarea></label><button class="btn ai-btn">Generate</button></div>
+                      <div class="ai-row"><label>Specials<textarea>Brunch on weekends; dinner is the safer bet for a calmer room.</textarea></label><button class="btn ai-btn">Generate</button></div>
+                      <div class="ai-row"><label>Insider tip<input value="Go early if you want a quieter table." /></label><button class="btn ai-btn">Generate</button></div>
+                    </div>
+                  </section>
+                  <section class="panel">
+                    <div class="panel-head"><div class="panel-title">Safety</div></div>
+                    <div class="safe-strip"><span class="safe good">Old web safe</span><span class="safe good">Mobile fallback safe</span><span class="safe warn">Hours missing</span></div>
+                  </section>
+                </div>
+              </div>
+              <aside class="mobile-preview-pane">
+                <div class="device-label">Live mobile detail preview</div>
+                <div class="app-card">
+                  <div class="app-hero"><h3>Cafe Mogador</h3></div>
+                  <div class="app-body">
+                    <div class="app-special"><div class="ui">Specials</div><p>Brunch on weekends; dinner is the safer bet for a calmer room.</p></div>
+                    <p style="color:#c9beab">Warm, steady, and always useful when you want dinner that feels like a real neighborhood ritual.</p>
+                    <div class="app-row"><b>Address</b><span>101 St Marks Pl</span></div>
+                    <div class="app-row"><b>Phone</b><span>(212) 677-2226</span></div>
+                    <div class="app-row"><b>Tags</b><span>Moroccan · Dinner · Date Night</span></div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="device-label">Mobile</div>
+          <div class="phone-shell">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-admin">
+                <div class="phone-top"><span class="phone-title">Preview studio</span><button class="icon-btn">Save</button></div>
+                <div class="phone-scroll">
+                  <div class="segmented"><span class="active">Preview</span><span>Edit</span></div>
+                  <div class="app-card">
+                    <div class="app-hero"><h3>Cafe Mogador</h3></div>
+                    <div class="app-body">
+                      <div class="app-special"><div class="ui">Specials</div><p>Brunch on weekends; dinner is the safer bet.</p></div>
+                      <p style="color:#c9beab">Warm, steady, and always useful...</p>
+                      <div class="app-row"><b>Address</b><span>101 St Marks Pl</span></div>
+                    </div>
+                  </div>
+                  <section class="panel">
+                    <div class="panel-head"><div class="panel-title">Quick fixes</div></div>
+                    <button class="btn ai-btn" style="width:100%">Regenerate pitch</button>
+                    <button class="btn" style="width:100%;margin-top:8px">Replace photo</button>
+                  </section>
+                </div>
+                <div class="bottom-save"><button class="btn btn-primary">Edit content</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

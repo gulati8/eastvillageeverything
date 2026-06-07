@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { PlaceModel, NeighborhoodModel } from '@eve/db';
 import { SearchInput } from '../../components/SearchInput';
+import { DeleteButton } from '../../components/DeleteButton';
+import { deletePlace } from '../../lib/actions/places';
 
 export default async function PlacesPage({
   searchParams,
@@ -33,6 +35,12 @@ export default async function PlacesPage({
                 {p.address ?? 'no address'} · {nameById.get(p.neighborhood_id) ?? '—'}
               </span>
             </Link>
+            <DeleteButton
+              action={deletePlace}
+              id={p.id}
+              label="Delete"
+              confirmText={`Delete ${p.name}? This cannot be undone.`}
+            />
           </li>
         ))}
       </ul>
