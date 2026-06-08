@@ -31,6 +31,7 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/packages ./packages
 COPY --from=build /app/apps/admin/.next ./apps/admin/.next
 COPY --from=build /app/apps/admin/public ./apps/admin/public
+COPY --from=build /app/apps/admin/next.config.mjs ./apps/admin/next.config.mjs
 COPY --from=build /app/apps/admin/package.json ./apps/admin/package.json
 COPY --from=build /app/package.json ./package.json
 EXPOSE 3001
