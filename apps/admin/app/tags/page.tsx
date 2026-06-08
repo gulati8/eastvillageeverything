@@ -7,12 +7,14 @@ import { reorderTags } from '../../lib/actions/tags';
 
 interface Tag { id: string; value: string; display: string; sort_order: number; }
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 export default function TagsPage() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
-    fetch('/api/admin/tags', { credentials: 'same-origin' })
+    fetch(`${basePath}/api/admin/tags`, { credentials: 'same-origin' })
       .then((r) => r.json())
       .then((rows: Tag[]) => setTags(rows));
   }, []);

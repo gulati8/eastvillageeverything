@@ -11,6 +11,8 @@ RUN npm ci --workspaces --include-workspace-root --legacy-peer-deps
 
 FROM node:20-alpine AS build
 WORKDIR /app
+ARG NEXT_PUBLIC_BASE_PATH=/admin
+ENV NEXT_PUBLIC_BASE_PATH=${NEXT_PUBLIC_BASE_PATH}
 COPY --from=deps /app/node_modules ./node_modules
 COPY tsconfig.json package.json package-lock.json ./
 COPY packages ./packages
@@ -21,6 +23,7 @@ RUN npm --prefix apps/admin run build
 FROM node:20-alpine AS run
 WORKDIR /app
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_BASE_PATH=/admin
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/packages ./packages
 COPY --from=build /app/apps/admin/.next ./apps/admin/.next

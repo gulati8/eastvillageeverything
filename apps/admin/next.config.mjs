@@ -1,6 +1,9 @@
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  basePath,
   // Read workspace packages from source — no built dist required for admin dev.
   transpilePackages: ['@eve/db', '@eve/design-tokens', '@eve/shared-types', '@eve/storage'],
   experimental: {

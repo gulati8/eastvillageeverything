@@ -2,6 +2,8 @@
 
 import { useRef, useState } from 'react';
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 interface Props {
   name: string;
   prefix: 'tag' | 'place';
@@ -24,7 +26,7 @@ export function PhotoUpload({ name, prefix, initialUrl, label, help }: Props) {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('prefix', prefix);
-      const res = await fetch('/api/admin/uploads', { method: 'POST', body: fd, credentials: 'same-origin' });
+      const res = await fetch(`${basePath}/api/admin/uploads`, { method: 'POST', body: fd, credentials: 'same-origin' });
       if (!res.ok) {
         const body = await res.json().catch(() => ({ error: `Upload failed (${res.status})` }));
         setError(body.error ?? 'Upload failed');

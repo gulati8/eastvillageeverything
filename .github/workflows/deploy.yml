@@ -8,6 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/eve-app
+  ADMIN_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/eve-admin
 
 jobs:
   build-and-push:
@@ -51,6 +52,28 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Extract admin metadata
+        id: admin-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.ADMIN_IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=raw,value=latest
+
+      - name: Build and push admin image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/admin/Dockerfile
+          push: true
+          tags: ${{ steps.admin-meta.outputs.tags }}
+          labels: ${{ steps.admin-meta.outputs.labels }}
+          build-args: |
+            NEXT_PUBLIC_BASE_PATH=/admin
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -73,6 +96,7 @@ jobs:
         run: |
           # Read and base64 encode the docker-compose file
           COMPOSE_CONTENT=$(base64 -w 0 deploy/docker-compose.prod.yml)
+          CADDY_UPDATE_CONTENT=$(base64 -w 0 deploy/update-caddy-eve-admin.sh)
 
           # Base64 encode secrets to avoid shell escaping issues
           PG_PASS_B64=$(echo -n '${{ secrets.POSTGRES_PASSWORD }}' | base64 -w 0)
@@ -86,6 +110,8 @@ jobs:
             --parameters "commands=[
               \"sudo mkdir -p /srv/eve\",
               \"echo '$COMPOSE_CONTENT' | base64 -d | sudo tee /srv/eve/docker-compose.prod.yml > /dev/null\",
+              \"echo '$CADDY_UPDATE_CONTENT' | base64 -d | sudo tee /srv/eve/update-caddy-eve-admin.sh > /dev/null\",
+              \"sudo chmod +x /srv/eve/update-caddy-eve-admin.sh\",
               \"PG_PASS=\$(echo '$PG_PASS_B64' | base64 -d) && echo \\\"POSTGRES_PASSWORD=\$PG_PASS\\\" | sudo tee /srv/eve/.env > /dev/null\",
               \"SESSION=\$(echo '$SESSION_B64' | base64 -d) && echo \\\"SESSION_SECRET=\$SESSION\\\" | sudo tee -a /srv/eve/.env > /dev/null\",
               \"REDIS_PASS=\$(echo '$REDIS_PASS_B64' | base64 -d) && echo \\\"REDIS_PASSWORD=\$REDIS_PASS\\\" | sudo tee -a /srv/eve/.env > /dev/null\",
@@ -117,6 +143,7 @@ jobs:
               \"docker compose -f docker-compose.prod.yml pull\",
               \"docker compose -f docker-compose.prod.yml run --rm app npm run migrate || true\",
               \"docker compose -f docker-compose.prod.yml up -d\",
+              \"sudo /srv/eve/update-caddy-eve-admin.sh\",
               \"docker image prune -f --filter label=org.opencontainers.image.source=https://github.com/gulati8/eastvillageeverything || true\"
             ]" \
             --query 'Command.CommandId' \

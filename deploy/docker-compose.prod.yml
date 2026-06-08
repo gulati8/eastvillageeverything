@@ -52,6 +52,35 @@ services:
       - internal
       - proxy
 
+  admin:
+    image: ghcr.io/gulati8/eve-admin:latest
+    container_name: eve-admin
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_BASE_PATH: /admin
+      DATABASE_URL: postgres://eve:${POSTGRES_PASSWORD:-eve_prod_password_change_me}@eve-db:5432/eve_production
+      REDIS_URL: redis://eve-redis:6379
+      SESSION_COOKIE_NAME: connect.sid
+      SESSION_SECRET: ${SESSION_SECRET:-change_this_session_secret_in_production}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      STORAGE_LOCAL_DIR: public/uploads
+      STORAGE_LOCAL_URL_PREFIX: /uploads
+      STORAGE_S3_BUCKET: ${STORAGE_S3_BUCKET:-}
+      STORAGE_S3_REGION: ${STORAGE_S3_REGION:-us-east-1}
+      STORAGE_S3_PREFIX: ${STORAGE_S3_PREFIX:-public}
+      STORAGE_S3_URL_PATTERN: ${STORAGE_S3_URL_PATTERN:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - internal
+      - proxy
+
 volumes:
   postgres_data:
   redis_data:
