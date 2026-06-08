@@ -1,13 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { putObject } from '@eve/storage';
+import { adminErrorResponse, requireAdminRequest } from '../../../../lib/security';
 
 export const runtime = 'nodejs';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  try {
+    await requireAdminRequest(req, { mutation: true });
+  } catch (err) {
+    return adminErrorResponse(err) ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   let fd: FormData;
   try {
     fd = await req.formData();

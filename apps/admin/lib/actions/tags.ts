@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { TagModel } from '@eve/db';
+import { requireAdminMutation } from '../security';
 
 function slugify(s: string): string {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
@@ -22,6 +23,7 @@ async function uniqueSlug(base: string): Promise<string> {
 }
 
 export async function createTag(formData: FormData) {
+  await requireAdminMutation();
   const display = String(formData.get('display') ?? '').trim();
   const value = String(formData.get('value') ?? '').trim();
   if (!display || !value || !isValidSlug(value)) return;
@@ -32,6 +34,7 @@ export async function createTag(formData: FormData) {
 }
 
 export async function updateTag(id: string, formData: FormData) {
+  await requireAdminMutation();
   const display = String(formData.get('display') ?? '').trim();
   const value = String(formData.get('value') ?? '').trim();
   if (!display || !value || !isValidSlug(value)) return;
@@ -43,6 +46,7 @@ export async function updateTag(id: string, formData: FormData) {
 }
 
 export async function deleteTag(formData: FormData) {
+  await requireAdminMutation();
   const id = String(formData.get('id') ?? '');
   if (!id) return;
   await TagModel.delete(id);
@@ -51,6 +55,7 @@ export async function deleteTag(formData: FormData) {
 }
 
 export async function reorderTags(orderedIds: string[]) {
+  await requireAdminMutation();
   for (let i = 0; i < orderedIds.length; i++) {
     await TagModel.update(orderedIds[i]!, { sort_order: i });
   }
@@ -58,6 +63,7 @@ export async function reorderTags(orderedIds: string[]) {
 }
 
 export async function createTagInline(display: string): Promise<{ id: string; value: string; display: string } | null> {
+  await requireAdminMutation();
   const trimmed = display.trim();
   if (!trimmed) return null;
   const value = await uniqueSlug(slugify(trimmed));

@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { PlaceModel, TagModel } from '@eve/db';
+import { requireAdminMutation } from '../security';
 
 function readTagIds(formData: FormData): string[] {
   const raw = String(formData.get('tag_ids') ?? '[]');
@@ -43,6 +44,7 @@ function readForm(formData: FormData) {
 }
 
 export async function createPlace(formData: FormData) {
+  await requireAdminMutation();
   const f = readForm(formData);
   if (!f.name) return;
   const tags = await tagValuesForIds(readTagIds(formData));
@@ -52,6 +54,7 @@ export async function createPlace(formData: FormData) {
 }
 
 export async function updatePlace(id: string, formData: FormData) {
+  await requireAdminMutation();
   const f = readForm(formData);
   const tags = await tagValuesForIds(readTagIds(formData));
   await PlaceModel.update(id, { ...f, tags });
@@ -61,6 +64,7 @@ export async function updatePlace(id: string, formData: FormData) {
 }
 
 export async function deletePlace(formData: FormData) {
+  await requireAdminMutation();
   const id = String(formData.get('id') ?? '');
   if (!id) return;
   await PlaceModel.delete(id);

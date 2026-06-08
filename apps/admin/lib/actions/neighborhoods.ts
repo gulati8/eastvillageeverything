@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { NeighborhoodModel } from '@eve/db';
+import { requireAdminMutation } from '../security';
 
 function slugify(s: string): string {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
@@ -18,6 +19,7 @@ async function uniqueSlug(base: string): Promise<string> {
 }
 
 export async function createNeighborhood(formData: FormData) {
+  await requireAdminMutation();
   const display = String(formData.get('display') ?? '').trim();
   const valueRaw = String(formData.get('value') ?? '').trim();
   const isDefault = formData.get('is_default') === 'on';
@@ -29,6 +31,7 @@ export async function createNeighborhood(formData: FormData) {
 }
 
 export async function updateNeighborhood(id: string, formData: FormData) {
+  await requireAdminMutation();
   const display = String(formData.get('display') ?? '').trim();
   const value = String(formData.get('value') ?? '').trim();
   const isDefault = formData.get('is_default') === 'on';
@@ -38,6 +41,7 @@ export async function updateNeighborhood(id: string, formData: FormData) {
 }
 
 export async function deleteNeighborhood(formData: FormData) {
+  await requireAdminMutation();
   const id = String(formData.get('id') ?? '');
   if (!id) return;
   await NeighborhoodModel.delete(id);
@@ -46,6 +50,7 @@ export async function deleteNeighborhood(formData: FormData) {
 }
 
 export async function createNeighborhoodInline(display: string): Promise<{ id: string; value: string; display: string } | null> {
+  await requireAdminMutation();
   const trimmed = display.trim();
   if (!trimmed) return null;
   const value = await uniqueSlug(slugify(trimmed));

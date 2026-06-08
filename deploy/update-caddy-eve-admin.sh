@@ -2,7 +2,7 @@
 set -euo pipefail
 
 CADDYFILE=${CADDYFILE:-/srv/proxy/Caddyfile}
-SITE=${SITE:-eastvillageeverything.nyc}
+SITES=${SITES:-"eastvillageeverything.nyc www.eastvillageeverything.nyc"}
 
 if [[ ! -f "$CADDYFILE" ]]; then
   echo "Missing Caddyfile: $CADDYFILE" >&2
@@ -12,35 +12,40 @@ fi
 BACKUP="${CADDYFILE}.bak.$(date +%Y%m%d%H%M%S)"
 cp "$CADDYFILE" "$BACKUP"
 
-python3 - "$CADDYFILE" "$SITE" <<'PY'
+python3 - "$CADDYFILE" "$SITES" <<'PY'
 import sys
 from pathlib import Path
 
 path = Path(sys.argv[1])
-site = sys.argv[2]
+sites = sys.argv[2].split()
 text = path.read_text()
 
-marker = f"{site} {{"
-start = text.find(marker)
-if start == -1:
-    raise SystemExit(f"Could not find Caddy site block: {site}")
-
-brace = 0
-end = None
-for idx in range(start, len(text)):
-    char = text[idx]
-    if char == "{":
-        brace += 1
-    elif char == "}":
-        brace -= 1
-        if brace == 0:
-            end = idx + 1
+def find_site_block(caddyfile: str, site: str) -> tuple[int, int]:
+    offset = 0
+    for line in caddyfile.splitlines(keepends=True):
+        stripped = line.strip()
+        if stripped == f"{site} {{":
+            start = offset
             break
+        offset += len(line)
+    else:
+        raise SystemExit(f"Could not find Caddy site block: {site}")
 
-if end is None:
+    brace = 0
+    for idx in range(start, len(caddyfile)):
+        char = caddyfile[idx]
+        if char == "{":
+            brace += 1
+        elif char == "}":
+            brace -= 1
+            if brace == 0:
+                return start, idx + 1
+
     raise SystemExit(f"Could not parse Caddy site block: {site}")
 
-replacement = f"""{site} {{
+for site in sites:
+    start, end = find_site_block(text, site)
+    replacement = f"""{site} {{
     header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
     handle /admin* {{
@@ -51,9 +56,9 @@ replacement = f"""{site} {{
         reverse_proxy eve-app:3000
     }}
 }}"""
+    text = text[:start] + replacement + text[end:]
 
-next_text = text[:start] + replacement + text[end:]
-path.write_text(next_text)
+path.write_text(text)
 PY
 
 CADDY_CONTAINER=$(docker ps --format '{{.Names}} {{.Image}}' | awk '$1 == "proxy-caddy-1" { print $1; exit } /caddy/ { print $1; exit }')

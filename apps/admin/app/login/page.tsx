@@ -1,4 +1,5 @@
 import { loginAction } from '../../lib/actions/login';
+import { sanitizeAdminNextPath } from '../../lib/security';
 
 interface Props {
   searchParams: Promise<{ next?: string; error?: string }>;
@@ -6,6 +7,7 @@ interface Props {
 
 export default async function LoginPage({ searchParams }: Props) {
   const sp = await searchParams;
+  const next = sanitizeAdminNextPath(sp.next);
   return (
     <main className="min-h-screen flex items-center justify-center p-5 bg-paper">
       <form action={loginAction} className="w-full max-w-sm space-y-4 bg-paper2 p-6 rounded-card">
@@ -14,7 +16,7 @@ export default async function LoginPage({ searchParams }: Props) {
         {sp.error && (
           <p className="ui text-sm" style={{ color: '#C44' }}>{sp.error}</p>
         )}
-        <input type="hidden" name="next" value={sp.next ?? '/places'} />
+        <input type="hidden" name="next" value={next} />
         <label className="block">
           <span className="ui text-xs uppercase text-ink3">Email</span>
           <input

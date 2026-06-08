@@ -4,10 +4,20 @@ import { readSession, SESSION_COOKIE } from './lib/auth';
 export const runtime = 'nodejs';
 
 const PUBLIC_PATHS = ['/login', '/_next', '/favicon.ico'];
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
+function appPath(pathname: string): string {
+  if (basePath && (pathname === basePath || pathname.startsWith(`${basePath}/`))) {
+    return pathname.slice(basePath.length) || '/';
+  }
+  return pathname;
+}
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+  const pathnameWithoutBase = appPath(pathname);
+
+  if (PUBLIC_PATHS.some((p) => pathnameWithoutBase === p || pathnameWithoutBase.startsWith(p + '/'))) {
     return NextResponse.next();
   }
 
@@ -17,7 +27,7 @@ export async function middleware(req: NextRequest) {
   if (!session) {
     const url = req.nextUrl.clone();
     url.pathname = '/login';
-    url.searchParams.set('next', pathname);
+    url.searchParams.set('next', pathnameWithoutBase);
     return NextResponse.redirect(url);
   }
 

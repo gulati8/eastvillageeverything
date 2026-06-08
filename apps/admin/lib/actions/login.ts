@@ -7,6 +7,7 @@ import { sign } from 'cookie-signature';
 import { UserModel } from '@eve/db';
 import { redis } from '../redis';
 import { destroySession, SESSION_COOKIE } from '../auth';
+import { assertSameOriginAction, sanitizeAdminNextPath } from '../security';
 
 const SECRET = process.env.SESSION_SECRET ?? '';
 const SESSION_TTL_SECONDS = 24 * 60 * 60;
@@ -17,9 +18,10 @@ function bounceWithError(error: string, next: string): never {
 }
 
 export async function loginAction(formData: FormData): Promise<void> {
+  await assertSameOriginAction();
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const password = String(formData.get('password') ?? '');
-  const next = String(formData.get('next') ?? '/places');
+  const next = sanitizeAdminNextPath(formData.get('next'));
 
   if (!email || !password) bounceWithError('Email and password are required.', next);
   if (!SECRET) bounceWithError('Server misconfigured: SESSION_SECRET is empty.', next);
@@ -55,6 +57,7 @@ export async function loginAction(formData: FormData): Promise<void> {
 }
 
 export async function logoutAction(): Promise<void> {
+  await assertSameOriginAction();
   const cookieStore = await cookies();
   const raw = cookieStore.get(SESSION_COOKIE)?.value;
   await destroySession(raw);
