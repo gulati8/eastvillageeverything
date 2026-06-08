@@ -47,21 +47,29 @@ export function PhotoUpload({ name, prefix, initialUrl, label, help }: Props) {
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileRef.current?.click(); } }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer?.files?.[0]; if (f) onPick(f); }}
-        className="block border-2 border-dashed border-hairline rounded-card p-4 text-center cursor-pointer hover:border-accent"
+        className="block border-2 border-dashed border-hairline rounded-card p-4 text-center cursor-pointer hover:border-accent bg-paper"
       >
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={url} alt="" className="max-h-40 mx-auto rounded" />
         ) : (
-          <div className="ui text-sm text-ink3">{uploading ? 'Uploading…' : 'Drop image or tap to browse (max 10MB)'}</div>
+          <div className="ui text-sm text-ink3">{uploading ? 'Uploading…' : 'Drop image, tap to browse, or choose from photos (max 10MB)'}</div>
         )}
         <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden
                onChange={(e) => { if (e.target.files?.[0]) onPick(e.target.files[0]); }} />
       </div>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => fileRef.current?.click()} className="ui text-xs uppercase bg-ink text-paper px-3 py-2 rounded-input">
+          Take / choose photo
+        </button>
+        {url && (
+          <button type="button" onClick={() => setUrl('')} className="ui text-xs uppercase border border-hairline px-3 py-2 rounded-input">
+            Remove
+          </button>
+        )}
+      </div>
       {error && <p className="ui text-sm" style={{ color: '#C44' }}>{error}</p>}
-      <input type="url" name={name} value={url} onChange={(e) => setUrl(e.target.value)}
-             placeholder="https://…"
-             className="w-full p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent" />
+      <input type="hidden" name={name} value={url} />
       {help && <p className="ui text-xs text-ink3">{help}</p>}
     </div>
   );
