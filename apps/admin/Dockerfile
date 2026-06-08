@@ -17,7 +17,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY tsconfig.json package.json package-lock.json ./
 COPY packages ./packages
 COPY apps/admin ./apps/admin
-RUN npm run build:packages
+RUN npm --workspace @eve/shared-types run build
+RUN npm --workspace @eve/db run build
+RUN npm --workspace @eve/storage run build
+RUN npm --workspace @eve/design-tokens run build
 RUN npm --prefix apps/admin run build
 
 FROM node:20-alpine AS run
