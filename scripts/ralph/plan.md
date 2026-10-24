@@ -52,7 +52,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: `npx tsx scripts/enrich-places.ts --dry-run --limit 3` prints what it would write and changes nothing (verify with a before/after `select count(*) from places where enriched_at is not null`). Prefix: `feat(enrich)`.
 - [x] **2.6 Run enrichment against production, 5 places first.** Blocked by: 2.3, 2.4, 2.5. Run locally with `DATABASE_URL` pointed at prod through an SSH tunnel to the `eve-db` container (publish 5432 to the host's localhost only, or run the script inside the `eve-app` container with the key passed as an env var). Inspect the 5 rows in the admin. Record the method in `progress.txt`.
   Done when: 5 places show hours and coordinates in the admin. No commit.
-- [ ] **2.7 Run enrichment against all 352 places.** Blocked by: 2.6. Then list the failures in `progress.txt` by name.
+- [x] **2.7 Run enrichment against all 352 places.** Blocked by: 2.6. Then list the failures in `progress.txt` by name.
   Done when: `select enrichment_status, count(*) from places group by 1` shows `enriched` for at least 300 rows and every `failed` row is listed in `progress.txt`. No commit.
 - [ ] **2.8 Confirm the public API serves the new data.** Blocked by: 2.7. `curl -s 'https://eastvillageeverything.nyc/api/places?limit=5'` returns `hours_json` and `lat`/`lng` on enriched rows and `null` on failed rows, and the mobile transform tests cover both shapes.
   Done when: the curl check passes and `cd apps/mobile && npm test` passes. Commit only if a test or fix was added, prefix `fix(mobile)`.

@@ -2,6 +2,7 @@
 Started: 2026-10-24
 
 ## Codebase Patterns
+- `places.google_place_id` has a UNIQUE constraint (`places_google_place_id_key`). When Text Search resolves two rows to the same Google place (a duplicate listing such as "The Phoenix"/"Phoenix", or a wrong match on a neighbor), the second write fails with Postgres 23505 and the script marks that row `failed`; the log line is `DB write failed ... duplicate key`, not a Google error. 35 of the 38 failures in 2.7 were this. The backfill query is `google_place_id IS NULL`, so `failed` rows are retried automatically on the next `npm run enrich`; fix for 3.3 is delete the duplicate or correct the address, then re-run, with no status reset. Rows with a NULL `address` (Club Groove) are never selected by the backfill and stay `'pending'`.
 - Prod DB access for scripts: `eve-db` publishes no port, and the `eve-app` image has no `scripts/` dir or `tsx`, so run scripts from the laptop through an SSH tunnel to the container IP on the compose `internal` network: `IP=$(ssh ec2-user@100.29.233.41 "sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' eve-db")` (172.21.0.3 as of 2.6; re-read it, it can change on recreate), then `ssh -f -N -M -S /tmp/eve-db-tunnel.sock -o ExitOnForwardFailure=yes -L 127.0.0.1:15432:$IP:5432 ec2-user@100.29.233.41`, build `DATABASE_URL=postgres://eve:<url-encoded POSTGRES_PASSWORD from /srv/eve/.env>@127.0.0.1:15432/eve_production` in a shell variable without echoing it, run, then `ssh -S /tmp/eve-db-tunnel.sock -O exit ec2-user@100.29.233.41`. Prod `enrichment_status` values for never-enriched rows are the 9-char literal `'pending'` WITH single quotes (an import artifact); the script writes `ok`/`failed` without quotes, so group-by queries show both styles and `enrichment_status = 'pending'` matches nothing.
 - Enrichment script (`scripts/enrich-places.ts`): Text Search returns a BARE place id (`ChIJ...`); the details endpoint needs `places/<id>`, which the script now prepends. `google_place_id` stores the bare id. The script writes `enrichment_status = 'ok'` on success (not `enriched`, which the 2.7 Done when names); `lat`/`lng` are written with COALESCE so a missing `location` never nulls existing coordinates. `--limit N` and `--dry-run` are supported (`--dry-run` still calls Google, so it costs API requests, but every DB write becomes a `DRY RUN: would UPDATE ...` log line; `npm run enrich:dry-run -- --limit 5`). The local dev DB also has three unenriched places (Death & Co, Superiority Burger, Please Don't Tell) left `'pending'` on purpose for dry-run tests. Root `tsconfig.json` only includes `src/**`, so typecheck the script with `npx tsc --noEmit --strict --target es2022 --module nodenext --moduleResolution nodenext --skipLibCheck scripts/enrich-places.ts`. The local dev DB has three seeded East Village places (Veselka, McSorley's, Tompkins Square Bagels) that are already enriched.
 - Google Places: the enrich script (`scripts/enrich-places.ts`) uses Places API (New) only, whose service is `places.googleapis.com`; `places-backend.googleapis.com` is the legacy Places API and does not serve `places:searchText`. Both are enabled on project `eve-enrich-2026` and the `eve-enrich` key (`projects/496847463127/locations/global/keys/31d70efe-22d4-4cba-b95f-b7fed756e72c`) is restricted to both. `gcloud services api-keys create` prints the `keyString` in its operation output even with `--format`; redirect everything to `/dev/null` and get the name from `api-keys list` (which omits the key string).
@@ -184,4 +185,52 @@ Started: 2026-10-24
 - Files touched: `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
 - Validation: before: `select count(*) from places where enriched_at is not null` -> 0 of 352. Dry run -> `Enrichment dry run: 5 processed, 5 ok, 0 failed, 0 skipped (nothing written)`; rows with any of `enriched_at`, `google_place_id`, `lat`, `hours_json` set -> still 0. Real run -> `Enrichment complete: 5 processed, 5 ok, 0 failed, 0 skipped`. After: `select enrichment_status, count(*) from places group by 1` -> `'pending'` 347, `ok` 5; the 5 rows have `google_place_id`, `lat`, `lng`, `enriched_at`; 4 have `hours_json` and `google_price_level`. Public API checks above. No code changed, so no typecheck or tests.
 - Learnings for 2.7 and 3.3: (1) "13th step  ( See the 13th Step)" has an EMPTY address in prod and still resolved (to `ChIJ0ct3QZxZwokRecWgCBoHfPg`, The 13th Step, 149 2nd Ave) because the text query appends "East Village, New York, NY"; Google reports it `CLOSED_PERMANENTLY`, and it has no hours, so it is a 3.3 candidate for deletion even though its status is `ok`. The script does not request `businessStatus`, so permanently closed places will pass as `ok` in 2.7; a `select name from places where enrichment_status = 'ok' and hours_json is null` after 2.7 is the cheap way to find them. (2) 2.7's Done when says `enriched`; the script writes `ok`. (3) Each place costs 2 Google calls (Text Search + Details) and takes about 0.6 s, so the full 347-row run is about 700 requests and under 5 minutes. (4) The 5 enriched rows now sort first in `/api/places?limit=N` because they are alphabetically first, which is convenient for 2.8.
+---
+
+## 2026-10-24 - 2.7
+- Ran the full enrichment backfill against production: `Enrichment complete: 346 processed, 308 ok, 38 failed, 0 skipped`. Prod now has 313 `ok` rows (the 5 from 2.6 plus 308), 38 `failed`, and 1 `'pending'` (Club Groove, which has a NULL `address` and so is never selected by the backfill query). All 313 `ok` rows have `lat`/`lng`; 225 have `hours_json`; 247 have `google_price_level`. No code changed.
+- Method: same as 2.6. SSH master tunnel `-L 127.0.0.1:15432:172.21.0.3:5432` to the `eve-db` container IP, `POSTGRES_PASSWORD` read from `/srv/eve/.env` over SSH into a shell variable and URL-encoded into `DATABASE_URL`, `GOOGLE_PLACES_API_KEY` from root `.env`, neither echoed. `npm run enrich --silent > /tmp/enrich-2.7.log`. The run took about 4 minutes (roughly 700 Google requests). Tunnel closed afterwards; `psql` is not installed locally, so SQL checks ran through a throwaway Node script using the repo's `pg`.
+- Failure breakdown: 3 Google "Text Search: no results" (Louis 649 (temp closed), Queen Vic, Sutra), and 35 `duplicate key value violates unique constraint "places_google_place_id_key"`: Google resolved the row to a Place ID another row already holds. Each of those is either a duplicate listing or a wrong match (on either side). The owning row is noted so 3.3 can decide delete-vs-fix.
+- The 38 `failed` rows by name (address in parentheses; "->" is the row that already holds the same Google Place ID):
+  1. Copper Sill ( See The Copper Sill ) (empty address) -> Barrel  ( See the Barrel)
+  2. Dba (41 1st Ave New York, NY 10003) -> Cookies & Booze Part IX  [owner's address is "DBA 1st Ave", so the owner is probably the wrong match]
+  3. Flinders Lane (162 Ave A New York, NY 10009) -> A10 Kitchen (162 Ave. A)  [same storefront, likely a successor business]
+  4. Horseshoe Bar / 7B (108 Avenue B) -> 7B / Horseshoe (108 Ave B)  [duplicate]
+  5. Kazuza (107 Ave A) -> Kavasutra (261 E 10th)  [one side is a wrong match]
+  6. Lobby Bar @ Bowery Hotel (335 Bowery) -> Katra (217 Bowery)  [Katra's own match is suspect; three Bowery Hotel rows collided on it]
+  7. Louis 649 (temp closed) (649 East 9th Street) : Text Search no results
+  8. Meyahuel (304 E 6th street) -> Mayamezcal (304 E 6th Street)  [same storefront]
+  9. Momofuku Ssam Bar (207 2nd Ave) -> Momofuku Milk Bar (251 E 13th St)  [Ssam Bar closed; Google returned Milk Bar]
+  10. Niagara (112 Avenue A) -> Lei Bar (112 Avenue A)  [same storefront]
+  11. Nublu Classic (62 Ave C) -> Nublu (62 Avenue C)  [duplicate]
+  12. Plado (192 E 2nd Sreet) -> Pata Negra (345 E 12th St # B)  [address typo "Sreet"; one side is a wrong match]
+  13. Post (217 East 3rd Street) -> Elsa (217 E 3rd St)  [same storefront]
+  14. Purple (507 E 6th St) -> Nowon (507 E 6th Street)  [same storefront]
+  15. Queen Vic (68 2nd Ave) : Text Search no results
+  16. Rififi (219 Avenue B) -> ReVision Lounge (219 Ave B)  [same storefront]
+  17. Saxon + Parole (316 Bowery) -> Katra (217 Bowery)  [see 6]
+  18. Sobaya (229 E. 9th Street) -> Soba-ya (229 E 9th St New York, NY 10003)  [duplicate]
+  19. Stage Restaurant (128 2nd Ave New York, NY 10003) -> Brasserie Saint Marc (136 2nd Ave.)  [one side is a wrong match]
+  20. Standings (43 E 7th St) -> Jimmy's No. (43 E 7th St)  [same address; Jimmy's No. 43 is downstairs]
+  21. Sutra (78-80 E 4th St) : Text Search no results
+  22. The Blind Barber (339 E 10th St) -> Blind Barber ( See The Blind Barber )  [duplicate]
+  23. The Bowery Hotel Lobby Bar and Lounge (335 Bowery New York, NY 10003) -> Katra (217 Bowery)  [see 6; also a duplicate of 6]
+  24. The Central Bar (109 E 9th St) -> Central Bar ( See The Central Bar )  [duplicate]
+  25. The Cøøper Sill (151 2nd Ave) -> Barrel  ( See the Barrel)  [duplicate of 1]
+  26. The Drunken Clam (6 St Marks Pl) -> Barcade (6 St Marks)  [same address]
+  27. The Headless Widow (99 First Ave.) -> Headless Widow (99 First Ave.)  [duplicate]
+  28. The Linen Hall   (See Linen Hall) (empty address) -> Linen Hall (101 3rd ave)  [duplicate]
+  29. The Phoenix (447 E 13th St) -> Phoenix (447 E 13th St New York, NY 10009)  [duplicate]
+  30. The Scratcher (209 E 5th St) -> Scratchers (209 E 5th St)  [duplicate]
+  31. The Spotted Owl Tavern (211 Avenue A) -> Percy's Tavern (210 Avenue A)  [one side is a wrong match]
+  32. The Summit Bar (133 Avenue C) -> Summit Bar ( See The Summit Bar )  [duplicate]
+  33. The Third Man (116 Avenue C) -> Kafana (116 Ave C New York, NY 10009)  [same storefront]
+  34. The laurels (231 2nd Ave) -> The laurels (231 2nd Ave)  [exact duplicate row]
+  35. Two Perrys (127 Loisaida Ave (Ave C)) -> Two Perrys (127 Ave C)  [exact duplicate row]
+  36. U2 Karaoke (6 St Marks Pl) -> Sing Sing Karaoke (9 St Marks Pl)  [one side is a wrong match]
+  37. Vera @ Frank (88 2nd Ave) -> Frankie's (88 2nd Ave)  [same address]
+  38. Wayland. (See the Wayland) (empty address) -> The Wayland (700 E 9th St)  [duplicate]
+- Also for 3.3: Club Groove is still `'pending'` with a NULL address and needs an address before any run will touch it. 88 `ok` rows have no `hours_json` (query: `select name from places where enrichment_status = 'ok' and hours_json is null`); many are permanently closed (Google reports `CLOSED_PERMANENTLY`, which the script does not request), for example 13th step, Angel's Share, Booker & Dax, Pouring Ribbons, Terroir, The Redhead, Webster Hall. 15 "( See X )" cross-reference rows exist with empty addresses; several now hold a Google ID that belongs to the real row, so deleting the cross-reference row frees the ID for the real one.
+- Files touched: `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: before: `select enrichment_status, count(*) from places group by 1` -> `'pending'` 347, `ok` 5; `select count(*) from places where address is not null and google_place_id is null` -> 346. Run -> `Enrichment complete: 346 processed, 308 ok, 38 failed, 0 skipped`, exit 0. After: `select enrichment_status, count(*) from places group by 1` -> `'pending'` 1, `failed` 38, `ok` 313 (>= 300 required; the script writes `ok` where the task says `enriched`, as noted in 2.6). `select count(*), count(hours_json), count(lat), count(google_price_level) from places where enrichment_status='ok'` -> 313, 225, 313, 247. All 38 `failed` rows are listed above. No code changed, so no typecheck or tests.
 ---
