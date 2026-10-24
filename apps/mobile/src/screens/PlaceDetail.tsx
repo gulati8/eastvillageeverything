@@ -145,7 +145,7 @@ export function PlaceDetail({ id }: { id: string }) {
       >
         <View style={styles.hero}>
           <PhotoFallback
-            photo={place.photo}
+            photo={place.photoHero}
             id={place.key}
             name={place.name}
             width="100%"

@@ -6,6 +6,18 @@ function normalizeString(v: string | null | undefined): string | null {
   return trimmed ? trimmed : null;
 }
 
+/**
+ * First usable URL from the candidates, in order. Empty or whitespace-only
+ * strings count as absent so a blank column falls through to the next size.
+ */
+function firstPhoto(...candidates: Array<string | null | undefined>): string | null {
+  for (const candidate of candidates) {
+    const url = normalizeString(candidate);
+    if (url) return url;
+  }
+  return null;
+}
+
 function summarizeHours(p: PlaceResponse): HoursSummary | null {
   const hoursJson = p.hours_json ?? null;
   if (!hoursJson) return null;
@@ -34,7 +46,9 @@ export function transformPlace(p: PlaceResponse): PlaceV2Display {
     url: p.url ?? null,
     lat: p.lat ?? null,
     lng: p.lng ?? null,
-    photo: p.photo_url ?? null,
+    photo: firstPhoto(p.photo_url),
+    photoThumb: firstPhoto(p.photo_thumb_url, p.photo_url),
+    photoHero: firstPhoto(p.photo_hero_url, p.photo_url),
     photoCredit: p.photo_credit ?? null,
     specials: p.specials ?? null,
     notes: p.notes ?? null,

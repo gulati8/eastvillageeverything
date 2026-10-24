@@ -10,6 +10,8 @@ const place = (tags: string[]): PlaceV2Display => ({
   hoursJson: null,
   vibe: null,
   photo: null,
+  photoThumb: null,
+  photoHero: null,
   photoCredit: null,
   specials: null,
   notes: null,

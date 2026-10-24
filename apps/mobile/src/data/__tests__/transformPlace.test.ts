@@ -219,4 +219,67 @@ describe('transformPlace', () => {
       expect(result).not.toHaveProperty('kind');
     });
   });
+
+  describe('sized photos (photoThumb / photoHero fallback order)', () => {
+    const original = 'https://img.example.com/p.png';
+    const thumb = 'https://img.example.com/p.thumb.jpg';
+    const hero = 'https://img.example.com/p.hero.jpg';
+
+    it('uses the sized variant when all three URLs are present', () => {
+      const result = transformPlace(
+        makePlaceResponse({ photo_url: original, photo_thumb_url: thumb, photo_hero_url: hero }),
+      );
+      expect(result.photo).toBe(original);
+      expect(result.photoThumb).toBe(thumb);
+      expect(result.photoHero).toBe(hero);
+    });
+
+    it('falls back to photo_url when the sized variants are null', () => {
+      const result = transformPlace(
+        makePlaceResponse({ photo_url: original, photo_thumb_url: null, photo_hero_url: null }),
+      );
+      expect(result.photoThumb).toBe(original);
+      expect(result.photoHero).toBe(original);
+    });
+
+    it('falls back to photo_url when the sized variants are absent (older API / cached rows)', () => {
+      const result = transformPlace(makePlaceResponse({ photo_url: original }));
+      expect(result.photoThumb).toBe(original);
+      expect(result.photoHero).toBe(original);
+    });
+
+    it('falls back to photo_url when a sized variant is an empty string', () => {
+      const result = transformPlace(
+        makePlaceResponse({ photo_url: original, photo_thumb_url: '', photo_hero_url: '   ' }),
+      );
+      expect(result.photoThumb).toBe(original);
+      expect(result.photoHero).toBe(original);
+    });
+
+    it('falls back independently per size', () => {
+      const result = transformPlace(
+        makePlaceResponse({ photo_url: original, photo_thumb_url: thumb, photo_hero_url: null }),
+      );
+      expect(result.photoThumb).toBe(thumb);
+      expect(result.photoHero).toBe(original);
+    });
+
+    it('is null for every size when there is no photo at all, so PhotoFallback renders', () => {
+      const result = transformPlace(
+        makePlaceResponse({ photo_url: null, photo_thumb_url: null, photo_hero_url: null }),
+      );
+      expect(result.photo).toBeNull();
+      expect(result.photoThumb).toBeNull();
+      expect(result.photoHero).toBeNull();
+    });
+
+    it('does not promote a sized variant to photo (the original)', () => {
+      const result = transformPlace(
+        makePlaceResponse({ photo_url: null, photo_thumb_url: thumb, photo_hero_url: hero }),
+      );
+      expect(result.photo).toBeNull();
+      expect(result.photoThumb).toBe(thumb);
+      expect(result.photoHero).toBe(hero);
+    });
+  });
 });

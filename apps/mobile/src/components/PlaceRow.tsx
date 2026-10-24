@@ -46,7 +46,7 @@ export function PlaceRow({ place, isLast = false, isSaved = false, onPress, onSa
       ]}
     >
       <PhotoFallback
-        photo={place.photo}
+        photo={place.photoThumb}
         id={place.key}
         name={place.name}
         width={72}

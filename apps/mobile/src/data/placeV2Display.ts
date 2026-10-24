@@ -23,7 +23,12 @@ export interface PlaceV2Display {
   hours: HoursSummary | null;
   hoursJson: HoursJson | null;
   vibe: string | null;
+  /** Original upload (PlaceResponse.photo_url). */
   photo: string | null;
+  /** List-row image: photo_thumb_url, falling back to photo_url. */
+  photoThumb: string | null;
+  /** Detail hero image: photo_hero_url, falling back to photo_url. */
+  photoHero: string | null;
   photoCredit: string | null;
   specials: string | null;
   notes: string | null;
