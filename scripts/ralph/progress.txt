@@ -2,6 +2,7 @@
 Started: 2026-10-24
 
 ## Codebase Patterns
+- S3 bucket `eastvillageeverything-uploads` (us-east-1) is versioned. The IAM user `eve-uploads` can only Put/Delete under `public/*` and cannot delete object versions; use root to purge. Its keys live in root `.env` as `STORAGE_AWS_ACCESS_KEY_ID` / `STORAGE_AWS_SECRET_ACCESS_KEY`.
 - Local iOS builds need `SENTRY_AUTH_TOKEN` exported from root `.env` (`SENTRY_KEY`). EAS secrets are not delivered to local builds. See apps/mobile/README.md.
 - Server typecheck needs the workspace packages built first: `npm run build:packages` then `npx tsc --noEmit`. See CLAUDE.md.
 - The production site is `eastvillageeverything.nyc`. The `.com` domain is not ours.
@@ -39,4 +40,12 @@ Started: 2026-10-24
 - Files touched: `.github/workflows/deploy.yml` (commit 31553b8, pushed), `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
 - Validation: pre-push `npm run build:packages` exit 0, `npx tsc --noEmit` exit 0, `cd apps/mobile && npm test` exit 0 (13 suites, 148 passed, 1 skipped). Deploy run 40134490169 completed with conclusion success (`gh run watch --exit-status` exit 0). `ssh ec2-user@100.29.233.41 'grep CORS /srv/eve/.env'` -> `CORS_ORIGINS=https://eastvillageeverything.nyc,https://www.eastvillageeverything.nyc`.
 - Learnings: `gh run list --commit <sha>` returned nothing right after the push; list by workflow and match `headSha` instead, then `gh run watch <id> --exit-status`. The run took about 8 minutes. `sudo docker exec eve-app env | grep CORS` prints nothing: the compose file has no `env_file` and no `CORS_ORIGINS` in `environment`, so the server still runs with its localhost CORS defaults until 1.3 lands. Added to Codebase Patterns.
+---
+
+## 2026-10-24 - 1.1
+- The bucket `eastvillageeverything-uploads` already existed in `us-east-1` (empty, versioning enabled, all four public-access blocks on, no bucket policy). Set the public-access block to `BlockPublicAcls=true, IgnorePublicAcls=true, BlockPublicPolicy=false, RestrictPublicBuckets=false` and attached the section 4 bucket policy (public `s3:GetObject` on `public/*` only).
+- Created IAM user `eve-uploads` (the task's name; `docs/aws-setup.md` says `eve-app-uploads`) with inline policy `eve-uploads-rw` from section 2: `s3:PutObject`/`s3:DeleteObject` on `public/*` plus `s3:GetBucketLocation` on the bucket. Created one access key pair and appended it to the root `.env` as `STORAGE_AWS_ACCESS_KEY_ID` and `STORAGE_AWS_SECRET_ACCESS_KEY` via `printf` from shell variables. The secret was never printed.
+- Files touched: root `.env` (gitignored), `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: `aws s3api head-bucket --bucket eastvillageeverything-uploads` -> BucketRegion us-east-1. `aws iam list-access-keys --user-name eve-uploads` -> one Active key. With the new keys (`env -u AWS_PROFILE AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... aws ...`): `sts get-caller-identity` -> `arn:aws:iam::324480210257:user/eve-uploads`; `put-object` to `public/test.txt` -> ETag returned on first attempt; `curl https://eastvillageeverything-uploads.s3.us-east-1.amazonaws.com/public/test.txt` -> body echoed, HTTP 200; `delete-object` -> `DeleteMarker: true`; curl afterward -> HTTP 403 (S3 returns 403 not 404 to anonymous callers without ListBucket). Negative check: `put-object` to `private/test.txt` with the new keys -> AccessDenied. Purged the noncurrent version and delete marker of `public/test.txt` with root creds so the bucket is empty again.
+- Learnings: the account has no default region configured (`aws configure get region` is empty); pass `--region us-east-1` on s3api calls. Do not override `AWS_PROFILE=` with an empty value (the CLI then errors with "config profile () could not be found"); use `env -u AWS_PROFILE` instead. `docs/aws-setup.md` never actually creates the bucket ("created in Phase B"); it existed already.
 ---
