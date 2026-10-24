@@ -13,6 +13,8 @@
  *
  * Flags:
  *   --limit N   Process at most N places (useful for testing against prod).
+ *   --dry-run   Call Google as usual but write nothing to the database; each
+ *               place logs the row it would have written instead.
  *
  * Required environment variables:
  *   DATABASE_URL       — PostgreSQL connection string
@@ -39,6 +41,7 @@ if (!apiKey) {
 }
 
 const isRefresh = process.argv.includes('--refresh');
+const isDryRun = process.argv.includes('--dry-run');
 
 /**
  * Parse `--limit N` (or `--limit=N`). Returns null when absent.
@@ -255,11 +258,28 @@ function toNumericPrice(priceLevel: string | null): number | null {
   return priceLevel !== null ? (PRICE_LEVEL_MAP[priceLevel] ?? null) : null;
 }
 
+/** One-line description of the columns a write would set, for --dry-run output. */
+function describeWrite(details: PlaceDetails): string {
+  const periods = Array.isArray((details.regularOpeningHours as { periods?: unknown[] } | null)?.periods)
+    ? (details.regularOpeningHours as { periods: unknown[] }).periods.length
+    : 0;
+  return (
+    `hours_json=${details.regularOpeningHours ? `${periods} period(s)` : 'NULL'}, ` +
+    `google_price_level=${toNumericPrice(details.priceLevel) ?? 'NULL'}, ` +
+    `lat=${details.lat ?? 'NULL'}, lng=${details.lng ?? 'NULL'}, ` +
+    `enrichment_status=ok, enriched_at=NOW()`
+  );
+}
+
 async function markEnriched(
   id: string,
   googlePlaceId: string,
   details: PlaceDetails
 ): Promise<void> {
+  if (isDryRun) {
+    console.log(`  DRY RUN: would UPDATE places SET google_place_id=${googlePlaceId}, ${describeWrite(details)} WHERE id=${id}`);
+    return;
+  }
   await pool.query(
     `UPDATE places
      SET google_place_id = $1,
@@ -282,6 +302,10 @@ async function markEnriched(
 }
 
 async function refreshEnriched(id: string, details: PlaceDetails): Promise<void> {
+  if (isDryRun) {
+    console.log(`  DRY RUN: would UPDATE places SET ${describeWrite(details)} WHERE id=${id}`);
+    return;
+  }
   await pool.query(
     `UPDATE places
      SET hours_json = $1,
@@ -302,6 +326,10 @@ async function refreshEnriched(id: string, details: PlaceDetails): Promise<void>
 }
 
 async function markFailed(id: string): Promise<void> {
+  if (isDryRun) {
+    console.log(`  DRY RUN: would UPDATE places SET enrichment_status=failed WHERE id=${id}`);
+    return;
+  }
   await pool.query(
     `UPDATE places SET enrichment_status = 'failed' WHERE id = $1`,
     [id]
@@ -435,14 +463,16 @@ async function runRefresh(): Promise<{
 async function main(): Promise<void> {
   console.log(
     `Mode: ${isRefresh ? 'refresh' : 'backfill'}` +
-      (limit !== null ? ` (limit ${limit})` : '')
+      (limit !== null ? ` (limit ${limit})` : '') +
+      (isDryRun ? ' [DRY RUN: no database writes]' : '')
   );
 
   const summary = isRefresh ? await runRefresh() : await runBackfill();
 
   console.log(
-    `Enrichment complete: ${summary.processed} processed, ` +
-      `${summary.ok} ok, ${summary.failed} failed, ${summary.skipped} skipped`
+    `Enrichment ${isDryRun ? 'dry run' : 'complete'}: ${summary.processed} processed, ` +
+      `${summary.ok} ok, ${summary.failed} failed, ${summary.skipped} skipped` +
+      (isDryRun ? ' (nothing written)' : '')
   );
 }
 

@@ -34,6 +34,7 @@
     "typecheck": "tsc --noEmit && npm --prefix apps/mobile run typecheck && npm --prefix apps/admin run typecheck",
     "enrich": "tsx scripts/enrich-places.ts",
     "enrich:refresh": "tsx scripts/enrich-places.ts --refresh",
+    "enrich:dry-run": "tsx scripts/enrich-places.ts --dry-run",
     "report:content": "tsx scripts/content-report.ts"
   },
   "dependencies": {

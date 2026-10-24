@@ -48,7 +48,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: `grep -c '^GOOGLE_PLACES_API_KEY=.' .env` prints 1 and a single `places:searchText` request with the key returns 200. No commit.
 - [x] **2.4 Extend the enrichment script to also fetch `location`** (lat/lng) in the details field mask and write `lat`, `lng`. Blocked by: 2.3.
   Done when: a run against the local dev DB with `--limit 3` sets `lat`, `lng`, and `hours_json` on those rows. Prefix: `feat(enrich)`.
-- [ ] **2.5 Add `--limit N` and `--dry-run` flags** to the script so a prod run can be tested on a handful of rows first. Blocked by: 2.3.
+- [x] **2.5 Add `--limit N` and `--dry-run` flags** to the script so a prod run can be tested on a handful of rows first. Blocked by: 2.3.
   Done when: `npx tsx scripts/enrich-places.ts --dry-run --limit 3` prints what it would write and changes nothing (verify with a before/after `select count(*) from places where enriched_at is not null`). Prefix: `feat(enrich)`.
 - [ ] **2.6 Run enrichment against production, 5 places first.** Blocked by: 2.3, 2.4, 2.5. Run locally with `DATABASE_URL` pointed at prod through an SSH tunnel to the `eve-db` container (publish 5432 to the host's localhost only, or run the script inside the `eve-app` container with the key passed as an env var). Inspect the 5 rows in the admin. Record the method in `progress.txt`.
   Done when: 5 places show hours and coordinates in the admin. No commit.
