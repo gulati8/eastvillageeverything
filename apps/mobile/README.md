@@ -68,6 +68,11 @@ Local prerequisites:
 - Xcode 16.1+ (`xcodebuild -version`)
 - Fastlane (`brew install fastlane`)
 - An Apple distribution certificate + provisioning profile registered with the EAS project (the first run prompts to reuse or create them)
+- `SENTRY_AUTH_TOKEN` exported in the shell. The Xcode build uploads source maps and dSYMs to Sentry and fails without it. EAS stores the token as a secret for cloud builds, but secrets are never delivered to local builds, so export it yourself (the root `.env` holds it as `SENTRY_KEY`):
+
+  ```bash
+  export SENTRY_AUTH_TOKEN=$(grep '^SENTRY_KEY=' ../../.env | cut -d= -f2-)
+  ```
 
 ### Submit to App Store Connect
 

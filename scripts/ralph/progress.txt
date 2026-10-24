@@ -1,0 +1,18 @@
+# Ralph Progress Log
+Started: 2026-10-24
+
+## Codebase Patterns
+- Local iOS builds need `SENTRY_AUTH_TOKEN` exported from root `.env` (`SENTRY_KEY`). EAS secrets are not delivered to local builds. See apps/mobile/README.md.
+- Server typecheck needs the workspace packages built first: `npm run build:packages` then `npx tsc --noEmit`. See CLAUDE.md.
+- The production site is `eastvillageeverything.nyc`. The `.com` domain is not ours.
+- The deploy workflow rewrites `/srv/eve/.env` on every run. Anything that must persist on the host goes in a separate file.
+
+---
+
+## 2026-10-24 - before 0.1
+- iOS build 11 (1.0.0) submitted to App Store Connect from a local EAS build. Build numbers 1 through 10 are used and expired in App Store Connect.
+- `SENTRY_AUTH_TOKEN` set as an EAS production secret from root `.env` `SENTRY_KEY`. Sentry has the source maps and dSYMs for build 11.
+- Apple Developer Program License Agreement and Free Apps Agreement accepted and active.
+- Production data: 352 places, 32 tags, 1 neighborhood. All places `enrichment_status = pending`. No coordinates, hours, photos, or pitch text on any place.
+- Validation: `npm run typecheck` and `cd apps/mobile && npm test` pass on `main`.
+---
