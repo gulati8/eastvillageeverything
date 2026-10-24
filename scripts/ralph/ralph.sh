@@ -42,7 +42,7 @@ ticked() { grep -c '^- \[x\]' "$PLAN_FILE" || true; }
 # Unattended runs cannot answer permission prompts, so permissions are bypassed.
 # The prompt's guardrails and the plan's task text are the only limits on what
 # the agent does. Review plan.md before raising the iteration count.
-AGENT_CMD=(claude --print --dangerously-skip-permissions --no-session-persistence)
+AGENT_CMD=(claude --print --dangerously-skip-permissions)
 
 NO_PROGRESS=0
 FAILURES=0
