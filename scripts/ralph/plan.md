@@ -74,7 +74,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
 
 - [x] **4.1 Align build numbering.** Set `cli.appVersionSource` to `local` in `apps/mobile/eas.json` and keep `ios.buildNumber` in `app.json` as the source of truth. Update the mobile README to say so (today it describes `autoIncrement`, which is not configured).
   Done when: README and `eas.json` agree and `cd apps/mobile && eas build:configure --platform ios --non-interactive` reports nothing to change. Prefix: `chore(mobile)`.
-- [ ] **4.2 Bring Expo packages to the SDK-expected patch versions.** `npx expo install --check` in `apps/mobile` listed expo, expo-constants, expo-font, expo-router as a patch behind.
+- [x] **4.2 Bring Expo packages to the SDK-expected patch versions.** `npx expo install --check` in `apps/mobile` listed expo, expo-constants, expo-font, expo-router as a patch behind.
   Done when: `npx expo-doctor` passes 18 of 18 checks and `npm test` passes. Prefix: `chore(mobile)`.
 - [ ] **4.3 Release candidate build.** Blocked by: 1.6, 2.8, 3.2, 3.3, 3.4, 3.5. Bump `ios.buildNumber`, export `SENTRY_AUTH_TOKEN` from root `.env` `SENTRY_KEY`, run `eas build --local --profile production --platform ios --output ./build-<n>.ipa`, then `eas submit --profile production --platform ios --path ./build-<n>.ipa`.
   Done when: EAS reports the submission accepted and the Sentry project has a new artifact bundle. Prefix: `chore(mobile)`.
