@@ -1,3 +1,10 @@
+// Mock @eve/shared-types to avoid ESM .js extension resolution issues in Jest
+// (index.ts uses `from './place.js'` which CommonJS Jest cannot resolve).
+// transformPlace pulls in signals/hours, which reads EVE_TIMEZONE at runtime.
+jest.mock('@eve/shared-types', () => ({
+  EVE_TIMEZONE: 'America/New_York',
+}));
+
 import { transformPlace } from './transformPlace';
 import type { PlaceResponse } from '@eve/shared-types';
 

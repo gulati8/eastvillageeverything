@@ -1,5 +1,12 @@
-import type { PlaceResponse } from '@eve/shared-types';
-import { transformPlace } from '../transformPlace';
+// Mock @eve/shared-types to avoid ESM .js extension resolution issues in Jest
+// (index.ts uses `from './place.js'` which CommonJS Jest cannot resolve).
+// transformPlace pulls in signals/hours, which reads EVE_TIMEZONE at runtime.
+jest.mock('@eve/shared-types', () => ({
+  EVE_TIMEZONE: 'America/New_York',
+}));
+
+import type { HoursJson, PlaceResponse } from '@eve/shared-types';
+import { todayHoursLabel, transformPlace } from '../transformPlace';
 
 // ---------------------------------------------------------------------------
 // Helper
@@ -280,6 +287,162 @@ describe('transformPlace', () => {
       expect(result.photo).toBeNull();
       expect(result.photoThumb).toBe(thumb);
       expect(result.photoHero).toBe(hero);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Shapes the public API actually serves after the Google Places enrichment
+  // run (scripts/enrich-places.ts). Fixtures are copied from
+  // GET https://eastvillageeverything.nyc/api/places on 2026-10-24.
+  // -------------------------------------------------------------------------
+
+  describe('enrichment shapes from the public API', () => {
+    /** 11th Street Bar: enriched, open every day, overnight closes. */
+    const sevenDayHours: HoursJson = {
+      periods: [
+        { open: { day: 0, hour: 12, minute: 0 }, close: { day: 1, hour: 4, minute: 0 } },
+        { open: { day: 1, hour: 14, minute: 0 }, close: { day: 2, hour: 4, minute: 0 } },
+        { open: { day: 2, hour: 14, minute: 0 }, close: { day: 3, hour: 4, minute: 0 } },
+        { open: { day: 3, hour: 14, minute: 0 }, close: { day: 4, hour: 4, minute: 0 } },
+        { open: { day: 4, hour: 14, minute: 0 }, close: { day: 5, hour: 4, minute: 0 } },
+        { open: { day: 5, hour: 14, minute: 0 }, close: { day: 6, hour: 4, minute: 0 } },
+        { open: { day: 6, hour: 12, minute: 0 }, close: { day: 0, hour: 4, minute: 0 } },
+      ],
+      weekdayDescriptions: [
+        'Monday: 2:00 PM – 4:00 AM',
+        'Tuesday: 2:00 PM – 4:00 AM',
+        'Wednesday: 2:00 PM – 4:00 AM',
+        'Thursday: 2:00 PM – 4:00 AM',
+        'Friday: 2:00 PM – 4:00 AM',
+        'Saturday: 12:00 PM – 4:00 AM',
+        'Sunday: 12:00 PM – 4:00 AM',
+      ],
+    };
+
+    /** 310 Bowery Bar: enriched, closed Mondays, so only six periods. */
+    const sixDayHours: HoursJson = {
+      periods: [
+        { open: { day: 0, hour: 12, minute: 0 }, close: { day: 1, hour: 0, minute: 0 } },
+        { open: { day: 2, hour: 17, minute: 0 }, close: { day: 3, hour: 0, minute: 0 } },
+        { open: { day: 3, hour: 17, minute: 0 }, close: { day: 4, hour: 1, minute: 0 } },
+        { open: { day: 4, hour: 17, minute: 0 }, close: { day: 5, hour: 2, minute: 0 } },
+        { open: { day: 5, hour: 17, minute: 0 }, close: { day: 6, hour: 4, minute: 0 } },
+        { open: { day: 6, hour: 11, minute: 30 }, close: { day: 0, hour: 4, minute: 0 } },
+      ],
+      weekdayDescriptions: [
+        'Monday: Closed',
+        'Tuesday: 5:00 PM – 12:00 AM',
+        'Wednesday: 5:00 PM – 1:00 AM',
+        'Thursday: 5:00 PM – 2:00 AM',
+        'Friday: 5:00 PM – 4:00 AM',
+        'Saturday: 11:30 AM – 4:00 AM',
+        'Sunday: 12:00 PM – 12:00 AM',
+      ],
+    };
+
+    /** The list endpoint row for 11th Street Bar (enrichment_status = ok). */
+    const enrichedRow = makePlaceResponse({
+      key: '2498bf36-7de6-4f87-8029-4570ef7288ef',
+      name: '11th Street Bar',
+      address: '510 E 11th St',
+      lat: 40.7280546,
+      lng: -73.9812525,
+      hours_json: sevenDayHours,
+      google_price_level: null,
+    });
+
+    /** 13th step: resolved a Google place (lat/lng written) but Google has no hours for it. */
+    const enrichedRowWithoutHours = makePlaceResponse({
+      name: '13th step  ( See the 13th Step)',
+      address: '',
+      lat: 40.7294796,
+      lng: -73.9872714,
+      hours_json: null,
+    });
+
+    /** Queen Vic: Text Search found nothing, so every enrichment column is null. */
+    const failedRow = makePlaceResponse({
+      name: 'Queen Vic',
+      address: '68 2nd Ave',
+      lat: null,
+      lng: null,
+      hours_json: null,
+      google_place_id: null,
+      google_price_level: null,
+      enrichment_status: 'failed',
+      enriched_at: null,
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('enriched row: keeps numeric coordinates and the hours object', () => {
+      const result = transformPlace(enrichedRow);
+      expect(result.lat).toBe(40.7280546);
+      expect(result.lng).toBe(-73.9812525);
+      expect(result.hoursJson).toBe(sevenDayHours);
+      expect(result.hours).toEqual({ openNow: null, label: expect.any(String) });
+    });
+
+    it('enriched row without hours: coordinates present, hours and hoursJson null', () => {
+      const result = transformPlace(enrichedRowWithoutHours);
+      expect(result.lat).toBe(40.7294796);
+      expect(result.lng).toBe(-73.9872714);
+      expect(result.hours).toBeNull();
+      expect(result.hoursJson).toBeNull();
+    });
+
+    it('failed row: coordinates, hours and hoursJson are all null and nothing throws', () => {
+      expect(() => transformPlace(failedRow)).not.toThrow();
+      const result = transformPlace(failedRow);
+      expect(result.lat).toBeNull();
+      expect(result.lng).toBeNull();
+      expect(result.hours).toBeNull();
+      expect(result.hoursJson).toBeNull();
+      expect(result.googlePriceLevel).toBeNull();
+    });
+
+    it('hours.label is today\'s line, with Google\'s Monday-first weekdayDescriptions', () => {
+      // Monday 2026-10-26, 2:00 PM Eastern.
+      jest.useFakeTimers({ now: new Date('2026-10-26T18:00:00Z') });
+      expect(transformPlace(enrichedRow).hours?.label).toBe('Monday: 2:00 PM – 4:00 AM');
+    });
+
+    it('todayHoursLabel maps every weekday to the matching description', () => {
+      // 2026-10-25 is a Sunday; each step is 24h, 2:00 PM Eastern (EDT, UTC-4).
+      const sunday = Date.UTC(2026, 9, 25, 18, 0, 0);
+      const expected = [
+        'Sunday: 12:00 PM – 4:00 AM',
+        'Monday: 2:00 PM – 4:00 AM',
+        'Tuesday: 2:00 PM – 4:00 AM',
+        'Wednesday: 2:00 PM – 4:00 AM',
+        'Thursday: 2:00 PM – 4:00 AM',
+        'Friday: 2:00 PM – 4:00 AM',
+        'Saturday: 12:00 PM – 4:00 AM',
+      ];
+      expected.forEach((label, offset) => {
+        const now = new Date(sunday + offset * 24 * 60 * 60 * 1000);
+        expect(todayHoursLabel(sevenDayHours, now)).toBe(label);
+      });
+    });
+
+    it('todayHoursLabel uses the Eastern Time day, not the UTC day', () => {
+      // 02:00 UTC on Tuesday 2026-10-27 is still 10:00 PM Monday in New York.
+      const now = new Date('2026-10-27T02:00:00Z');
+      expect(todayHoursLabel(sevenDayHours, now)).toBe('Monday: 2:00 PM – 4:00 AM');
+    });
+
+    it('todayHoursLabel still works when a day has no period (closed Mondays)', () => {
+      const monday = new Date('2026-10-26T18:00:00Z');
+      expect(todayHoursLabel(sixDayHours, monday)).toBe('Monday: Closed');
+      const tuesday = new Date('2026-10-27T18:00:00Z');
+      expect(todayHoursLabel(sixDayHours, tuesday)).toBe('Tuesday: 5:00 PM – 12:00 AM');
+    });
+
+    it('todayHoursLabel is null for null hours or empty descriptions', () => {
+      expect(todayHoursLabel(null)).toBeNull();
+      expect(todayHoursLabel({ periods: [], weekdayDescriptions: [] })).toBeNull();
     });
   });
 });

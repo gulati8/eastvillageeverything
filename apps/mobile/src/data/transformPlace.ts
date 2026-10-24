@@ -1,4 +1,5 @@
-import type { PlaceResponse } from '@eve/shared-types';
+import type { HoursJson, PlaceResponse } from '@eve/shared-types';
+import { getETWeekday } from '../signals/hours';
 import type { HoursSummary, PlaceV2Display } from './placeV2Display';
 
 function normalizeString(v: string | null | undefined): string | null {
@@ -18,18 +19,29 @@ function firstPhoto(...candidates: Array<string | null | undefined>): string | n
   return null;
 }
 
+/**
+ * Today's line from Google's weekdayDescriptions, e.g. "Monday: 2:00 PM – 4:00 AM".
+ *
+ * Google orders weekdayDescriptions Monday-first (index 0 = Monday, 6 = Sunday),
+ * while JS Date#getDay and Google period.open.day are Sunday-first, so the
+ * weekday has to be rotated by one. "Today" is the Eastern Time day, because
+ * every place is in New York and the device clock may be elsewhere.
+ */
+export function todayHoursLabel(hoursJson: HoursJson | null, now: Date = new Date()): string | null {
+  if (!hoursJson) return null;
+  const weekdayDescriptions = hoursJson.weekdayDescriptions;
+  if (!Array.isArray(weekdayDescriptions) || weekdayDescriptions.length === 0) return null;
+  const mondayFirstIndex = (getETWeekday(now) + 6) % 7;
+  return weekdayDescriptions[mondayFirstIndex] ?? null;
+}
+
 function summarizeHours(p: PlaceResponse): HoursSummary | null {
   const hoursJson = p.hours_json ?? null;
   if (!hoursJson) return null;
 
-  const weekdayDescriptions = hoursJson.weekdayDescriptions;
-  const label = Array.isArray(weekdayDescriptions) && weekdayDescriptions.length > 0
-    ? weekdayDescriptions[new Date().getDay()] ?? null
-    : null;
-
   return {
     openNow: null,
-    label,
+    label: todayHoursLabel(hoursJson),
   };
 }
 

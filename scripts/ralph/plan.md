@@ -54,7 +54,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: 5 places show hours and coordinates in the admin. No commit.
 - [x] **2.7 Run enrichment against all 352 places.** Blocked by: 2.6. Then list the failures in `progress.txt` by name.
   Done when: `select enrichment_status, count(*) from places group by 1` shows `enriched` for at least 300 rows and every `failed` row is listed in `progress.txt`. No commit.
-- [ ] **2.8 Confirm the public API serves the new data.** Blocked by: 2.7. `curl -s 'https://eastvillageeverything.nyc/api/places?limit=5'` returns `hours_json` and `lat`/`lng` on enriched rows and `null` on failed rows, and the mobile transform tests cover both shapes.
+- [x] **2.8 Confirm the public API serves the new data.** Blocked by: 2.7. `curl -s 'https://eastvillageeverything.nyc/api/places?limit=5'` returns `hours_json` and `lat`/`lng` on enriched rows and `null` on failed rows, and the mobile transform tests cover both shapes.
   Done when: the curl check passes and `cd apps/mobile && npm test` passes. Commit only if a test or fix was added, prefix `fix(mobile)`.
 
 ## Phase 3: content

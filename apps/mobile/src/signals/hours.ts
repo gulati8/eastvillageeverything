@@ -43,6 +43,11 @@ function getETComponents(date: Date): { day: number; hour: number; minute: numbe
   return { day, hour, minute };
 }
 
+/** Day of week in Eastern Time, 0=Sunday (the same convention as Google period.open.day). */
+export function getETWeekday(date: Date): number {
+  return getETComponents(date).day;
+}
+
 /** Convert ET day/hour/minute components to a total-minutes-since-week-start value */
 function toWeekMinutes(day: number, hour: number, minute: number): number {
   return day * 24 * 60 + hour * 60 + minute;
