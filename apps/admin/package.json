@@ -25,7 +25,8 @@
     "ioredis": "^5.4.2",
     "next": "15.5.16",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@types/cookie-signature": "^1.1.0",

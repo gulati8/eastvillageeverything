@@ -31,7 +31,11 @@ function readForm(formData: FormData) {
     phone: String(formData.get('phone') ?? '').trim() || undefined,
     url: String(formData.get('url') ?? '').trim() || undefined,
     neighborhood_id: String(formData.get('neighborhood_id') ?? '').trim() || undefined,
-    photo_url: String(formData.get('photo_url') ?? '').trim() || undefined,
+    // Photo fields are submitted as '' when cleared so the model nulls them;
+    // the three must change together.
+    photo_url: String(formData.get('photo_url') ?? '').trim(),
+    photo_thumb_url: String(formData.get('photo_thumb_url') ?? '').trim(),
+    photo_hero_url: String(formData.get('photo_hero_url') ?? '').trim(),
     photo_credit: String(formData.get('photo_credit') ?? '').trim() || undefined,
     specials: String(formData.get('specials') ?? '') || undefined,
     notes: String(formData.get('notes') ?? '') || undefined,

@@ -41,6 +41,8 @@ export interface Place {
   price_tier?: string;
   cross_street?: string;
   photo_url?: string;
+  photo_thumb_url?: string;
+  photo_hero_url?: string;
   photo_credit?: string;
   google_place_id?: string;
   hours_json?: HoursJson | null;
@@ -77,6 +79,8 @@ export interface PlaceResponse {
   price_tier?: string | null;
   cross_street?: string | null;
   photo_url?: string | null;
+  photo_thumb_url?: string | null;
+  photo_hero_url?: string | null;
   photo_credit?: string | null;
   google_place_id?: string | null;
   hours_json?: HoursJson | null;

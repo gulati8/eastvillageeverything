@@ -4,16 +4,32 @@ import { useRef, useState } from 'react';
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
+interface VariantField {
+  name: string;
+  initialUrl?: string | null;
+}
+
 interface Props {
   name: string;
   prefix: 'tag' | 'place';
   initialUrl?: string | null;
+  /** Optional hidden fields for the resized copies the upload route returns. */
+  variants?: { thumb: VariantField; hero: VariantField };
   label?: string;
   help?: string;
 }
 
-export function PhotoUpload({ name, prefix, initialUrl, label, help }: Props) {
+interface UploadResponse {
+  url: string;
+  key: string;
+  thumb_url?: string;
+  hero_url?: string;
+}
+
+export function PhotoUpload({ name, prefix, initialUrl, variants, label, help }: Props) {
   const [url, setUrl] = useState(initialUrl ?? '');
+  const [thumbUrl, setThumbUrl] = useState(variants?.thumb.initialUrl ?? '');
+  const [heroUrl, setHeroUrl] = useState(variants?.hero.initialUrl ?? '');
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -32,8 +48,10 @@ export function PhotoUpload({ name, prefix, initialUrl, label, help }: Props) {
         setError(body.error ?? 'Upload failed');
         return;
       }
-      const { url: newUrl } = await res.json();
-      setUrl(newUrl);
+      const body = (await res.json()) as UploadResponse;
+      setUrl(body.url);
+      setThumbUrl(body.thumb_url ?? '');
+      setHeroUrl(body.hero_url ?? '');
     } finally {
       setUploading(false);
     }
@@ -65,13 +83,15 @@ export function PhotoUpload({ name, prefix, initialUrl, label, help }: Props) {
           Take / choose photo
         </button>
         {url && (
-          <button type="button" onClick={() => setUrl('')} className="ui text-xs uppercase border border-hairline px-3 py-2 rounded-input">
+          <button type="button" onClick={() => { setUrl(''); setThumbUrl(''); setHeroUrl(''); }} className="ui text-xs uppercase border border-hairline px-3 py-2 rounded-input">
             Remove
           </button>
         )}
       </div>
       {error && <p className="ui text-sm" style={{ color: '#C44' }}>{error}</p>}
       <input type="hidden" name={name} value={url} />
+      {variants && <input type="hidden" name={variants.thumb.name} value={thumbUrl} />}
+      {variants && <input type="hidden" name={variants.hero.name} value={heroUrl} />}
       {help && <p className="ui text-xs text-ink3">{help}</p>}
     </div>
   );

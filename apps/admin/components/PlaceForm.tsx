@@ -11,7 +11,7 @@ interface Props {
   action: (formData: FormData) => void;
   defaultValues?: Partial<{
     name: string; address: string; cross_street: string; phone: string; url: string;
-    neighborhood_id: string; photo_url: string; photo_credit: string;
+    neighborhood_id: string; photo_url: string; photo_thumb_url: string; photo_hero_url: string; photo_credit: string;
     specials: string; notes: string;
     pitch: string; perfect: string; insider: string; vibe: string; crowd: string;
   }>;
@@ -90,8 +90,12 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
                 name="photo_url"
                 prefix="place"
                 initialUrl={v.photo_url ?? null}
+                variants={{
+                  thumb: { name: 'photo_thumb_url', initialUrl: v.photo_thumb_url ?? null },
+                  hero: { name: 'photo_hero_url', initialUrl: v.photo_hero_url ?? null },
+                }}
                 label="Place image"
-                help="Next phase: save app-ready crops for list thumbnails and detail hero images."
+                help="Each upload also saves a 400px list thumbnail and a 1200px detail hero."
               />
               <div className="space-y-3">
                 <Field label="Photo credit" name="photo_credit" defaultValue={v.photo_credit ?? ''} />

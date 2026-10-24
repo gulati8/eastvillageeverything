@@ -22,6 +22,8 @@ export interface PlaceInput {
   price_tier?: string;
   cross_street?: string;
   photo_url?: string;
+  photo_thumb_url?: string;
+  photo_hero_url?: string;
   photo_credit?: string;
   neighborhood_id?: string | null;
 }
@@ -76,6 +78,7 @@ export class PlaceModel {
         p.lat, p.lng,
         p.pitch, p.perfect, p.insider, p.crowd, p.vibe,
         p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit,
+        p.photo_thumb_url, p.photo_hero_url,
         p.neighborhood_id,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         COALESCE(
@@ -190,6 +193,7 @@ export class PlaceModel {
         p.lat, p.lng,
         p.pitch, p.perfect, p.insider, p.crowd, p.vibe,
         p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit,
+        p.photo_thumb_url, p.photo_hero_url,
         p.neighborhood_id,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         COALESCE(
@@ -227,9 +231,10 @@ export class PlaceModel {
       const insertSql = `
         INSERT INTO places (name, address, phone, url, specials, categories, notes,
           pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-          cross_street, photo_url, photo_credit, neighborhood_id)
+          cross_street, photo_url, photo_credit, neighborhood_id,
+          photo_thumb_url, photo_hero_url)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
-                $15, $16, $17, $18)
+                $15, $16, $17, $18, $19, $20)
         RETURNING id
       `;
 
@@ -252,6 +257,8 @@ export class PlaceModel {
         validateUrl(data.photo_url),
         data.photo_credit || null,
         neighborhoodId,
+        validateUrl(data.photo_thumb_url),
+        validateUrl(data.photo_hero_url),
       ]);
 
       const place = placeResult.rows[0];
@@ -339,6 +346,14 @@ export class PlaceModel {
       if (data.photo_url !== undefined) {
         updates.push(`photo_url = $${paramIndex++}`);
         params.push(validateUrl(data.photo_url));
+      }
+      if (data.photo_thumb_url !== undefined) {
+        updates.push(`photo_thumb_url = $${paramIndex++}`);
+        params.push(validateUrl(data.photo_thumb_url));
+      }
+      if (data.photo_hero_url !== undefined) {
+        updates.push(`photo_hero_url = $${paramIndex++}`);
+        params.push(validateUrl(data.photo_hero_url));
       }
       if (data.photo_credit !== undefined) {
         updates.push(`photo_credit = $${paramIndex++}`);

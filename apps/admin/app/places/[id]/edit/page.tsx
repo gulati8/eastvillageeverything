@@ -43,6 +43,8 @@ export default async function EditPlacePage({
     url: place.url ?? '',
     neighborhood_id: place.neighborhood_id,
     photo_url: place.photo_url ?? '',
+    photo_thumb_url: place.photo_thumb_url ?? '',
+    photo_hero_url: place.photo_hero_url ?? '',
     photo_credit: place.photo_credit ?? '',
     specials: place.specials ?? '',
     notes: place.notes ?? '',
