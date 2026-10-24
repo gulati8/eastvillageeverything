@@ -40,7 +40,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
 
 `scripts/enrich-places.ts` resolves each place to a Google Place ID by text search, then fetches `regularOpeningHours` and `priceLevel`. It writes `google_place_id`, `hours_json`, `google_price_level`, `enriched_at`, `enrichment_status`. It does not fetch coordinates today. It has never run against prod: all 352 places are `pending` with no hours, coordinates, or Place ID.
 
-- [ ] **2.1 Install the Google Cloud CLI.** `brew install --cask google-cloud-sdk`.
+- [x] **2.1 Install the Google Cloud CLI.** `brew install --cask google-cloud-sdk`.
   Done when: `gcloud --version` prints. No commit.
 - [ ] **2.2 [HUMAN] Log in to gcloud and pick the project.** Run `gcloud auth login` (opens a browser) and `gcloud config set project <id>`. The project must have billing enabled; Places API (New) will not serve requests without it. Write the project id in `progress.txt`.
   Done when: `gcloud auth list` shows an active account and `gcloud beta billing projects describe $(gcloud config get-value project)` shows `billingEnabled: true`.

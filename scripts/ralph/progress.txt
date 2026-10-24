@@ -93,3 +93,10 @@ Started: 2026-10-24
 - Validation: `grep -rc 'type="file"' src/views/admin/ | grep -v ':0$'` prints nothing. `npm run build:packages` exit 0, `npm run typecheck` (server, mobile, admin) exit 0, `cd apps/mobile && npm test` 13 suites, 155 passed, 1 skipped. EJS smoke render with `ejs.renderFile` for `place: null` and for a place with id + photo_url: both render, new-page link and edit-page link present, no `type="file"`. Deploy run 40139896778 for 209b12f completed success (CI run for the same sha also success). On the host: `/srv/eve/.env` has the `NEXT_ADMIN_URL` line, `sudo docker exec eve-app env | grep -c "^NEXT_ADMIN_URL="` -> 1, all four `eve-*` containers up (`eve-app` healthy), `docker logs --since 10m eve-app` has 0 lines matching "entity too large" or "invalid csrf". `curl https://eastvillageeverything.nyc/api/places?limit=1` now returns `photo_thumb_url` and `photo_hero_url` keys, so the 1.5 migration ran on prod with this deploy.
 - Learnings: the 1.5 migration is confirmed live on prod. `grep -c` exits 1 when the count is 0, which makes a chained SSH check look failed; read the printed counts. Polling `gh run list --json headSha,status,conclusion` every 10 s worked for the ~7 minute deploy; the earlier note about `gh run watch` exceeding the tool timeout still holds.
 ---
+
+## 2026-10-24 - 2.1
+- The Google Cloud CLI was already installed: `/opt/homebrew/bin/gcloud` is a symlink into the `gcloud-cli` Homebrew cask (590.0.1, installed 2026-10-24 17:00). Homebrew renamed the `google-cloud-sdk` cask to `gcloud-cli`, so `brew install --cask google-cloud-sdk` was not needed and `brew list --cask` shows `gcloud-cli`. Nothing was installed or changed on the machine.
+- Files touched: `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: `gcloud --version` -> Google Cloud SDK 590.0.1, bq 2.1.41, bundled-python3-unix 3.14.8, core 2026.10.22, gcloud-crc32c 1.0.0, gsutil 5.38; exit 0.
+- Learnings: 2.2 is `[HUMAN]` and 2.3 through 2.8 are blocked by it, so the next iteration will be BLOCKED on 2.2 unless the human runs `gcloud auth login` and `gcloud config set project <id>` first.
+---
