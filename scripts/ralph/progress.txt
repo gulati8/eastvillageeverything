@@ -139,3 +139,12 @@ Started: 2026-10-24
 - Validation: `test -f docs/app-store/listing.md` -> exists. Field lengths measured with `printf | wc -c` and an awk extract of the description block: subtitle 30, keywords 98, promo 144, description 1852. Claims checked against `apps/mobile/src/screens/PlaceDetail.tsx`, `PlaceRow.tsx`, `TabBar.tsx`, `PlaceList.tsx`, `signals/signal.ts`, `state/useFilterState.ts`, `state/useSavedPlaces.ts`, `package.json`, `app.json`, and `curl https://eastvillageeverything.nyc/api/tags`. No code changed, so no typecheck or test run.
 - Learnings: the Map and You tabs in `TabBar.tsx` are inert (`handleTabPress` in `PlaceList.tsx` only switches Home and Saved). The listing avoids the word "map" and the review notes disclose the inactive tabs; hiding them before 4.3 would be safer against a Guideline 2.1 placeholder rejection but is not a plan task. The detail screen does not render `pitch` or `cross_street` even though the API returns them, so 3.4's pitch text will not be visible in the app until a `fix(mobile)` task wires it in; the description therefore says "our notes" (the `notes` column, which is rendered). The "open now" and "closes in" copy depends on `hours_json`, so 2.7 must run before the description is uploaded in 5.7.
 ---
+
+## 2026-10-24 - BLOCKED after 5.5
+- No unticked task is available to the loop. Every remaining non-HUMAN task is blocked: 2.3 through 2.8 on 2.2; 4.3 on 2.8, 3.2 to 3.5; 5.2 and 5.3 on 5.1; 5.4 on 4.3; 5.7 on 5.2 to 5.6; 6.2 on 6.1.
+- Next HUMAN tasks, in the order that unblocks the most work:
+  1. 2.2: run `gcloud auth login` (opens a browser), then `gcloud config set project <id>` for a project with billing enabled. Check with `gcloud auth list` and `gcloud beta billing projects describe $(gcloud config get-value project)` (expect `billingEnabled: true`). Write the project id in this file and tick 2.2 in `plan.md`. This unblocks 2.3 to 2.8.
+  2. 5.1: decide the support email and write it in this file, then tick 5.1. This unblocks 5.2 and 5.3 (privacy and support pages), which 5.7 needs.
+  3. 5.6: create the App Store Connect API key (App Manager role), save the `.p8` outside the repo, and add `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` to the root `.env`, then tick 5.6.
+- Commits since the last push (0.4 and 1.7 pushed; 2.1, 3.1, 4.1, 4.2, 5.5 are local) will go out with the next task that deploys.
+---
