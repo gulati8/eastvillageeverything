@@ -24,3 +24,11 @@ Started: 2026-10-24
 - Validation: `ls eas.json app.json` -> both "No such file or directory". `npm run typecheck` (root tsc, mobile tsc, admin tsc) exit 0.
 - Learnings: `npm run typecheck` runs all three tsc passes (server, mobile, admin) and takes a minute or so; in zsh use `$?` after the command rather than `PIPESTATUS`, which is `pipestatus` (lowercase) in zsh.
 ---
+
+## 2026-10-24 - 0.3
+- Deleted 13 old `.ipa` files in `apps/mobile/` (build-10, build-10-nosourcemaps, the May timestamped builds, and the 20260508 builds). Kept `apps/mobile/build-11.ipa`, the build submitted to App Store Connect.
+- All of the deleted files were untracked: `git ls-files | grep '\.ipa$'` printed nothing before deletion, and `.gitignore` line 54 already has `apps/mobile/build-*.ipa`. No tracked file changed, so this commit only carries the plan and progress edits.
+- Files touched: `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: `ls apps/mobile/*.ipa` -> `build-11.ipa` only. `git status --short` after deletion -> empty.
+- Learnings: the `.ipa` files were never tracked, so git history does not carry them; nothing to purge.
+---
