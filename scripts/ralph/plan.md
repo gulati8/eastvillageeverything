@@ -42,7 +42,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
 
 - [x] **2.1 Install the Google Cloud CLI.** `brew install --cask google-cloud-sdk`.
   Done when: `gcloud --version` prints. No commit.
-- [ ] **2.2 [HUMAN] Log in to gcloud and pick the project.** Run `gcloud auth login` (opens a browser) and `gcloud config set project <id>`. The project must have billing enabled; Places API (New) will not serve requests without it. Write the project id in `progress.txt`.
+- [x] **2.2 [HUMAN] Log in to gcloud and pick the project.** Run `gcloud auth login` (opens a browser) and `gcloud config set project <id>`. The project must have billing enabled; Places API (New) will not serve requests without it. Write the project id in `progress.txt`.
   Done when: `gcloud auth list` shows an active account and `gcloud beta billing projects describe $(gcloud config get-value project)` shows `billingEnabled: true`.
 - [ ] **2.3 Enable the API and mint a restricted key.** Blocked by: 2.2. `gcloud services enable places-backend.googleapis.com`, then `gcloud services api-keys create --display-name eve-enrich --api-target=service=places-backend.googleapis.com`. Read the key string with `gcloud services api-keys get-key-string <name>` and write it to the root `.env` as `GOOGLE_PLACES_API_KEY`. Never print it.
   Done when: `grep -c '^GOOGLE_PLACES_API_KEY=.' .env` prints 1 and a single `places:searchText` request with the key returns 200. No commit.
@@ -90,7 +90,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: `curl -s -o /dev/null -w '%{http_code}' https://eastvillageeverything.nyc/support` prints 200. Prefix: `feat(site)`.
 - [ ] **5.4 Screenshots.** Blocked by: 4.3. Capture from the iOS Simulator (`xcrun simctl io booted screenshot`) on iPhone 17 Pro Max (6.9") and an iPhone with a 6.5" display, against prod data: list, detail, search, filters, saved. Save to `docs/app-store/screenshots/<size>/`.
   Done when: the files exist at the pixel sizes App Store Connect requires. Prefix: `docs(app-store)`.
-- [ ] **5.5 Listing copy.** Write `docs/app-store/listing.md`: name, subtitle, description, keywords, category, age rating answers (4+), and the App Privacy questionnaire answers (Identifiers: Device ID, used for app functionality, not linked to identity, not used for tracking; Diagnostics: crash data, not linked).
+- [x] **5.5 Listing copy.** Write `docs/app-store/listing.md`: name, subtitle, description, keywords, category, age rating answers (4+), and the App Privacy questionnaire answers (Identifiers: Device ID, used for app functionality, not linked to identity, not used for tracking; Diagnostics: crash data, not linked).
   Done when: the file exists. Prefix: `docs(app-store)`.
 - [ ] **5.6 [HUMAN] Create an App Store Connect API key for fastlane.** App Store Connect > Users and Access > Integrations > App Store Connect API > generate a key with the App Manager role. Download the `.p8` once. Save it outside the repo (for example `~/.appstoreconnect/AuthKey_<KEYID>.p8`) and put `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` in the root `.env`.
   Done when: the three vars are in `.env`.
