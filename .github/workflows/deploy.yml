@@ -139,6 +139,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --parameters "commands=[
               \"cd /srv/eve\",
+              \"test -f /srv/eve/.env.storage || sudo install -m 600 -o ec2-user -g ec2-user /dev/null /srv/eve/.env.storage\",
               \"echo '${{ secrets.GHCR_PAT }}' | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin\",
               \"docker compose -f docker-compose.prod.yml pull\",
               \"docker compose -f docker-compose.prod.yml run --rm app npm run migrate || true\",
