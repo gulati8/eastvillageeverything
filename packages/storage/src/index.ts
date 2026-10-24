@@ -42,6 +42,10 @@ if (backend === 'local') {
       client,
       bucket,
       visibility: 'public',
+      // The bucket has Object Ownership = bucket owner enforced (ACLs disabled);
+      // public read comes from the bucket policy on the `public/` prefix, so
+      // sending an x-amz-acl header makes S3 reject the PutObject.
+      supportsACL: false,
     })
   );
 
