@@ -20,7 +20,7 @@ You are Claude Code running unattended in a Ralph loop for this repository, one 
 - Never tick a `[HUMAN]` task. Never do a `[HUMAN]` task on the human's behalf.
 - Never print or commit a secret. The root `.env` is gitignored and holds them. Pipe values; do not echo them.
 - The production host is `ssh ec2-user@100.29.233.41`. The app lives in `/srv/eve`. The database is the `eve-db` container, user `eve`, database `eve_production`. Do not run anything destructive there unless the task says so.
-- Push to `main` triggers a production deploy. Only push when the task says to deploy, and wait for the workflow to pass (`gh run watch`) before running the `Done when` check.
+- Push to `main` triggers a production deploy. Only push when the task says to deploy. Before any push, run `npm run build:packages && npx tsc --noEmit && (cd apps/mobile && npm test)` and do not push if anything fails. After pushing, wait for the workflow to pass (`gh run watch`) before running the `Done when` check. Commits from tasks that do not push stay local until the next task that does; that is expected.
 - Do not change the plan's tasks except to tick a box or to add a task that a task explicitly tells you to add (such as a review rejection).
 - If a `Done when` check fails after a reasonable fix attempt, leave the box unticked, write what failed and what you tried in `progress.txt`, commit that, and exit.
 
