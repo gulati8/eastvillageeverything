@@ -50,7 +50,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: a run against the local dev DB with `--limit 3` sets `lat`, `lng`, and `hours_json` on those rows. Prefix: `feat(enrich)`.
 - [x] **2.5 Add `--limit N` and `--dry-run` flags** to the script so a prod run can be tested on a handful of rows first. Blocked by: 2.3.
   Done when: `npx tsx scripts/enrich-places.ts --dry-run --limit 3` prints what it would write and changes nothing (verify with a before/after `select count(*) from places where enriched_at is not null`). Prefix: `feat(enrich)`.
-- [ ] **2.6 Run enrichment against production, 5 places first.** Blocked by: 2.3, 2.4, 2.5. Run locally with `DATABASE_URL` pointed at prod through an SSH tunnel to the `eve-db` container (publish 5432 to the host's localhost only, or run the script inside the `eve-app` container with the key passed as an env var). Inspect the 5 rows in the admin. Record the method in `progress.txt`.
+- [x] **2.6 Run enrichment against production, 5 places first.** Blocked by: 2.3, 2.4, 2.5. Run locally with `DATABASE_URL` pointed at prod through an SSH tunnel to the `eve-db` container (publish 5432 to the host's localhost only, or run the script inside the `eve-app` container with the key passed as an env var). Inspect the 5 rows in the admin. Record the method in `progress.txt`.
   Done when: 5 places show hours and coordinates in the admin. No commit.
 - [ ] **2.7 Run enrichment against all 352 places.** Blocked by: 2.6. Then list the failures in `progress.txt` by name.
   Done when: `select enrichment_status, count(*) from places group by 1` shows `enriched` for at least 300 rows and every `failed` row is listed in `progress.txt`. No commit.
