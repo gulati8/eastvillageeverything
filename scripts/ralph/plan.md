@@ -59,7 +59,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
 
 ## Phase 3: content
 
-- [ ] **3.1 Build a content-gaps report.** `scripts/content-report.ts` lists, per place: has photo, has pitch, tag count, has hours, enrichment status. Sorted so the worst gaps are first. Takes `DATABASE_URL` from the environment.
+- [x] **3.1 Build a content-gaps report.** `scripts/content-report.ts` lists, per place: has photo, has pitch, tag count, has hours, enrichment status. Sorted so the worst gaps are first. Takes `DATABASE_URL` from the environment.
   Done when: running it against prod prints a table and the counts match ad hoc SQL. Prefix: `feat(scripts)`.
 - [ ] **3.2 [HUMAN] Verify mobile rendering against real prod data.** Blocked by: 1.6, 2.7. Walk the list and at least 20 detail screens in the simulator against prod, including a place with all three photo sizes and one with no photo. Any place that renders blank space, a broken image, or overlapping text is a bug.
   Done when: findings are in `progress.txt`. Each one becomes a `fix(mobile)` task added under this phase for the loop.
