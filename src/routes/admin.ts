@@ -1,10 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { randomUUID } from 'node:crypto';
 import { PlaceModel, TagModel, UserModel } from '@eve/db';
 import { requireAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { uploadSingle } from '../middleware/upload.js';
-import { putObject } from '@eve/storage';
 
 const router = Router();
 
@@ -133,7 +130,7 @@ router.get('/places/new', asyncHandler(async (req: Request, res: Response) => {
 router.post('/places', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-    cross_street, photo_url, photo_credit
+    cross_street, photo_credit
   } = req.body;
 
   const errors: string[] = [];
@@ -171,7 +168,6 @@ router.post('/places', asyncHandler(async (req: Request, res: Response) => {
     crowd_level: crowd_level?.trim() || undefined,
     price_tier: price_tier?.trim() || undefined,
     cross_street: cross_street?.trim() || undefined,
-    photo_url: photo_url?.trim() || undefined,
     photo_credit: photo_credit?.trim() || undefined,
   });
 
@@ -202,7 +198,7 @@ router.get('/places/:id/edit', asyncHandler(async (req: Request, res: Response) 
 router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-    cross_street, photo_url, photo_credit
+    cross_street, photo_credit
   } = req.body;
 
   const errors: string[] = [];
@@ -240,7 +236,6 @@ router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
     crowd_level: crowd_level?.trim() || undefined,
     price_tier: price_tier?.trim() || undefined,
     cross_street: cross_street?.trim() || undefined,
-    photo_url: photo_url?.trim() || undefined,
     photo_credit: photo_credit?.trim() || undefined,
   });
 
@@ -437,57 +432,5 @@ router.patch('/api/tags/:id', asyncHandler(async (req: Request, res: Response) =
   }
   res.json(tag);
 }));
-
-// =====================================================
-// Uploads
-// =====================================================
-
-/**
- * POST /admin/uploads
- *
- * Multipart form-data with a single field `file`. Auth: existing admin session.
- *
- * Optional form field `prefix` selects a logical bucket within storage
- * (e.g. 'tag', 'place'). Defaults to 'misc'. Stored filename is randomized;
- * client never controls the stored name.
- *
- * Response: 200 JSON { url, key }.
- */
-router.post('/uploads', requireAuth, (req, res) => {
-  uploadSingle(req, res, async (err) => {
-    if (err) {
-      const status =
-        err.message?.startsWith('Unsupported MIME type') ? 415 :
-        (err as { code?: string }).code === 'LIMIT_FILE_SIZE' ? 413 :
-        400;
-      return res.status(status).json({ error: err.message ?? 'Upload failed' });
-    }
-
-    const file = (req as Request & { file?: Express.Multer.File }).file;
-    if (!file) {
-      return res.status(400).json({ error: 'No file uploaded under field "file"' });
-    }
-
-    const prefixRaw = typeof req.body.prefix === 'string' ? req.body.prefix : 'misc';
-    const prefix = prefixRaw.replace(/[^a-z0-9_-]/gi, '').toLowerCase().slice(0, 16) || 'misc';
-
-    const ext = file.originalname.includes('.')
-      ? file.originalname.split('.').pop()!.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8)
-      : (file.mimetype.split('/')[1] ?? 'bin');
-
-    const key = `${prefix}/${randomUUID()}.${ext}`;
-
-    try {
-      const result = await putObject(file.buffer, {
-        key,
-        contentType: file.mimetype,
-      });
-      return res.json(result);
-    } catch (writeErr: unknown) {
-      console.error('upload: storage write failed', writeErr);
-      return res.status(500).json({ error: 'Storage write failed' });
-    }
-  });
-});
 
 export default router;

@@ -70,8 +70,12 @@ const { csrfSynchronisedProtection, generateToken } = csrfSync({
 });
 
 // Apply CSRF to admin routes only (public API is stateless)
+// Where the Next.js admin lives. The legacy EJS admin links there for photo uploads.
+const nextAdminUrl = (process.env.NEXT_ADMIN_URL || 'http://localhost:3001').replace(/\/+$/, '');
+
 app.use('/admin', csrfSynchronisedProtection, (req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.locals.csrfToken = generateToken(req);
+  res.locals.nextAdminUrl = nextAdminUrl;
   next();
 });
 

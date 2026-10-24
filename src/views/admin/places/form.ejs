@@ -157,14 +157,22 @@
               </div>
             </div>
             <div class="col-md-12">
-              <%- include('../partials/upload-widget', {
-                id: 'photo_url',
-                name: 'photo_url',
-                value: place && place.photo_url ? place.photo_url : '',
-                prefix: 'place',
-                label: 'Photo',
-                help: 'The hero image for this place. Drop an image, click to browse, or paste a CDN URL.',
-              }) %>
+              <div class="mb-3">
+                <label class="form-label">Photo</label>
+                <% if (place && place.photo_url) { %>
+                  <div class="mb-2">
+                    <img src="<%= place.photo_url %>" alt="" style="max-height: 120px; max-width: 100%; border-radius: 4px;">
+                  </div>
+                <% } else { %>
+                  <div class="text-muted mb-2">No photo yet.</div>
+                <% } %>
+                <% if (place && place.id) { %>
+                  <a class="btn btn-outline-primary btn-sm" href="<%= nextAdminUrl %>/places/<%= place.id %>/edit" target="_blank" rel="noopener">Manage photo in the new admin</a>
+                <% } else { %>
+                  <a class="btn btn-outline-primary btn-sm" href="<%= nextAdminUrl %>/places/new" target="_blank" rel="noopener">Create with a photo in the new admin</a>
+                <% } %>
+                <div class="form-text">Photos are uploaded in the new admin, which generates the list and detail sizes. Saving here leaves the current photo unchanged.</div>
+              </div>
             </div>
           </div>
         </div>
