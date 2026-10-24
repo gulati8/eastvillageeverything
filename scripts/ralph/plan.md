@@ -10,7 +10,7 @@ before ticking it. Tasks tagged `[HUMAN]` are done by a person, who ticks them.
 
 ## Phase 0: housekeeping
 
-- [ ] **0.2 Remove the stale root-level `eas.json` and `app.json`.** They predate the move to `apps/mobile/` and disagree with the real config. Confirm nothing references them first (`grep -rn "eas.json\|app.json" package.json .github scripts`).
+- [x] **0.2 Remove the stale root-level `eas.json` and `app.json`.** They predate the move to `apps/mobile/` and disagree with the real config. Confirm nothing references them first (`grep -rn "eas.json\|app.json" package.json .github scripts`).
   Done when: both files are gone and `npm run typecheck` passes. Prefix: `chore(mobile)`.
 - [ ] **0.3 Delete the old `.ipa` files in `apps/mobile/`** except `build-11.ipa`. Confirm `apps/mobile/build-*.ipa` is in `.gitignore`.
   Done when: `ls apps/mobile/*.ipa` shows only build-11. No commit if nothing tracked changes.

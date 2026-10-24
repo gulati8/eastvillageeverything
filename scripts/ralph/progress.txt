@@ -16,3 +16,11 @@ Started: 2026-10-24
 - Production data: 352 places, 32 tags, 1 neighborhood. All places `enrichment_status = pending`. No coordinates, hours, photos, or pitch text on any place.
 - Validation: `npm run typecheck` and `cd apps/mobile && npm test` pass on `main`.
 ---
+
+## 2026-10-24 - 0.2
+- Removed the stale root-level `eas.json` (unwired EAS config with `appVersionSource: remote` and `autoIncrement: true`) and `app.json` (`{"expo": {}}`). The live configs are `apps/mobile/eas.json` and `apps/mobile/app.json`.
+- Confirmed nothing references the root files: `grep -rn "eas.json\|app.json" package.json .github scripts` only hit the plan text itself; Dockerfile and Dockerfile.dev do not COPY them; no `.dockerignore` exists.
+- Files touched: `eas.json` (deleted), `app.json` (deleted), `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: `ls eas.json app.json` -> both "No such file or directory". `npm run typecheck` (root tsc, mobile tsc, admin tsc) exit 0.
+- Learnings: `npm run typecheck` runs all three tsc passes (server, mobile, admin) and takes a minute or so; in zsh use `$?` after the command rather than `PIPESTATUS`, which is `pipestatus` (lowercase) in zsh.
+---
