@@ -6,6 +6,7 @@ Started: 2026-10-24
 - Server typecheck needs the workspace packages built first: `npm run build:packages` then `npx tsc --noEmit`. See CLAUDE.md.
 - The production site is `eastvillageeverything.nyc`. The `.com` domain is not ours.
 - The deploy workflow rewrites `/srv/eve/.env` on every run. Anything that must persist on the host goes in a separate file.
+- Neither `app` nor `admin` in `deploy/docker-compose.prod.yml` reads `/srv/eve/.env` today (no `env_file`), so values written there such as `CORS_ORIGINS` do not reach the containers until task 1.3 adds `env_file`.
 
 ---
 
@@ -31,4 +32,11 @@ Started: 2026-10-24
 - Files touched: `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
 - Validation: `ls apps/mobile/*.ipa` -> `build-11.ipa` only. `git status --short` after deletion -> empty.
 - Learnings: the `.ipa` files were never tracked, so git history does not carry them; nothing to purge.
+---
+
+## 2026-10-24 - 0.4
+- Changed the `CORS_ORIGINS` line the deploy workflow writes to `/srv/eve/.env` (`.github/workflows/deploy.yml`, SSM "Copy deployment files" step) from the three `.com` origins to `https://eastvillageeverything.nyc,https://www.eastvillageeverything.nyc`. Dropped the `admin.` origin: Caddy serves the Next admin path-based under `/admin` on the `.nyc` sites (`deploy/update-caddy-eve-admin.sh`); there is no admin subdomain.
+- Files touched: `.github/workflows/deploy.yml` (commit 31553b8, pushed), `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: pre-push `npm run build:packages` exit 0, `npx tsc --noEmit` exit 0, `cd apps/mobile && npm test` exit 0 (13 suites, 148 passed, 1 skipped). Deploy run 40134490169 completed with conclusion success (`gh run watch --exit-status` exit 0). `ssh ec2-user@100.29.233.41 'grep CORS /srv/eve/.env'` -> `CORS_ORIGINS=https://eastvillageeverything.nyc,https://www.eastvillageeverything.nyc`.
+- Learnings: `gh run list --commit <sha>` returned nothing right after the push; list by workflow and match `headSha` instead, then `gh run watch <id> --exit-status`. The run took about 8 minutes. `sudo docker exec eve-app env | grep CORS` prints nothing: the compose file has no `env_file` and no `CORS_ORIGINS` in `environment`, so the server still runs with its localhost CORS defaults until 1.3 lands. Added to Codebase Patterns.
 ---

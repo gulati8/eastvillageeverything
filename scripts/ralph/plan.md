@@ -14,7 +14,7 @@ before ticking it. Tasks tagged `[HUMAN]` are done by a person, who ticks them.
   Done when: both files are gone and `npm run typecheck` passes. Prefix: `chore(mobile)`.
 - [x] **0.3 Delete the old `.ipa` files in `apps/mobile/`** except `build-11.ipa`. Confirm `apps/mobile/build-*.ipa` is in `.gitignore`.
   Done when: `ls apps/mobile/*.ipa` shows only build-11. No commit if nothing tracked changes.
-- [ ] **0.4 Fix `CORS_ORIGINS` in `.github/workflows/deploy.yml`** to list `https://eastvillageeverything.nyc` and `https://www.eastvillageeverything.nyc` instead of the `.com` domains. Push to deploy and wait for the workflow to pass.
+- [x] **0.4 Fix `CORS_ORIGINS` in `.github/workflows/deploy.yml`** to list `https://eastvillageeverything.nyc` and `https://www.eastvillageeverything.nyc` instead of the `.com` domains. Push to deploy and wait for the workflow to pass.
   Done when: the workflow passed and `ssh ec2-user@100.29.233.41 'grep CORS /srv/eve/.env'` shows the `.nyc` origins. Prefix: `fix(deploy)`.
 
 ## Phase 1: production uploads (S3) and image sizes
