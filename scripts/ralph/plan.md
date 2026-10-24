@@ -72,7 +72,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
 
 ## Phase 4: mobile release build
 
-- [ ] **4.1 Align build numbering.** Set `cli.appVersionSource` to `local` in `apps/mobile/eas.json` and keep `ios.buildNumber` in `app.json` as the source of truth. Update the mobile README to say so (today it describes `autoIncrement`, which is not configured).
+- [x] **4.1 Align build numbering.** Set `cli.appVersionSource` to `local` in `apps/mobile/eas.json` and keep `ios.buildNumber` in `app.json` as the source of truth. Update the mobile README to say so (today it describes `autoIncrement`, which is not configured).
   Done when: README and `eas.json` agree and `cd apps/mobile && eas build:configure --platform ios --non-interactive` reports nothing to change. Prefix: `chore(mobile)`.
 - [ ] **4.2 Bring Expo packages to the SDK-expected patch versions.** `npx expo install --check` in `apps/mobile` listed expo, expo-constants, expo-font, expo-router as a patch behind.
   Done when: `npx expo-doctor` passes 18 of 18 checks and `npm test` passes. Prefix: `chore(mobile)`.

@@ -53,7 +53,20 @@ ngrok http 3000
 Build profiles in `apps/mobile/eas.json`:
 - `development` — for `expo-dev-client` (debugger attached, internal distribution)
 - `preview` — internal distribution, points at the prod API
-- `production` — TestFlight / App Store distribution; `autoIncrement: true` bumps the build number on every build
+- `production` — TestFlight / App Store distribution
+
+### Build numbering
+
+`cli.appVersionSource` is `local` in `eas.json`, so EAS reads the version and
+build number from `app.json` and never changes them itself. `expo.version`
+(`1.0.0`) is the marketing version and `expo.ios.buildNumber` is the App Store
+build number. Both are the source of truth; nothing is stored remotely on EAS
+and there is no `autoIncrement`.
+
+Before each release build, bump `expo.ios.buildNumber` by hand in `app.json`
+and commit it. App Store Connect rejects a build whose number it has already
+seen for the same version, so a forgotten bump fails at submit time, not at
+build time. `scripts/ralph/progress.txt` records which numbers are used.
 
 ### Local build (recommended)
 
@@ -62,7 +75,8 @@ cd apps/mobile
 eas build --local --profile production --platform ios
 ```
 
-Produces a signed `.ipa` on disk at `apps/mobile/build-<timestamp>.ipa`. ~10–15 min on an Apple Silicon Mac. Bypasses EAS Cloud build quota.
+Produces a signed `.ipa` on disk. Pass `--output ./build-<buildNumber>.ipa` so the
+file name matches `expo.ios.buildNumber` (otherwise EAS names it `build-<timestamp>.ipa`). ~10–15 min on an Apple Silicon Mac. Bypasses EAS Cloud build quota.
 
 Local prerequisites:
 - Xcode 16.1+ (`xcodebuild -version`)
@@ -77,7 +91,7 @@ Local prerequisites:
 ### Submit to App Store Connect
 
 ```bash
-eas submit --profile production --platform ios --path apps/mobile/build-<timestamp>.ipa
+eas submit --profile production --platform ios --path apps/mobile/build-<buildNumber>.ipa
 ```
 
 The first run interactively prompts for App Store Connect auth (Apple ID + 2FA, or an ASC API key). EAS caches the credential for future runs, so subsequent submits can run non-interactively.
