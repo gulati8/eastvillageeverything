@@ -7,7 +7,7 @@ Started: 2026-10-24
 - Server typecheck needs the workspace packages built first: `npm run build:packages` then `npx tsc --noEmit`. See CLAUDE.md.
 - The production site is `eastvillageeverything.nyc`. The `.com` domain is not ours.
 - The deploy workflow rewrites `/srv/eve/.env` on every run. Anything that must persist on the host goes in a separate file.
-- Neither `app` nor `admin` in `deploy/docker-compose.prod.yml` reads `/srv/eve/.env` today (no `env_file`), so values written there such as `CORS_ORIGINS` do not reach the containers until task 1.3 adds `env_file`.
+- Since 1.3, `app` and `admin` in `deploy/docker-compose.prod.yml` both have `env_file: [.env, .env.storage]`. Anything the deploy workflow writes to `/srv/eve/.env` (such as `CORS_ORIGINS`) and anything in the host-only `/srv/eve/.env.storage` reaches both containers. `environment:` entries still win over `env_file` values.
 
 ---
 
@@ -56,4 +56,11 @@ Started: 2026-10-24
 - Files touched: `/srv/eve/.env.storage` on the host (not in the repo), `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
 - Validation: `ssh ec2-user@100.29.233.41 'sudo cut -d= -f1 /srv/eve/.env.storage; sudo stat -c %a /srv/eve/.env.storage'` -> the seven key names in order, then `600`. Extra checks: 7 lines, secret value length 40, key id length 20 (matching the local `.env`).
 - Learnings: the file did not exist before this task. The deploy workflow does not touch it, so it persists across deploys; 1.3 still has to add the `env_file` entries and the create-if-missing line in `deploy.yml`. In zsh, a bare `=====` as an `echo` argument triggers equals expansion ("==== not found"); quote it.
+---
+
+## 2026-10-24 - 1.3
+- Added `env_file: [.env, .env.storage]` to the `app` and `admin` services in `deploy/docker-compose.prod.yml` and removed all seven `STORAGE_*` `environment:` lines from `admin` (the two `STORAGE_LOCAL_*` lines matched the defaults in `packages/storage/src/index.ts`, so nothing changes for a local backend). Added a create-if-missing line to the "Deploy to EC2 via SSM" step in `.github/workflows/deploy.yml`, before `docker login`: `test -f /srv/eve/.env.storage || sudo install -m 600 -o ec2-user -g ec2-user /dev/null /srv/eve/.env.storage`.
+- Files touched: `deploy/docker-compose.prod.yml`, `.github/workflows/deploy.yml` (commit b860b65, pushed), `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: local `docker compose -f <tmp copy> config` with a stub `.env` and an empty `.env.storage` exit 0; with a populated stub `.env.storage` the resolved JSON shows 7 `STORAGE_`/`AWS_` vars and `CORS_ORIGINS` on both `app` and `admin`. Pre-push: `npm run build:packages` exit 0, `npx tsc --noEmit` exit 0, `cd apps/mobile && npm test` exit 0 (13 suites, 148 passed, 1 skipped). Deploy run 40135802797 for b860b65 completed with conclusion success (`gh run watch --exit-status` exit 0). On the host: `sudo docker exec eve-admin env | grep -c "^STORAGE_\|^AWS_"` -> 7, same for `eve-app` -> 7; `eve-app env | grep -c "^CORS_ORIGINS="` -> 1; `/srv/eve/.env.storage` still `600 ec2-user`; all four `eve-*` containers up, `eve-app` healthy.
+- Learnings: `docker compose config` inlines `env_file` contents into `environment`, so the output never shows an `env_file` key; count the resolved variables instead. `gh run watch` on an 8-minute run exceeds a 600 s foreground tool timeout; poll `gh run list --json status,conclusion` instead. The 0.4 CORS fix is now actually live in the container as a side effect of this task.
 ---
