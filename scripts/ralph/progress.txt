@@ -244,3 +244,17 @@ Started: 2026-10-24
 - Validation: `curl -s 'https://eastvillageeverything.nyc/api/places?limit=5' | jq ...` -> 5 rows, all with numeric lat/lng, 4 with hours_json objects and 1 null (shown above). `curl -s 'https://eastvillageeverything.nyc/api/places' | jq` filtered to Dba/Niagara/Queen Vic/Sutra/Club Groove -> `lat`, `lng`, `hours_json` all `null`, keys present. Baseline `cd apps/mobile && npm test` before edits -> 13 suites, 155 passed, 1 skipped. After edits -> 13 suites passed, 163 passed, 1 skipped, exit 0. `cd apps/mobile && npx tsc --noEmit` -> exit 0. Server code unchanged, so root tsc not re-run.
 - Learnings: the list endpoint (`PlacesListResponse`) does not carry `enrichment_status`; only the detail endpoint does, so a client cannot tell "failed" from "not yet enriched" from the list alone, both look like `lat: null`. The mobile `signal` code path (`signals/signal.ts`) already used `period.open.day` (Sunday-first) correctly; only the human-readable label was off. For 3.2 (device pass) the detail screen HOURS row should now match the day in New York.
 ---
+
+## 2026-10-24 - BLOCKED (no task available to the loop)
+- Every unticked task that is not `[HUMAN]` is blocked by an unticked `[HUMAN]` task: 4.3 (by 3.2, 3.3, 3.4, 3.5), 5.2 and 5.3 (by 5.1), 5.4 (by 4.3), 5.7 (by 5.2, 5.3, 5.4, 5.6), 6.2 (by 6.1). No code changed this iteration.
+- Next `[HUMAN]` task in file order: **3.2 Verify mobile rendering against real prod data.** Its blockers (1.6, 2.7) are ticked. What to do: run the app in the iOS Simulator pointed at `https://eastvillageeverything.nyc` (`cd apps/mobile && npx expo start`, with `EXPO_PUBLIC_API_BASE_URL` set to prod), scroll the full list, open at least 20 detail screens including one place with all three photo sizes and one with no photo, and write every blank space, broken image, or overlapping-text finding into this file. Then add each finding as a `fix(mobile)` task under Phase 3 in `plan.md` and tick 3.2.
+- The other `[HUMAN]` tasks that are already unblocked and can be done in any order:
+  - **3.3** Fix or delete the 38 `failed` rows listed under the 2.7 entry above (plus give Club Groove an address), then re-run `npm run enrich` with the tunnel recipe from Codebase Patterns. The 2.7 entry marks each as duplicate / same storefront / wrong match.
+  - **3.4** Write a `pitch` for every place in the Next admin at `https://eastvillageeverything.nyc/admin`; `scripts/content-report.ts` (3.1) shows what is left.
+  - **3.5** Upload a photo for every place through the Next admin (uploads go to S3 since 1.7).
+  - **5.1** Decide the support email and write it in this file; it unblocks 5.2 and 5.3 for the loop with no other human step.
+  - **5.6** Create an App Store Connect API key (App Manager role), save the `.p8` outside the repo, and put `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` in the root `.env`.
+- Shortest way to give the loop work again: tick 5.1 (write the email here), which unblocks 5.2 and 5.3 immediately.
+- Files touched: `scripts/ralph/progress.txt`.
+- Validation: `grep -n "^- \[ \]" scripts/ralph/plan.md` lists only 3.2, 3.3, 3.4, 3.5, 4.3, 4.4, 5.1, 5.2, 5.3, 5.4, 5.6, 5.7, 5.8, 6.1, 6.2, 6.3; each non-HUMAN entry's `Blocked by` includes an unticked `[HUMAN]` task.
+---
