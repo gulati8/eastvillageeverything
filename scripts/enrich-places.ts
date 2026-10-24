@@ -3,12 +3,16 @@
  *
  * Backfill mode (default):
  *   npx tsx scripts/enrich-places.ts
- *   Resolves google_place_id via Text Search, then fetches hours + price for places
- *   that have an address but no google_place_id yet.
+ *   Resolves google_place_id via Text Search, then fetches hours, price and
+ *   coordinates (lat/lng) for places that have an address but no google_place_id yet.
  *
  * Refresh mode:
  *   npx tsx scripts/enrich-places.ts --refresh
- *   Re-fetches hours + price for places with a google_place_id that are stale (>7 days).
+ *   Re-fetches hours, price and coordinates for places with a google_place_id that
+ *   are stale (>7 days).
+ *
+ * Flags:
+ *   --limit N   Process at most N places (useful for testing against prod).
  *
  * Required environment variables:
  *   DATABASE_URL       — PostgreSQL connection string
@@ -35,6 +39,25 @@ if (!apiKey) {
 }
 
 const isRefresh = process.argv.includes('--refresh');
+
+/**
+ * Parse `--limit N` (or `--limit=N`). Returns null when absent.
+ * Exits with an error on a non-positive or non-numeric value.
+ */
+function parseLimit(argv: string[]): number | null {
+  const eqArg = argv.find((a) => a.startsWith('--limit='));
+  const idx = argv.indexOf('--limit');
+  const raw = eqArg ? eqArg.slice('--limit='.length) : idx !== -1 ? argv[idx + 1] : undefined;
+  if (eqArg === undefined && idx === -1) return null;
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n <= 0) {
+    console.error(`Error: --limit expects a positive integer, got "${raw ?? ''}"`);
+    process.exit(1);
+  }
+  return n;
+}
+
+const limit = parseLimit(process.argv.slice(2));
 
 const pool = new Pool({
   connectionString: databaseUrl,
@@ -90,7 +113,7 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Resolve a Google place_id for a given place name + address using Text Search.
- * Returns the place_id string (e.g. "places/ChIJ...") or null on failure.
+ * Returns the bare place_id string (e.g. "ChIJ...") or null on failure.
  */
 async function resolveGooglePlaceId(
   name: string,
@@ -149,26 +172,39 @@ async function resolveGooglePlaceId(
   }
 }
 
+interface PlaceDetails {
+  regularOpeningHours: unknown;
+  priceLevel: string | null;
+  lat: number | null;
+  lng: number | null;
+}
+
 /**
- * Fetch regularOpeningHours and priceLevel for a given Google place_id.
+ * Fetch regularOpeningHours, priceLevel and location for a given Google place_id.
  * Returns the raw fields or null on failure.
  */
 async function fetchPlaceDetails(
   googlePlaceId: string,
   placeName: string
-): Promise<{ regularOpeningHours: unknown; priceLevel: string | null } | null> {
+): Promise<PlaceDetails | null> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10_000);
 
   try {
+    // Text Search returns the bare id (e.g. "ChIJ..."); the details resource
+    // name is "places/<id>". Accept either form.
+    const resourceName = googlePlaceId.startsWith('places/')
+      ? googlePlaceId
+      : `places/${googlePlaceId}`;
+
     const response = await fetch(
-      `https://places.googleapis.com/v1/${googlePlaceId}`,
+      `https://places.googleapis.com/v1/${resourceName}`,
       {
         method: 'GET',
         signal: controller.signal,
         headers: {
           'X-Goog-Api-Key': apiKey as string,
-          'X-Goog-FieldMask': 'regularOpeningHours,priceLevel',
+          'X-Goog-FieldMask': 'regularOpeningHours,priceLevel,location',
         },
       }
     );
@@ -183,11 +219,21 @@ async function fetchPlaceDetails(
     const data = (await response.json()) as {
       regularOpeningHours?: unknown;
       priceLevel?: string;
+      location?: { latitude?: number; longitude?: number };
     };
+
+    const lat = data.location?.latitude;
+    const lng = data.location?.longitude;
+    const hasLocation = typeof lat === 'number' && typeof lng === 'number';
+    if (!hasLocation) {
+      console.error(`  Place Details: no location for "${placeName}" (${googlePlaceId})`);
+    }
 
     return {
       regularOpeningHours: data.regularOpeningHours ?? null,
       priceLevel: data.priceLevel ?? null,
+      lat: hasLocation ? lat : null,
+      lng: hasLocation ? lng : null,
     };
   } catch (err: unknown) {
     if (err instanceof Error && err.name === 'AbortError') {
@@ -205,43 +251,53 @@ async function fetchPlaceDetails(
 // Database helpers
 // ---------------------------------------------------------------------------
 
+function toNumericPrice(priceLevel: string | null): number | null {
+  return priceLevel !== null ? (PRICE_LEVEL_MAP[priceLevel] ?? null) : null;
+}
+
 async function markEnriched(
   id: string,
   googlePlaceId: string,
-  hoursJson: unknown,
-  priceLevel: string | null
+  details: PlaceDetails
 ): Promise<void> {
-  const numericPrice =
-    priceLevel !== null ? (PRICE_LEVEL_MAP[priceLevel] ?? null) : null;
-
   await pool.query(
     `UPDATE places
      SET google_place_id = $1,
          hours_json = $2,
          google_price_level = $3,
+         lat = COALESCE($4, lat),
+         lng = COALESCE($5, lng),
          enrichment_status = 'ok',
          enriched_at = NOW()
-     WHERE id = $4`,
-    [googlePlaceId, hoursJson ? JSON.stringify(hoursJson) : null, numericPrice, id]
+     WHERE id = $6`,
+    [
+      googlePlaceId,
+      details.regularOpeningHours ? JSON.stringify(details.regularOpeningHours) : null,
+      toNumericPrice(details.priceLevel),
+      details.lat,
+      details.lng,
+      id,
+    ]
   );
 }
 
-async function refreshEnriched(
-  id: string,
-  hoursJson: unknown,
-  priceLevel: string | null
-): Promise<void> {
-  const numericPrice =
-    priceLevel !== null ? (PRICE_LEVEL_MAP[priceLevel] ?? null) : null;
-
+async function refreshEnriched(id: string, details: PlaceDetails): Promise<void> {
   await pool.query(
     `UPDATE places
      SET hours_json = $1,
          google_price_level = $2,
+         lat = COALESCE($3, lat),
+         lng = COALESCE($4, lng),
          enrichment_status = 'ok',
          enriched_at = NOW()
-     WHERE id = $3`,
-    [hoursJson ? JSON.stringify(hoursJson) : null, numericPrice, id]
+     WHERE id = $5`,
+    [
+      details.regularOpeningHours ? JSON.stringify(details.regularOpeningHours) : null,
+      toNumericPrice(details.priceLevel),
+      details.lat,
+      details.lng,
+      id,
+    ]
   );
 }
 
@@ -265,7 +321,9 @@ async function runBackfill(): Promise<{
   const result = await pool.query<BackfillPlace>(
     `SELECT id, name, address
      FROM places
-     WHERE address IS NOT NULL AND google_place_id IS NULL`
+     WHERE address IS NOT NULL AND google_place_id IS NULL
+     ORDER BY name
+     ${limit !== null ? `LIMIT ${limit}` : ''}`
   );
 
   const places = result.rows;
@@ -302,13 +360,11 @@ async function runBackfill(): Promise<{
 
     // Step 3: Store results
     try {
-      await markEnriched(
-        place.id,
-        googlePlaceId,
-        details.regularOpeningHours,
-        details.priceLevel
+      await markEnriched(place.id, googlePlaceId, details);
+      console.log(
+        `  OK: ${googlePlaceId}` +
+          (details.lat !== null ? ` @ ${details.lat},${details.lng}` : ' (no location)')
       );
-      console.log(`  OK: ${googlePlaceId}`);
       ok++;
     } catch (err) {
       console.error(`  DB write failed for "${place.name}":`, err);
@@ -330,7 +386,9 @@ async function runRefresh(): Promise<{
     `SELECT id, name, google_place_id
      FROM places
      WHERE google_place_id IS NOT NULL
-       AND (enriched_at IS NULL OR enriched_at < NOW() - INTERVAL '7 days')`
+       AND (enriched_at IS NULL OR enriched_at < NOW() - INTERVAL '7 days')
+     ORDER BY enriched_at NULLS FIRST, name
+     ${limit !== null ? `LIMIT ${limit}` : ''}`
   );
 
   const places = result.rows;
@@ -354,12 +412,11 @@ async function runRefresh(): Promise<{
     }
 
     try {
-      await refreshEnriched(
-        place.id,
-        details.regularOpeningHours,
-        details.priceLevel
+      await refreshEnriched(place.id, details);
+      console.log(
+        `  OK` +
+          (details.lat !== null ? ` @ ${details.lat},${details.lng}` : ' (no location)')
       );
-      console.log(`  OK`);
       ok++;
     } catch (err) {
       console.error(`  DB write failed for "${place.name}":`, err);
@@ -376,7 +433,10 @@ async function runRefresh(): Promise<{
 // ---------------------------------------------------------------------------
 
 async function main(): Promise<void> {
-  console.log(`Mode: ${isRefresh ? 'refresh' : 'backfill'}`);
+  console.log(
+    `Mode: ${isRefresh ? 'refresh' : 'backfill'}` +
+      (limit !== null ? ` (limit ${limit})` : '')
+  );
 
   const summary = isRefresh ? await runRefresh() : await runBackfill();
 

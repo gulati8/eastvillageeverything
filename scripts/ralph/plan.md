@@ -46,7 +46,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: `gcloud auth list` shows an active account and `gcloud beta billing projects describe $(gcloud config get-value project)` shows `billingEnabled: true`.
 - [x] **2.3 Enable the API and mint a restricted key.** Blocked by: 2.2. `gcloud services enable places-backend.googleapis.com`, then `gcloud services api-keys create --display-name eve-enrich --api-target=service=places-backend.googleapis.com`. Read the key string with `gcloud services api-keys get-key-string <name>` and write it to the root `.env` as `GOOGLE_PLACES_API_KEY`. Never print it.
   Done when: `grep -c '^GOOGLE_PLACES_API_KEY=.' .env` prints 1 and a single `places:searchText` request with the key returns 200. No commit.
-- [ ] **2.4 Extend the enrichment script to also fetch `location`** (lat/lng) in the details field mask and write `lat`, `lng`. Blocked by: 2.3.
+- [x] **2.4 Extend the enrichment script to also fetch `location`** (lat/lng) in the details field mask and write `lat`, `lng`. Blocked by: 2.3.
   Done when: a run against the local dev DB with `--limit 3` sets `lat`, `lng`, and `hours_json` on those rows. Prefix: `feat(enrich)`.
 - [ ] **2.5 Add `--limit N` and `--dry-run` flags** to the script so a prod run can be tested on a handful of rows first. Blocked by: 2.3.
   Done when: `npx tsx scripts/enrich-places.ts --dry-run --limit 3` prints what it would write and changes nothing (verify with a before/after `select count(*) from places where enriched_at is not null`). Prefix: `feat(enrich)`.
