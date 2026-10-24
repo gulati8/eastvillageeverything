@@ -33,7 +33,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: a local upload through the admin produces three objects, `GET /api/places/:id` returns all three URLs, `npm run typecheck` and `cd apps/mobile && npm test` pass. Prefix: `feat(admin)`.
 - [x] **1.6 Mobile uses the sized images.** List rows load `photo_thumb_url`, the detail screen loads `photo_hero_url`, both falling back to `photo_url`, then to `PhotoFallback`.
   Done when: `cd apps/mobile && npx tsc --noEmit && npm test` pass, with a unit test covering the fallback order. Visual confirmation is part of 3.2. Prefix: `feat(mobile)`.
-- [ ] **1.7 Fix the legacy admin body limit.** `eve-app` logs show repeated `request entity too large` and `invalid csrf token` from the EJS admin in `src/routes/admin.ts`. Remove the photo upload from the EJS admin and link to the Next admin's place form instead. Push to deploy and wait for the workflow to pass.
+- [x] **1.7 Fix the legacy admin body limit.** `eve-app` logs show repeated `request entity too large` and `invalid csrf token` from the EJS admin in `src/routes/admin.ts`. Remove the photo upload from the EJS admin and link to the Next admin's place form instead. Push to deploy and wait for the workflow to pass.
   Done when: `grep -rc 'type="file"' src/views/admin/ | grep -v ':0$'` prints nothing, `npm run typecheck` passes, and the deploy workflow passed. Prefix: `fix(admin)`.
 
 ## Phase 2: enrichment (Google Places)
