@@ -63,7 +63,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: running it against prod prints a table and the counts match ad hoc SQL. Prefix: `feat(scripts)`.
 - [ ] **3.2 [HUMAN] Verify mobile rendering against real prod data.** Blocked by: 1.6, 2.7. Walk the list and at least 20 detail screens in the simulator against prod, including a place with all three photo sizes and one with no photo. Any place that renders blank space, a broken image, or overlapping text is a bug.
   Done when: findings are in `progress.txt`. Each one becomes a `fix(mobile)` task added under this phase for the loop.
-- [ ] **3.3 [HUMAN] Review the enrichment failures and fix or remove them.** Blocked by: 2.7. For each place listed as failed in `progress.txt`: correct the address in the admin, or delete the place if it is closed or a duplicate.
+- [x] **3.3 [HUMAN] Review the enrichment failures and fix or remove them.** Blocked by: 2.7. For each place listed as failed in `progress.txt`: correct the address in the admin, or delete the place if it is closed or a duplicate.
   Done when: `select count(*) from places where enrichment_status = 'failed'` is 0, after a re-run of the script on those rows.
 - [ ] **3.4 [HUMAN] Populate the editorial text.** Write the `pitch` for every place in the admin. Use the report from 3.1 to track which are left.
   Done when: the report shows every place has a pitch.

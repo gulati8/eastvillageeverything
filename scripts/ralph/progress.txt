@@ -266,3 +266,16 @@ Started: 2026-10-24
 ## 2026-10-24 - 5.6 [HUMAN]
 - Reused the existing App Store Connect team key `TVKZVTHF43` (Admin role) rather than minting a new one; its `.p8` was already at `~/.appstoreconnect/private_keys/`. `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` are set in the root `.env` (gitignored). Issuer ID `dd6e8253-4adf-4f68-a263-4b364b715d7c`.
 ---
+
+## 2026-10-24 - 3.3 [HUMAN]
+- Resolved all 38 `failed` rows plus Club Groove, with the user approving each group in chat. Prod now has 313 places, all `enrichment_status = 'ok'`, zero `failed`, zero `'pending'`, and no two rows share a `google_place_id`.
+- Deleted 39 rows over the SSH tunnel (throwaway Node scripts using the repo's `pg`, each guarded by an exact expected-row-count check and a transaction):
+  - 16 duplicates / empty "( See X )" cross-reference rows: Copper Sill (See…), Barrel (See…), Blind Barber (See…), Central Bar (See…), Summit Bar (See…), The Linen Hall (See…), Wayland. (See…), Horseshoe Bar / 7B, Nublu Classic, Sobaya, The Headless Widow, The Phoenix, The Scratcher, the newer The laurels, the Loisaida-Ave Two Perrys, The Bowery Hotel Lobby Bar and Lounge.
+  - 12 closed businesses whose storefront has a successor row already in the table: Flinders Lane, Meyahuel, Niagara, Post, Purple, Rififi, The Third Man, Momofuku Ssam Bar, Saxon + Parole, plus Louis 649, Queen Vic, Sutra (no Google match at all).
+  - 11 gone / not a place, per Google Places `businessStatus` and text search: Cookies & Booze Part IX (an event at d.b.a.), Kavasutra, Pata Negra, Stage Restaurant (closed 2016), Percy's Tavern, U2 Karaoke, Jimmy's No. 43, The Drunken Clam, Vera @ Frank (same business as Frankie's), Katra (217 Bowery is now Maison Nur), Club Groove (it is on MacDougal St, not in the East Village).
+- Renamed `Brasserie Saint Marc` to `Saint` (Google lists 136 2nd Ave as SAINT Restaurant Bar & Speakeasy; the row already held that Google ID).
+- Re-ran `npm run enrich` through the tunnel on the 10 rows left with a NULL `google_place_id` (Dba, Kazuza, Lobby Bar @ Bowery Hotel, Plado, Standings, The Blind Barber, The Central Bar, The Cøøper Sill, The Spotted Owl Tavern, The Summit Bar): 10 processed, 10 ok, 0 failed.
+- Files touched: `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`. No code changed.
+- Validation: `select enrichment_status, count(*) from places group by 1` -> `ok` 313 only. `select count(*) from places where enrichment_status = 'failed'` -> 0. Duplicate `google_place_id` count -> 0. Tunnel closed. Public API `GET /api/places?limit=500` returns 200 rows (its cap), all with `lat`.
+- Learnings: Google Places `businessStatus` is the fast way to settle "closed or not" for a name/address pair; Text Search returning a different business at the same address means the queried one is gone. Elsa, ReVision Lounge, and Momofuku Milk Bar exist but have no tags yet, so they will not appear in app filters until 3.4.
+---
