@@ -1671,5 +1671,75 @@
     "pitch": "A Moroccan counter inside Essex Market doing tagines, couscous and stuffed pita sandwiches with generous portions and a hug of a welcome. The chicken tagine has gone bland lately, so lean toward the lamb, the beef pita or the chicken tfaya and finish with mint tea.",
     "perfect": "a big, cheap lunch while wandering Essex Market.",
     "insider": "The stewed beef pita and the eggplant spread are the counter's best, and it closes at 8 most nights, 6 on Sundays."
+  },
+  {
+    "id": "b61cc643-0bd8-4312-8ad5-1d569bea7986",
+    "pitch": "Open-faced bagels with a crackly crust and a short menu of six, built around smoked salmon, whitefish, and a tomato one that people keep going back for. There is nearly always a line, but it moves fast, and the room is tiny, so plan to eat on the bench outside.",
+    "perfect": "you want a serious bagel before noon.",
+    "insider": "The smoked salmon comes with capers, red onion, and dill, and the shop closes at 5 PM, so this is a morning stop.",
+    "name": "Apollo Bagels"
+  },
+  {
+    "id": "e582206c-42ec-491d-94b3-8979523a1c79",
+    "pitch": "Modern Vietnamese on 3rd Ave with a bakery in house, so the bánh mì bread is the point, served in a tower meant for sharing. Tables are small and the walk-in wait can run an hour, so come as a pair and expect to wait.",
+    "perfect": "you want bánh mì and bánh xèo for weekend lunch.",
+    "insider": "Lunch runs only Friday through Sunday from noon to 4 PM; the rest of the week it is dinner from 6, and Mondays are dark.",
+    "name": "Bánh Anh Em"
+  },
+  {
+    "id": "de8e8e02-4536-4e48-b500-18c1f9c3f002",
+    "pitch": "A low-key lounge on Avenue C with a DJ, a big screen over the bar, and a buy-one-get-one happy hour on cocktails. Slow nights happen, so go with your own group and treat the dance floor as a bonus.",
+    "perfect": "you want a cheap happy hour and a DJ.",
+    "insider": "The raspberry mojito is the drink people come back for.",
+    "name": "C Lounge"
+  },
+  {
+    "id": "eaf73e6b-c5e6-40ba-b78b-f0caa579200a",
+    "pitch": "A Thai-Japanese speakeasy up a flight of stairs on Avenue B, with a tiger theme, a cocktail list that can be made alcohol-free, and dishes like the Crying Tiger steak and tom yum fried rice. It runs on energy and birthday tables, so expect the staff to keep things moving.",
+    "perfect": "a birthday dinner needs a theme and strong cocktails.",
+    "insider": "The pad thai with crispy duck and the tom yum fried rice are the plates people rave about; the steak can run chewy.",
+    "name": "Eleven Tigers"
+  },
+  {
+    "id": "28f25e33-0301-44f9-84ca-8daf67b12b0f",
+    "pitch": "A small Tuscan room on 11th Street where most of the pasta is made in house and the staff are loud, Italian, and fun. The tagliatelle al tartufo and the bottarga pasta are the ones to order, and the wine list stays reasonable.",
+    "perfect": "you want handmade pasta on a weeknight date.",
+    "insider": "Reserve ahead or come right at 5:30 PM, when walk-ins were still being seated.",
+    "name": "Fiaschetteria Pistoia"
+  },
+  {
+    "id": "4b57d476-bcb2-47bf-a027-47141c74760e",
+    "pitch": "A loud, young bar and grill on 1st Ave built around a simple cheeseburger that regulars rank near the top of the city, plus martinis. It gets packed and service can lag, so go for the scene as much as the food.",
+    "perfect": "a late burger and a martini after midnight sounds right.",
+    "insider": "Walk-in only, and the Caesar and the cucumber salad are the sleeper orders next to the burger and fries.",
+    "name": "Lion's"
+  },
+  {
+    "id": "4579c460-dc6b-4ae6-aaad-dd462f5048fd",
+    "pitch": "The East Village outpost of the West Village trattoria, on 3rd Ave with windows that open onto the sidewalk and a kitchen that does best with starters and pasta. Get the fried zucchini flowers, the carbonara, and the prosciutto pizza, and skip the fixed-price menus.",
+    "perfect": "you want a lively Italian dinner that runs late.",
+    "insider": "Ask for a table away from the entrance in cold months; the window seats are the draw in summer and a draft in winter.",
+    "name": "Olio e Più"
+  },
+  {
+    "id": "b895a1b5-2868-4561-960d-0149aca4992b",
+    "pitch": "The East Village branch of the West Village udon house, with thick, chewy noodles made in house and a clear, deep broth that does not need help. The shrimp tempura udon and the sansai udon are the standards, and the chicken tatsuta-age is the starter to split.",
+    "perfect": "a rainy day calls for a hot bowl of udon.",
+    "insider": "Saturday lunch runs nearly full, so grab the bar seats or reserve; the kitchen closes at 9 PM most nights.",
+    "name": "Raku"
+  },
+  {
+    "id": "c3ec8522-3a45-44c8-bfbd-857b2adb054b",
+    "pitch": "A brick-walled bar on Avenue B with decor built from salvaged materials, a DJ booth and dance floor in the back, and a calendar of comedy, music, and private parties. Recent event guests describe a tense door and management, so treat it as a drink-and-see rather than a destination.",
+    "perfect": "you want a back-room dance floor on Avenue B.",
+    "insider": "Most of the action is a ticketed or private event; check what is on before you walk over, and hours are not posted.",
+    "name": "ReVision Lounge"
+  },
+  {
+    "id": "3bd34880-6920-46e8-ae07-32afd8e50ed1",
+    "pitch": "Less a restaurant than a pickup counter for a roster of house brands cooked in one kitchen on Stuyvesant Street, ordered from your phone. Mix cuisines in a single order, then eat at the window seats or take it home.",
+    "perfect": "nobody in the group can agree on one cuisine.",
+    "insider": "Orders come up in 15 to 20 minutes, and the fries from Fred's are the item people keep mentioning.",
+    "name": "Wonder East Village"
   }
 ]

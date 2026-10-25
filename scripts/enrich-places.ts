@@ -22,6 +22,9 @@
  *   --force     With --refresh: ignore the 7-day staleness window and refresh
  *               every place that has a google_place_id (for example after a
  *               new field such as the photo reference is added).
+ *   --pending   With --refresh: only places whose enrichment_status is
+ *               'pending' (either the plain or the quoted import spelling),
+ *               such as rows renamed or repointed by scripts/audit-places.ts.
  *
  * Required environment variables:
  *   DATABASE_URL       — PostgreSQL connection string
@@ -50,6 +53,7 @@ if (!apiKey) {
 const isRefresh = process.argv.includes('--refresh');
 const isDryRun = process.argv.includes('--dry-run');
 const isForce = process.argv.includes('--force');
+const isPendingOnly = process.argv.includes('--pending');
 
 /**
  * Parse `--limit N` (or `--limit=N`). Returns null when absent.
@@ -448,12 +452,13 @@ async function runRefresh(): Promise<{
      FROM places
      WHERE google_place_id IS NOT NULL
        ${isForce ? '' : "AND (enriched_at IS NULL OR enriched_at < NOW() - INTERVAL '7 days')"}
+       ${isPendingOnly ? "AND enrichment_status IN ('pending', '''pending''')" : ''}
      ORDER BY enriched_at NULLS FIRST, name
      ${limit !== null ? `LIMIT ${limit}` : ''}`
   );
 
   const places = result.rows;
-  console.log(`Refresh: found ${places.length} ${isForce ? '' : 'stale '}place(s) to re-enrich`);
+  console.log(`Refresh: found ${places.length} ${isForce ? '' : 'stale '}${isPendingOnly ? 'pending ' : ''}place(s) to re-enrich`);
 
   let ok = 0;
   let failed = 0;
@@ -498,6 +503,7 @@ async function main(): Promise<void> {
   console.log(
     `Mode: ${isRefresh ? 'refresh' : 'backfill'}` +
       (isRefresh && isForce ? ' (force: ignoring staleness)' : '') +
+      (isRefresh && isPendingOnly ? ' (pending rows only)' : '') +
       (limit !== null ? ` (limit ${limit})` : '') +
       (isDryRun ? ' [DRY RUN: no database writes]' : '')
   );

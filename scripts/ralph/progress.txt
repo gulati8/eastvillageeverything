@@ -2,6 +2,7 @@
 Started: 2026-10-24
 
 ## Codebase Patterns
+- Place audit (3.12): `scripts/audit-places.ts` (dry run by default, `--apply`, `--report <path>`) classifies rows with no `pitch` from Place Details (New) + Text Search into delete / rename / repoint / keep; deleted rows go to `scripts/ralph/data/deleted-places.json` (committed, full columns + `tags` values + `deleted_reason`) before the `DELETE`. `enrich-places.ts --refresh --force --pending` refreshes only `pending` rows. Prod is 249 places since 3.12 (64 deleted, 8 renamed); `review-context.json` and `editorial.json` both hold 249 ids. The App Store description still says "Over 300 places" and needs a re-upload.
 - App Store listing (5.7): `docs/app-store/listing.md` is the source of truth; `node scripts/app-store-metadata.mjs` regenerates `apps/mobile/fastlane/metadata/` (committed) and `apps/mobile/fastlane/screenshots/en-US/` (gitignored copy of `docs/app-store/screenshots/<size>/`, prefixed `<size>-`), then from `apps/mobile` with `ASC_KEY_ID`/`ASC_ISSUER_ID`/`ASC_KEY_PATH` exported from root `.env`: `fastlane deliver --skip_binary_upload --skip_app_version_update` (Homebrew fastlane 2.241.1; the `Deliverfile` builds the `api_key` hash from those env vars, so no JSON key file). The App Store Connect version is now `1.0.0` (renamed from `1.0` by deliver's version check). The API refuses to create the App Review contact without a `+country` phone number, so the generator only writes `metadata/review_information/` when `listing.md` has a `| Phone | ` row under `## Review notes`; until then notes and contact are entered by hand (5.8). deliver 2.241.1 also crashes with `No data` in `review_attachment_file` when no review contact exists; the `Deliverfile` prepends a guard that skips that step in the no-attachment case. `apps/mobile/fastlane/verify_listing.rb` prints the live listing; run it with `GEM_PATH=$(brew --prefix fastlane)/libexec GEM_HOME=$(brew --prefix fastlane)/libexec ruby ...` because the Homebrew fastlane gems are not on the system Ruby's path. deliver skips `release_notes` for a first version (What's New stays empty, expected).
 - Simulator UI driving (5.4): `cliclick` (brew) taps and types into the Simulator reliably when the target window is raised (`AXRaise` via System Events), Window > Point Accurate is on and Show Device Bezels is off; then screen x = window x + device point x, screen y = window y + (window height - device point height) (17 Pro Max window 440x1008 -> top offset 52; 11 Pro Max 414x972 -> 76). Deep links `exp://127.0.0.1:8081/--/place/<key>` open the detail screen in Expo Go. `simctl io screenshot` PNGs carry an alpha channel, which App Store Connect rejects; strip it by redrawing with CoreGraphics (`swift /tmp/strip-alpha.swift`, recipe in docs/app-store/screenshots/README.md). A 6.5" simulator (`iPhone 11 Pro Max (6.5 shots)`, udid 7F4AE8A7-3BAA-4EDE-B7A5-86776C2B157A, iOS 18.3) exists for recaptures; Expo Go can be copied between simulators with `simctl get_app_container <src> host.exp.Exponent` + `simctl install`.
 - Release builds (4.3): `SENTRY_KEY` in the root `.env` is wrapped in double quotes, so `cut -d= -f2-` alone yields an invalid token (`sentry-cli info` says `Invalid token`); strip them: `export SENTRY_AUTH_TOKEN="$(grep '^SENTRY_KEY=' .env | cut -d= -f2- | sed -E 's/^"//; s/"$//')"`. Never kill a running `eas build --local` with `pkill -f "eas build"` and immediately restart: the orphaned `eas-cli-local-build-plugin` child keeps running and its `CLEAN_UP_CREDENTIALS` step deletes `~/Library/MobileDevice/Provisioning Profiles/<uuid>.mobileprovision`, which the new build shares, so Xcode fails with `unable to read input file ... .mobileprovision`. Check `pgrep -fl eas-cli-local-build-plugin` is empty before rebuilding. `eas submit --non-interactive` works without local ASC key flags because an `[Expo] EAS Submit` API key is stored on EAS servers for `com.eastvillageeverything.app`; eas-cli 18.10.0 has no `--asc-api-key-*` flags, so the `ASC_*` vars in `.env` are for fastlane (5.7), not EAS. A full local production build takes about 7 minutes on this Mac.
@@ -543,4 +544,92 @@ Started: 2026-10-24
 
 ## 2026-10-25 - 5.8
 - App Store Connect done through Chrome: App Privacy published (Device ID, Crash Data, Performance Data; each App Functionality, not linked, not tracking; label reads "Data Not Linked to You: Identifiers, Diagnostics"). Age rating questionnaire saved, calculated 13+ (alcohol references Infrequent, everything else None/No). Price $0.00 in 175 regions; availability all 175 regions on release. DSA: already set to non-trader, active. Ticked.
+---
+
+## 2026-10-25 - 3.12
+- Audited the 74 prod places with no editorial copy with the new `scripts/audit-places.ts` and applied the result: 64 rows deleted (backed up first to `scripts/ralph/data/deleted-places.json`, committed, with every column, the tag values, `deleted_at` and `deleted_reason`), 8 rows renamed to the business now at that address and set `pending`, 2 kept. 0 repoints: every non-food / out-of-area match's Text Search came back with nothing operational under the row's name. Then `npx tsx scripts/enrich-places.ts --refresh --force --pending` re-pulled hours, price, coordinates and photo for the 8 renamed rows (8 ok), the 72 non-kept ids were pruned from `review-context.json` and `npx tsx scripts/pull-review-context.ts` fetched fresh context for the 8 renamed rows (8 ok; file now 249 of 249), copy was written for the 10 survivors (appended via `editorial-append.mjs`, 249 of 249 ids) and `npm run load-editorial` wrote it to prod (10 rows, 239 kept). Prod is now 249 places, all with pitch/perfect/insider, all `enrichment_status = ok`.
+- Script design (`scripts/audit-places.ts`, dry run by default, `--apply`, `--limit N`, `--report <path>`): Place Details (New) with mask `id,displayName,businessStatus,primaryType,formattedAddress,regularOpeningHours` per row, then rules in this order: (0) the user's explicit notes as an `OVERRIDES` table; (a) `CLOSED_PERMANENTLY`/`CLOSED_TEMPORARILY` -> delete; (c) non food/drink/nightlife `primaryType`, address outside 10002/10003/10009, missing status, unresolvable id, or a different name at a different street number -> Text Search `<name> <address> New York, NY`; top result `OPERATIONAL` with a matching name -> repoint (or keep if it is the stored id, or delete if another row already owns that id), else delete; (a again) zero reviews in `review-context.json` AND no Google hours -> delete; (b) name mismatch at the same street number -> rename to Google's `displayName` and, when Google's street number differs from ours, take Google's street line as the address; (d) keep. (c) runs before the no-reviews half of (a) and before (b) on purpose: a match on a bare `premise` has no reviews because it is the wrong match, and renaming a row to a building's name would be wrong. Name match = overlap coefficient `|A∩B| / min(|A|,|B|)` over tokens after lowercasing, stripping diacritics and punctuation and dropping `the, and, nyc, bar, lounge, restaurant, cafe` (so "Klimat Lounge" vs "B Lounge NYC" is 0, not 0.5); threshold 0.5. Writes run in one transaction; deletes cascade to `place_tags`.
+- Two deviations from the literal task text, both on evidence: Luzzo's Group was renamed to Olio e Più as the user said, but its stored Google place (and coordinates since 2.7) are Olio e Più East Village at 106 3rd Ave, so the address moved from 211 1st Ave to 106 3rd Ave. The Barrel (10 Stuyvesant St) was renamed to "Wonder East Village" by rule (b) (OPERATIONAL `restaurant` at the same address, name overlap 0); 3.5c had suggested "delete or re-point". White Noise -> Eleven Tigers kept its (empty) tags because the task only carried the Pinks retag; Eleven Tigers and Raku have no tags, so their list rows show the `perfect` line and they match no filter.
+- Decisions (name (address): reason). Deleted rows are also in `deleted-places.json` with the same reason:
+- DELETE (64):
+  - 13th step  ( See the 13th Step) (no address): Google businessStatus CLOSED_PERMANENTLY
+  - Angel's Share (8 Stuyvesant St.): Google businessStatus CLOSED_PERMANENTLY
+  - Apiary (60 3rd Avenue): Google businessStatus CLOSED_PERMANENTLY
+  - Bar Lula (132 1st Ave): Google businessStatus CLOSED_PERMANENTLY
+  - Bar On A (170 Avenue A): Google businessStatus CLOSED_PERMANENTLY
+  - Black & White (86 E 10th St): Google businessStatus CLOSED_PERMANENTLY
+  - Booker & Dax (207 2nd avenue): Google businessStatus CLOSED_PERMANENTLY
+  - Cacio e Vino (80 2nd Ave): Google businessStatus CLOSED_PERMANENTLY
+  - Cafe Cortadito (E 3rd street.   B - C): Google businessStatus CLOSED_PERMANENTLY
+  - Camp David NYC (221 Ave B New York, NY 10009): Google businessStatus CLOSED_PERMANENTLY
+  - Cienfuegos (95 Avenue A): Google businessStatus CLOSED_PERMANENTLY
+  - Cloister Cafe (238 E 9th St New York, NY 10003): Google businessStatus CLOSED_PERMANENTLY
+  - Coal Yard Bar (102 1st Ave): Google businessStatus CLOSED_PERMANENTLY
+  - Confessional (308 E 6th St New York, NY 10003): Google businessStatus CLOSED_PERMANENTLY
+  - Contrada (84 East 4th Street): Google type "none" is not food, drink or nightlife (and the row has no reviews in review-context and no opening hours); top Text Search result "84 E 4th St" (no status, no type, 84 E 4th St, New York, NY 10003, USA), which is not operational
+  - Dahlias Restaurant (300 E 5th St, New York, NY 10003): Google businessStatus CLOSED_PERMANENTLY
+  - Dieci (228 E 10th St): Google businessStatus CLOSED_PERMANENTLY
+  - East Village Social (126 St Marks Place): Google businessStatus CLOSED_PERMANENTLY
+  - Eterea (511 E 5th Street): Google businessStatus CLOSED_PERMANENTLY
+  - Exchange Alley (424 E. 9th St.): Google businessStatus CLOSED_PERMANENTLY
+  - Good Beer (422 E 9th St): Google businessStatus CLOSED_PERMANENTLY
+  - Grape and Grain (620 E 6th St): Google businessStatus CLOSED_PERMANENTLY
+  - Grayson ( See The Grayson ) (no address): Google businessStatus CLOSED_PERMANENTLY
+  - Hawkers Thai and Chinese (225 E 14th St): Google businessStatus CLOSED_PERMANENTLY
+  - Hermana NYC (349 E 13th Street): Google businessStatus CLOSED_PERMANENTLY
+  - Hi Note (188 Ave B): Google type "television_studio" is not food, drink or nightlife; top Text Search result "hnt.fm Studio" (OPERATIONAL, television_studio, 181 Avenue B, New York, NY 10009, USA), whose name does not match
+  - Jeepney (201 1st Ave): Google businessStatus CLOSED_PERMANENTLY
+  - Klimat Lounge (77 E 7th St): Google type "event_venue" is not food, drink or nightlife; top Text Search result "B Lounge NYC" (OPERATIONAL, event_venue, 77 E 7th St, New York, NY 10003, USA), whose name does not match
+  - Kobo by Nai Mediterranean Restaurant and Bar (202 Ave A): Google businessStatus CLOSED_PERMANENTLY
+  - Kyo Ya (94 E 7th St): Google businessStatus CLOSED_PERMANENTLY
+  - Lamias Fish Market (47 Ave B): Google businessStatus CLOSED_PERMANENTLY
+  - Lois (98 Ave C): Google businessStatus CLOSED_PERMANENTLY
+  - Lost City Oyster House (171 Ave C): Google businessStatus CLOSED_PERMANENTLY
+  - L’Apicio (13 E 1st St): Google businessStatus CLOSED_PERMANENTLY
+  - L’asso (192 Mott St New York, NY 10012): Google address "192 Mott St, New York, NY 10012, USA" is outside zips 10002/10003/10009; top Text Search result "noodlelove" (OPERATIONAL, asian_fusion_restaurant, 192 Mott St, New York, NY 10012, USA), whose name does not match
+  - Mark (33 St Marks Pl): Google type "premise" is not food, drink or nightlife (and the row has no reviews in review-context and no opening hours); top Text Search result "Mark" (CLOSED_PERMANENTLY, american_restaurant, 33 St Marks Pl, New York, NY 10003, USA), which is not operational
+  - Milk Bar East Village (251 E 13th Street): Google businessStatus CLOSED_PERMANENTLY
+  - Momofuku Milk Bar (251 E 13th St): user note: duplicate of "Milk Bar East Village" (same address); stored place id is Momofuku Noodle Bar
+  - Nomad (78 2nd Ave): Google businessStatus CLOSED_PERMANENTLY
+  - Nublu (62 Avenue C): user note: stale duplicate of the 151 Ave C row "Nublu (New One)"
+  - Oiji (119 1st Ave): Google businessStatus CLOSED_PERMANENTLY
+  - Paprika Italian Cuisine (110 St Marks Pl): Google businessStatus CLOSED_PERMANENTLY
+  - Pouring Ribbons (225 Avenue B): Google businessStatus CLOSED_PERMANENTLY
+  - Prime and Beyond (90 E 10th St): Google businessStatus CLOSED_PERMANENTLY
+  - Purple Ginger (no address): Google businessStatus CLOSED_PERMANENTLY
+  - Rizzos Fine Pizza (17 Clinton Street): Google businessStatus CLOSED_PERMANENTLY
+  - Root & Bone (200 E 3rd St New York, NY 10009): Google businessStatus CLOSED_PERMANENTLY
+  - Shervins (131 East 7th street): Google businessStatus CLOSED_PERMANENTLY
+  - Sigmund Pretzel Shop (29 Ave B): Google address "230 Park Avenue, New York, NY 10169, USA" is outside zips 10002/10003/10009; top Text Search result "Sigmund's Pretzels" (OPERATIONAL, restaurant, 230 Park Avenue, New York, NY 10169, USA), whose name does not match
+  - Sons of Essex (133 Essex Street): Google businessStatus CLOSED_PERMANENTLY
+  - Taberna 97 (97 St Marks Place): Google businessStatus CLOSED_PERMANENTLY
+  - Tableside (345 E 6th street): Google businessStatus CLOSED_PERMANENTLY
+  - Terroir (413 E 12th St): user note: closed years ago
+  - The Black Ant (60 2nd Ave): Google businessStatus CLOSED_PERMANENTLY
+  - The Central Bar (109 E 9th St): Google businessStatus CLOSED_PERMANENTLY
+  - The Crocodile Lounge (325 E 14th St): Google businessStatus CLOSED_PERMANENTLY
+  - The Garret (206 Ave A): Google businessStatus CLOSED_PERMANENTLY
+  - The Hard Swallow (140 1st Ave): Google type "premise" is not food, drink or nightlife (and the row has no reviews in review-context and no opening hours); top Text Search result "140 1st Ave" (no status, premise, 140 1st Ave, New York, NY 10009, USA), which is not operational
+  - The Horse Box (218 Avenue A): Google businessStatus CLOSED_PERMANENTLY
+  - The Redhead (349 E 13th St): Google businessStatus CLOSED_PERMANENTLY
+  - The Ugly Duckling NYC (106 Third Ave): Google businessStatus CLOSED_PERMANENTLY
+  - The kitchen Sink (88 2nd Ave): Google businessStatus CLOSED_PERMANENTLY
+  - Totem (505 E 12th St.): Google businessStatus CLOSED_PERMANENTLY
+  - Wechsler’s (120 1st Ave): Google businessStatus CLOSED_PERMANENTLY
+- RENAME (8):
+  - Luzzo's Group (211 1st Ave) -> "Olio e Più", address -> "106 3rd Ave": user note: the 211 1st Ave pizzeria is now Olio e Più
+  - Matilda (647 E 11th St) -> "Fiaschetteria Pistoia": user note: 647 E 11th St is now Fiaschetteria Pistoia
+  - Ngam (99 3rd Ave) -> "Bánh Anh Em": user note: 99 3rd Ave is now Bánh Anh Em
+  - Pinks (242 East 10th street) -> "Apollo Bagels": user note: 242 E 10th St is now Apollo Bagels; retag food, not Late-Night-Food
+  - The Barrel (10 Stuyvesant St New York, NY 10003) -> "Wonder East Village": Google lists "Wonder East Village" (restaurant) at the same address; name overlap 0.00
+  - The Eddy (342 E 6th St New York, NY 10003) -> "Raku": user note: 342 E 6th St is now Raku
+  - V-Bar (132 1st Ave) -> "Lion's": user note: 132 1st Ave is now Lion's
+  - White Noise (225 Ave B) -> "Eleven Tigers": user note: 225 Ave B is now Eleven Tigers
+- KEEP (2):
+  - C Lounge (14 Ave C): OPERATIONAL as "C Lounge" (bar_and_grill), no opening hours on Google
+  - ReVision Lounge (219 Ave B): OPERATIONAL as "ReVision Lounge and Gallery" (bar), no opening hours on Google
+- Also changed: `scripts/enrich-places.ts` gained `--pending` (with `--refresh`: only rows whose `enrichment_status` is `pending` or the quoted `'pending'` import spelling) so the post-audit refresh touches 8 rows instead of all 249.
+- Files touched: `scripts/audit-places.ts` (new), `scripts/enrich-places.ts`, `scripts/ralph/data/deleted-places.json` (new, 64 rows), `scripts/ralph/data/editorial.json` (+10 entries, 249), `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`. `scripts/ralph/data/review-context.json` (gitignored) now has 249 entries: 72 removed, 8 re-fetched.
+- Validation (Done when): prod `select count(*) filter (where pitch is null), count(*) filter (where perfect is null or insider is null), count(*) filter (where enrichment_status in ('pending','''pending''')), count(*) from places` -> 0, 0, 0, 249; `group by enrichment_status` -> `ok` 249 only. `deleted-places.json` has 64 entries = the 64 audit deletes, every one with `deleted_reason`, and all 64 are listed above. `GET https://eastvillageeverything.nyc/api/places/<id>` for Olio e Più (4579c460), Lion's (4b57d476), Apollo Bagels (b61cc643) and Bánh Anh Em (e582206c) -> new `name`, `hours_json` with `weekdayDescriptions`, non-null `pitch`/`perfect`/`insider`, photo URL present; Olio e Più's `address` is `106 3rd Ave`. `npx tsc --noEmit --strict --target es2022 --module nodenext --moduleResolution nodenext --skipLibCheck scripts/audit-places.ts` exit 0 (also clean together with `scripts/enrich-places.ts`). `node scripts/ralph/editorial-append.mjs /tmp/batch312.json` -> `appended 10; editorial.json now has 249 of 249 review-context ids`; `npm run load-editorial` -> `rows updated 10`, `places with no pitch 0 / 249`. Dry run first (`--report /tmp/audit-dry2.json`), reviewed, then `--apply --report /tmp/audit-apply.json`; both runs made 74 Details calls plus 7 Text Searches. Tunnel closed and the temp env helper removed afterwards.
+- Learnings / for the human: the App Store description uploaded in 5.7 (`docs/app-store/listing.md` line 49 and `apps/mobile/fastlane/metadata/en-US/description.txt`) says "Over 300 places"; prod now has 249, so that sentence needs a rewrite ("Nearly 250 places" or similar) and a `node scripts/app-store-metadata.mjs && fastlane deliver` re-run before or alongside 5.8. Nothing in the app hardcodes the count (the header shows the live total). Restoring a deleted row: `INSERT` the object from `deleted-places.json` minus `tags`, `deleted_at`, `deleted_reason`, then re-create `place_tags` from `tags` by `tags.value`. The Hard Swallow (140 1st Ave) and Contrada (84 E 4th St) were deleted because Google has no listing under those names at those addresses (only the building), not because Google says they closed; if either is open, add it back by hand with an address Text Search can resolve.
 ---
