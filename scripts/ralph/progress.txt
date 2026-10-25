@@ -387,3 +387,24 @@ Started: 2026-10-24
 - Files touched: `scripts/ralph/data/editorial.json`, `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
 - Validation: `node scripts/ralph/editorial-append.mjs /tmp/batch3b.json` -> `appended 33; editorial.json now has 171 of 313 review-context ids`. Coverage check over indexes 179 to 223: every index is either in `editorial.json` or in the skip list above (33 + 12 = 45, 0 missing). `git status --short` lists only `editorial.json`, not `review-context.json`.
 ---
+
+## 2026-10-24 - 3.5c
+- Wrote editorial copy for 33 places: review-context key indexes 224 through 268 (Saint through The Garret, alphabetical), minus the 12 skipped below. `scripts/ralph/data/editorial.json` now has 204 entries. Next task (3.5d) starts at index 269 and runs to 312, the last key (`node /tmp/dump.js 269 291 > /tmp/dump_a.txt; node /tmp/dump.js 291 313 > /tmp/dump_b.txt`, then read both files with the Read tool; the inline tool result is too large for `cat`). The dump script is still at `/tmp/dump.js`; its source is in the 3.5 batch 1 entry.
+- Same workflow as 3.5a/b: `/tmp/batch3c.json` with `id`, `pitch`, `perfect`, `insider`; a `node -e` snippet fills `name` from `review-context.json` by id; then `node scripts/ralph/editorial-append.mjs /tmp/batch3c.json`. Passed the validator first try.
+- Skipped (no copy written) in indexes 224 to 268, for the user to confirm, rename, or delete. "No hours" means Google returned no opening hours at enrichment, which it does for permanently closed places:
+  - Shervins (131 E 7th St): no hours; visits 2012 to 2014, 10 ratings total.
+  - Sigmund Pretzel Shop (29 Ave B): has hours, but the matched listing has 2 ratings total, visits 2016 and 2017, and weekday-only 9 AM to 5 PM hours, which looks like a wholesale or office listing rather than the shop. Suspected closed; verify or delete.
+  - Sons of Essex (133 Essex St): no hours; newest visit 2023-07 (suspected closed; verify).
+  - Taberna 97 (97 St Marks Pl): no hours; newest visit 2021-01.
+  - Tableside (345 E 6th St): no hours; newest visit 2022-07.
+  - Terroir (413 E 12th St): zero reviews, no rating, no hours. Closed years ago; delete.
+  - The Barrel (10 Stuyvesant St): has hours, but every visit describes Wonder, the multi-restaurant pickup and delivery hall now at that address, not a bar. Wrong match or changed hands; delete or re-point.
+  - The Black Ant (60 2nd Ave): no hours; newest visit 2023-11 (suspected closed; verify).
+  - The Central Bar (109 E 9th St): no hours; newest visit 2020-01, the rest 2011 to 2012.
+  - The Crocodile Lounge (325 E 14th St): no hours; newest visit 2019-06.
+  - The Eddy (342 E 6th St): has hours, but every visit describes Raku, the udon restaurant now at that address; the Eddy is gone. Rename to Raku (East Village) and re-enrich, or delete.
+  - The Garret (206 Ave A): no hours; newest visit 2023-12 (suspected closed; verify).
+- Other notes for the user: SenYa (newest visit 2024-07), Taverna Kyclades East Village (2024-07) and The Cabin NYC (2024-12) have no hours but got copy; verify they are open. The Cabinet has no hours but a 2026-10 visit, so copy was written. Suki's visits mention Kikoo Sushi once; the copy describes the all-you-can-eat iPad format common to both, but confirm the name. The Cøøper Sill is The Copper Still at 151 2nd Ave; copy written under our spelling. Socarrat (Nolita), Soho Diner NYC (SoHo Grand), Taverna Di Bacco (Ludlow) and The Banc Bar Cafe (Murray Hill) are outside the East Village but got copy. Sing Sing Karaoke (St Marks): all four 2026 visits are one- or two-out-of-five about surprise room charges and the door; copy was written with a warning to confirm the all-in price, judgment call like ReVision Lounge; delete or override. Sophie's (bartender), Spikes (bartender), Sake Bar Satsko (a drunk bartender and a food-safety complaint), Sake Bar Decibel (table-turn pressure), St. Dymphna's (auto gratuity), Ten Degrees (tip attitude), The Blind Barber (door) and Solas (bouncers) have 2026 conduct complaints; the pitches note them in neutral terms.
+- Files touched: `scripts/ralph/data/editorial.json`, `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: `node scripts/ralph/editorial-append.mjs /tmp/batch3c.json` -> `appended 33; editorial.json now has 204 of 313 review-context ids`. Coverage check over indexes 224 to 268: every index is either in `editorial.json` or in the skip list above (33 + 12 = 45, 0 missing, no skipped id present). `git status --short` lists only `editorial.json`, not `review-context.json`.
+---

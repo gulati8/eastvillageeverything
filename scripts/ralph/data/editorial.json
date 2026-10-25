@@ -1195,5 +1195,236 @@
     "pitch": "The Avenue C neighborhood bar and burger joint with a year-round patio, a well-made cocktail list, and a classic burger that regulars prefer to the smash version. It is quiet on a winter Monday and a Knicks-game madhouse in the spring, with a happy hour that holds either way.",
     "perfect": "a patio burger and a cocktail, late",
     "insider": "Order the classic Royale burger over the smash burger and let Maya or DJ mix your drink."
+  },
+  {
+    "id": "1d4b379a-7d6b-413c-815c-40f9f85c0ae2",
+    "name": "Saint",
+    "pitch": "A brick-walled brasserie on 2nd Ave with a secret garden room and a speakeasy tucked behind it, which is why half the neighborhood seems to book birthdays here. Come for cocktails and the octopus starter rather than the burger, and expect the bar to move slowly when private parties fill the back.",
+    "perfect": "you need a room for a birthday dinner.",
+    "insider": "Ask to see the speakeasy before a private event takes it over for the night."
+  },
+  {
+    "id": "c1564b56-58c4-4591-91ee-d7a7ef396ffa",
+    "name": "Sake Bar Decibel",
+    "pitch": "A basement sake bar on 9th St that feels lifted out of Osaka, loud and scuffed and papered in graffiti, with a sake list long enough to get lost in. Order by the glass and let the servers steer you, and know that on a busy night the staff push tables to drink up and turn over.",
+    "perfect": "you want a loud, low-ceilinged sake crawl for two.",
+    "insider": "Pairs get seated far faster than groups of four, so go as a duo and skip the trios in favor of single glasses."
+  },
+  {
+    "id": "9807a6e9-fe0f-4bdf-ad2c-0e9eb908b6df",
+    "name": "Sake Bar Satsko",
+    "pitch": "A tiny izakaya on 7th St where the staff are loose and loud, the sake pours are generous and you tend to leave with a new friend or two. The food comes out slowly and recent nights have been unpredictable, so treat it as a drinking stop with snacks rather than dinner.",
+    "perfect": "you want a rowdy sake nightcap with strangers.",
+    "insider": "Order the karaage and squid as soon as you sit down, because the curry rice takes a while."
+  },
+  {
+    "id": "30c85917-04b0-4adf-b27a-1c7507398c92",
+    "name": "San Loco",
+    "pitch": "Hard-shell gringo-Mex tacos and strong margaritas on Avenue C, open until midnight most nights and until 2 AM on Fridays and Saturdays. Nobody comes for refined food, but the queso loco tacos and a pitcher have kept regulars loyal for a decade.",
+    "perfect": "it is late and you want cheesy tacos and margaritas.",
+    "insider": "You order at the counter before sitting down, even though the room looks like a sit-down restaurant."
+  },
+  {
+    "id": "a589c72d-0d89-4945-b9f7-c7686e415c68",
+    "name": "San Marzano",
+    "pitch": "Handmade pasta in a cozy, art-filled room on 2nd Ave where a full plate still lands around twenty-five dollars, which is why it is packed every weekend. Pick a shape, pick a sauce, add the burrata, and expect noise when the room is full.",
+    "perfect": "you want real pasta without a fifty-dollar check.",
+    "insider": "Weekend brunch comes with bottomless mimosas, and the vodka rigatoni is the dish people come back for."
+  },
+  {
+    "id": "b9221bb8-1706-43be-9181-f456bc33b2ec",
+    "name": "Scratchers",
+    "pitch": "An Irish dive on 5th St between 2nd and 3rd with wooden benches, fairy lights, a UK-heavy playlist and bartenders who notice you even when it is three deep. Cheap drinks and a proper Guinness make it a reliable last stop or bar-crawl waypoint.",
+    "perfect": "you want a Guinness and a nightcap without fuss.",
+    "insider": "Tuesday and Wednesday nights are the quiet ones, and nobody minds if you bring a pizza in."
+  },
+  {
+    "id": "41ec8f67-7f44-4eb7-9045-595fbdb948eb",
+    "name": "SenYa",
+    "pitch": "A small, minimalist Japanese room on 1st Ave with six or so tables and a kitchen that likes a twist, from foie gras sushi to a snow crab mazemen with bone marrow. It is not cheap, so the restaurant week set is the move if you catch it.",
+    "perfect": "you want inventive sushi and have a budget.",
+    "insider": "The bone marrow melts on the tongue and the uni is the sushi to try, though it runs a little bitter."
+  },
+  {
+    "id": "69995d30-95ff-4aea-9659-a5b82cd0c3a8",
+    "name": "Sing Sing",
+    "pitch": "Private karaoke rooms on Avenue A with a huge song list, open until 4 AM every night, and a staff that is friendly when the place is not slammed. On busy weekends the room service button goes unanswered and you end up fetching your own drinks from a crowded bar.",
+    "perfect": "your group wants to scream-sing until 4 AM.",
+    "insider": "Order buckets of beer for the whole room at once, since single drink orders tend to arrive wrong or late."
+  },
+  {
+    "id": "1e64a074-f335-4adc-b2fc-638e95c62d4e",
+    "name": "Sing Sing Karaoke",
+    "pitch": "The St Marks branch of the private-room karaoke chain, open 6 PM to 4 AM every night with a broad song list in a brick building. Recent visits report surprise room charges and a brusque door, so get the all-in price in writing before you sing.",
+    "perfect": "you want karaoke on St Marks and will haggle first.",
+    "insider": "The sign out front advertises a per-person room rate, so confirm exactly what it covers before handing over ID."
+  },
+  {
+    "id": "28d98804-7b1f-4fbb-a9e9-35ce1ddaaa5b",
+    "name": "Slainte",
+    "pitch": "A big, brick-walled Irish sports bar on the Bowery with a long beer list, soccer and basketball on every screen, and pub food that is better than it needs to be. The nachos, sliders and even the steak get real praise, and the bartenders stay kind when March Madness packs the floor.",
+    "perfect": "you need a game on and real food.",
+    "insider": "Doors open at noon daily and 11 AM on weekends, so it works for early kickoffs."
+  },
+  {
+    "id": "ed7461fe-2bc2-4a32-a09f-92efbe37f5a6",
+    "name": "Sly Fox",
+    "pitch": "A true dive on 2nd Ave with Chucky and his bride behind the bar, rock on the speakers, a Ukrainian streak and shots cheap enough to raise an eyebrow. The crowd skews older and regular, bartenders remember faces for years, and nobody is making you a craft cocktail.",
+    "perfect": "you want a four-dollar shot and loud rock.",
+    "insider": "It is closed Sundays and Mondays and opens at 6 PM the rest of the week, so it is a night bar only."
+  },
+  {
+    "id": "b84979ff-a2cc-4064-85ed-6c19977f5d44",
+    "name": "Soba-ya",
+    "pitch": "A calm, Michelin-recognized noodle house on 9th St that makes its own soba and udon, served hot or cold with seasonal specials like chilled soba under fresh uni. The entrance alone feels like a flight to Japan, and the broth tastes like someone's home cooking.",
+    "perfect": "you want quiet, handmade noodles at lunch.",
+    "insider": "Try the kamo nanban duck soba or the zaru soba, and look for the seasonal specials board."
+  },
+  {
+    "id": "1dfc4b2c-0aa3-4209-bdb8-2c8ec60e2973",
+    "name": "Socarrat",
+    "pitch": "The Nolita paella bar, a short walk below Houston, where the rice comes with a proper crisp socarrat bottom and the gambas al ajillo are worth the trip alone. Paella is priced per person with a two-serving minimum, so bring company or stick to tapas if you are solo.",
+    "perfect": "you want paella and live flamenco on a Tuesday.",
+    "insider": "Tuesday nights bring live Spanish music and a flamenco dancer, and the kitchen handles gluten-free paella well."
+  },
+  {
+    "id": "58192927-fb9a-422b-8e49-f3285a538fa9",
+    "name": "Soda Club",
+    "pitch": "A dim, candlelit vegan Italian spot on Avenue B doing handmade pasta, Roman-style pizza and natural wines, and most people never notice the vegan part. Opinions on the pasta split, but the focaccia, the pistachio rotini and the wine service get consistent love.",
+    "perfect": "you want natural wine and pasta that happens to be vegan.",
+    "insider": "Sit at the bar, where the bartender will pour tastes of a few wines before you commit to a glass."
+  },
+  {
+    "id": "a76ac090-6960-4e9b-9f00-ae4cfdc2e2b8",
+    "name": "Soho Diner NYC",
+    "pitch": "A retro diner inside the SoHo Grand with yellow globe lights, booths and a jukebox, open from 7 AM to midnight and until 2 AM on weekends. The vegan burger and banana pancakes win fans, but the kitchen is uneven and the prices are hotel prices, so go for the room and the late hours.",
+    "perfect": "it is 1 AM in SoHo and you want fries.",
+    "insider": "The vegan banana pancakes and vegan burger are the safe orders, and they will swap hash browns for fries."
+  },
+  {
+    "id": "704d33d2-4565-481d-946c-c9e593176bdf",
+    "name": "Solas",
+    "pitch": "A two-floor bar on 9th St with a packed ground floor and a dark upstairs lounge where a DJ keeps people dancing until 4 AM on weekends. The Wednesday salsa party has run for sixteen years, and the bouncers have a short fuse, so keep your approach polite.",
+    "perfect": "you want to dance in the East Village on a Wednesday.",
+    "insider": "Wednesday salsa night is fifteen dollars at the door and includes a lesson if you arrive early."
+  },
+  {
+    "id": "00a80b86-ba1d-4bb0-8ebf-6b0fbabc3f10",
+    "name": "Soothr",
+    "pitch": "A Michelin-recognized Thai restaurant on 13th St whose duck noodles, chicken khao soi and yum nuer taste like someone's mother cooked them, served in a packed, loud room that runs like clockwork. Food arrives almost as soon as you order, which is good because tables are capped at ninety minutes.",
+    "perfect": "you want the best Thai dinner nearby, fast.",
+    "insider": "Tables have a ninety-minute limit, and the chicken khao soi runs hotter than the rest of the menu."
+  },
+  {
+    "id": "7c6e9780-ae66-45b8-992a-5d8472b99bdf",
+    "name": "Sophie's",
+    "pitch": "A no-frills Alphabet City barroom with a pool table, a jukebox and cheap drinks, holding out against everything that has changed around it. The longtime bartender runs the room her way and recent visitors have clashed with her, so follow the house rules and you will be fine.",
+    "perfect": "you want to shoot pool until 4 AM.",
+    "insider": "One person in the bathroom at a time, and the pool table is the reason regulars keep coming back."
+  },
+  {
+    "id": "7bc312d7-0a32-4864-a8ca-59de54b3be30",
+    "name": "Spikes",
+    "pitch": "A corner dive at 14th and A with darts, a few TVs for sports, a TouchTunes jukebox and bartenders who are quick with a pour. The energy is frenetic and the staff can be prickly, so it suits a loud group more than a quiet solo drink.",
+    "perfect": "your crew wants darts and a game, no frills.",
+    "insider": "There is no kitchen but you can bring food in, and it opens at noon every day."
+  },
+  {
+    "id": "45abb22c-43a9-44da-90c7-d1921fbad328",
+    "name": "St. Dymphna’s",
+    "pitch": "A snug Irish pub on St Marks with a back room and a patio, weekend happy hour and a door guy who keeps the line civil when the weather turns warm. Check your bill before tipping, because gratuity is sometimes added automatically and the screen will still ask for more.",
+    "perfect": "you want a pint and a patio on St Marks.",
+    "insider": "A twenty percent gratuity is often already on the tab, so skip the extra prompt on the card reader."
+  },
+  {
+    "id": "6921a23a-8923-4ad6-831a-c4bf43571068",
+    "name": "Standings",
+    "pitch": "A tiny pennant-lined sports bar on 7th St with a dozen taps, ten small TVs, about ten stools and a crowd that actually watches the game. It is a Mets bar at heart, the owner works the room, and you can order in food since the bar has none.",
+    "perfect": "you want to watch the game with real fans.",
+    "insider": "Cards are Visa or Mastercard only with a fifteen-dollar minimum, and weeknight games are far quieter than Saturdays."
+  },
+  {
+    "id": "1357452b-58de-4bf2-a22c-4ef0768ad838",
+    "name": "Stickett Inn",
+    "pitch": "A small, pretty bar on 1st Ave built around its own house-made cider, dry rather than sweet and poured by an owner who makes you feel like a regular. Recent visits have been uneven, with warm cider and so-so cocktails reported, so order the cider on a good night and keep it simple.",
+    "perfect": "you want cider instead of beer and a quiet corner.",
+    "insider": "The cider is the point here, and the restroom is prettier than most bars' front rooms."
+  },
+  {
+    "id": "4b485f4b-0b98-4cf6-a9f7-c4afaf20068d",
+    "name": "Suki",
+    "pitch": "All-you-can-eat sushi on 1st Ave ordered from an iPad, with sashimi, nigiri, pork buns and hot dishes like roasted fish collar included in one price. The menu leans heavily on salmon, so mix in the galbi and beef-wrapped enoki before your palate gives out.",
+    "perfect": "you want to overeat sushi for sixty dollars.",
+    "insider": "Arrive around 6 PM on a weekday for an empty room, because a line forms by eight."
+  },
+  {
+    "id": "a56c433c-e962-46c2-88cc-605a45df3f77",
+    "name": "Supper",
+    "pitch": "A candlelit, rustic Northern Italian trattoria on 2nd St with an open kitchen, complimentary bread with white beans in olive oil, and a tagliatelle al ragù people plan whole evenings around. It is cash only, with an ATM inside, and the chicken parm has a following of its own.",
+    "perfect": "you want a slow, candlelit pasta dinner and have cash.",
+    "insider": "Cash only, so hit the ATM by the door, and do not skip the marinated white beans that arrive with the bread."
+  },
+  {
+    "id": "f006cf75-c91a-4a92-8743-061fe870facf",
+    "name": "Taverna Di Bacco",
+    "pitch": "A brick-walled Italian bistro on Ludlow where chef Maurizio greets the room himself, brings out dishes and will sit down for a chat if you let him. The five-course chef's option is the way to go, the chocolate mousse ends the night, and reservations matter on weekends.",
+    "perfect": "you want the chef at your table and a long dinner.",
+    "insider": "Ask for the chef's five-course menu, and arrive mid-afternoon on a weekend to skip the reservation scramble."
+  },
+  {
+    "id": "26d618f1-d480-4aef-8e69-d13c543ef586",
+    "name": "Taverna Kyclades East Village",
+    "pitch": "The East Village outpost of the Astoria Greek seafood institution, an airy room with an open kitchen, big portions and grilled shrimp that arrive juicy and charred. Ownership has changed and the fish can run oily, so stick to the grilled seafood, spreads with warm pita and the lemon potatoes.",
+    "perfect": "you want grilled fish and Greek portions without a wait.",
+    "insider": "A non-cash surcharge of a few percent lands on card bills, so bring cash if that bothers you."
+  },
+  {
+    "id": "55fd2eca-2ff4-4984-a402-a1c2fd93925c",
+    "name": "Ten Degrees",
+    "pitch": "A loud, upbeat wine and cocktail bar on St Marks with a long happy hour, a back room that books out for birthdays and a hands-on owner named Aaron. Weekends go standing-room by nine, and the bar staff can turn cool if they feel shorted on tips, so tip on the card.",
+    "perfect": "you want a cheap happy hour on St Marks.",
+    "insider": "The back room takes private parties with food platters, and the General's cucumber cocktail is the one to order."
+  },
+  {
+    "id": "870bf656-ce96-4260-9fba-92fcc3b352c8",
+    "name": "The Banc Bar Cafe (Murray Hill)",
+    "pitch": "A stylish lounge in a 1920s bank building on 3rd Ave in Murray Hill, with sidewalk seating, live bands on weekends and a happy hour that starts at noon midweek. The cocktails and burger outshine the pasta, so lean on drinks, the coconut shrimp and the profiteroles.",
+    "perfect": "you want live music and cocktails in Murray Hill.",
+    "insider": "Sundays bring twenty-three dollar bottles of wine, and happy hour begins at noon Wednesday through Friday."
+  },
+  {
+    "id": "e869667e-293d-4757-83c4-0ce5bcdb8e13",
+    "name": "The Blind Barber",
+    "pitch": "A barbershop on 10th St with a cocktail bar hidden behind it, chill before 10 PM and loud once the DJ starts on Thursday through Saturday nights. The cocktails are fair for Manhattan, the air conditioning is serious, and the door can be strict and unfriendly late.",
+    "perfect": "you want a speakeasy with a haircut attached.",
+    "insider": "Come between eight and ten for a quiet drink, and book Maria if you actually want the haircut."
+  },
+  {
+    "id": "0f54f7a4-5370-4a43-b32b-a0751ed5cb80",
+    "name": "The Bowery Electric",
+    "pitch": "A bi-level rock club on the Bowery with a downstairs room whose acoustics make any show sound good, plus dance parties that start late. Beers are moderately priced, there is Guinness on tap, and there is no food, so eat first.",
+    "perfect": "you want a small loud show downstairs.",
+    "insider": "The downstairs room has the better sound, and the dance parties do not get going until around 11 PM."
+  },
+  {
+    "id": "d76cba61-81a2-42bc-b9e7-a391e816ceab",
+    "name": "The Cabin NYC",
+    "pitch": "A rustic cabin of a restaurant on 4th St that redecorates for every season, with a menu printed on vinyl records and an indoor swing. Come for happy hour and shareable plates like the maple-glazed bacon steak rather than a serious dinner, and bring a date.",
+    "perfect": "you want a cozy, kitschy date-night drink.",
+    "insider": "Order the glazed bacon steak to share, and ask about the seasonal cocktails before they rotate out."
+  },
+  {
+    "id": "6f8781fc-2421-4dcf-8840-36ed70da7fb0",
+    "name": "The Cabinet",
+    "pitch": "A dark, intimate mezcal bar on 9th St near Avenue C, its shelves lined cabinet-style with bottles and staffed by bartenders who will teach you the difference between them. The smoky margarita and Oaxacan old fashioned are the anchors, with guacamole and crispy tacos to keep you going.",
+    "perfect": "you want to learn mezcal from someone who cares.",
+    "insider": "Order the Chixa Tapacho, and note the bar turns into a Christmas pop-up for the holiday season."
+  },
+  {
+    "id": "9ad9ff7d-e494-4106-800c-a6741de6cee4",
+    "name": "The Cøøper Sill",
+    "pitch": "A whiskey bar on 2nd Ave with the bottles arranged by region, barrel-aged cocktails and better-than-pub food, including tots and a well-seasoned burger. The happy hour runs until 8 PM with three-dollar sliders and sidewalk seating, which is the cheapest good afternoon in the neighborhood.",
+    "perfect": "you want whiskey, sliders and a sidewalk seat before eight.",
+    "insider": "Happy hour until 8 PM gets you a six-dollar beer and three-dollar chicken or pork sliders."
   }
 ]
