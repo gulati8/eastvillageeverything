@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - East Village Everything</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.min.css" rel="stylesheet">
+  <link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+  <div class="row header text-center">
+    <div class="columns small-12">
+      <h1><a class="site-title" href="/">East Village Everything</a></h1>
+      <h2>Privacy Policy</h2>
+    </div>
+  </div>
+
+  <div class="row main-content page">
+    <div class="columns small-12 large-8 large-centered">
+      <p class="updated">Last updated: <%= updated %></p>
+
+      <p>This policy covers the East Village Everything app for iPhone. The app is a directory of bars and restaurants in the East Village. It has no accounts and asks for nothing about you. Here is everything it does with data.</p>
+
+      <h3>Anonymous device ID</h3>
+      <p>The first time the app opens, it generates a random identifier and stores it on your device. The app sends that identifier with each request to our server so we can tell one install from another when debugging problems or limiting abuse. It is random, it is not derived from your device's hardware or your Apple ID, and it is not linked to your identity. Deleting the app deletes it.</p>
+
+      <h3>Crash reports</h3>
+      <p>If the app crashes or hits an error, a report goes to Sentry, our crash reporting service. A report includes the device model, the iOS version, the app version, and what the app was doing when it failed. Reports do not include your name, location, or the anonymous device ID. We use them only to find and fix bugs.</p>
+
+      <h3>Saved places</h3>
+      <p>Places you save are stored on your device only. They never leave it, and we cannot see them. Deleting the app deletes them.</p>
+
+      <h3>What we do not do</h3>
+      <ul>
+        <li>No accounts. There is nothing to sign up for.</li>
+        <li>No location. The app does not ask for or use your location.</li>
+        <li>No ads.</li>
+        <li>No third-party analytics or tracking.</li>
+        <li>No selling or sharing of data with anyone.</li>
+      </ul>
+
+      <h3>Changes</h3>
+      <p>If this policy changes, the new version will be posted at this address with a new date.</p>
+
+      <h3>Contact</h3>
+      <p>Questions about privacy go to <a href="mailto:<%= contactEmail %>"><%= contactEmail %></a>.</p>
+
+      <p class="back"><a href="/">Back to East Village Everything</a></p>
+    </div>
+  </div>
+</body>
+</html>

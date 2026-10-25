@@ -3,6 +3,9 @@ import { PlaceModel, TagModel } from '@eve/db';
 
 const router = Router();
 
+const SUPPORT_EMAIL = 'amit@gulatilabs.me';
+const PRIVACY_POLICY_UPDATED = 'October 24, 2026';
+
 // Public home page - displays all places with tag filtering
 router.get('/', async (req: Request, res: Response) => {
   try {
@@ -49,6 +52,14 @@ router.get('/', async (req: Request, res: Response) => {
     console.error('Error loading public page:', error);
     res.status(500).send('Error loading page');
   }
+});
+
+// Privacy policy for the iOS app (App Store listing links here)
+router.get('/privacy', (_req: Request, res: Response) => {
+  res.render('public/privacy', {
+    contactEmail: SUPPORT_EMAIL,
+    updated: PRIVACY_POLICY_UPDATED
+  });
 });
 
 export default router;

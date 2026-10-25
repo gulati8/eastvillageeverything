@@ -186,3 +186,48 @@ a.place-name {
     margin-bottom: .5em;
   }
 }
+
+/* Static pages (privacy, support) */
+.header a.site-title {
+  color: #fff;
+  text-decoration: none;
+  line-height: inherit;
+}
+
+.header a.site-title:hover {
+  font-size: inherit;
+  font-weight: normal;
+}
+
+.row.main-content.page h3 {
+  font-family: AmericanCaptain;
+  font-weight: normal;
+  font-size: 1.5em;
+  color: #4d4d4d;
+  margin: 1.5em 0 .5em;
+}
+
+.row.main-content.page p,
+.row.main-content.page li {
+  font-size: 1.125em;
+  line-height: 1.5em;
+}
+
+.row.main-content.page ul {
+  list-style: disc;
+  margin-left: 1.25em;
+  line-height: 1.5em;
+}
+
+.row.main-content.page li {
+  margin-bottom: .5em;
+}
+
+.row.main-content.page .updated {
+  color: #4d4d4d;
+  font-size: 1em;
+}
+
+.row.main-content.page .back {
+  margin-top: 3em;
+}
