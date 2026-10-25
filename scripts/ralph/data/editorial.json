@@ -964,5 +964,236 @@
     "perfect": "bottomless brunch should be cheap and loud.",
     "insider": "Bottomless is 90 minutes for $25 and any drink counts; get the Benedict with salmon and skip the burrito.",
     "name": "Motel No tell"
+  },
+  {
+    "id": "82f61742-c282-4435-b48e-010bb74b5376",
+    "name": "Motorino East Village",
+    "pitch": "Wood-fired Neapolitan pies with properly blistered crusts, two minutes in a 950-degree oven, and the Brussels sprout and clam pizzas are still the ones people come back for. It is the rare East Village pizza place where a last-minute Friday table is realistic, and the servers are genuinely warm.",
+    "perfect": "you want real Neapolitan pizza without a long wait",
+    "insider": "The mortadella and burrata pie eats like a hero, and breaking the burrata over the slices is the move."
+  },
+  {
+    "id": "ebe00e68-52c1-4fcd-930b-200be02168e0",
+    "name": "Nai Tapas Bar",
+    "pitch": "Spanish regulars say this is the closest New York gets to home: croquettes like a grandmother's, a fideuà worth building the meal around, and a flan to finish. The room is handsome, service goes out of its way, and the front corner handles a table of eight or a rehearsal dinner of twenty.",
+    "perfect": "a group dinner that needs to feel like a party",
+    "insider": "Order the fideuà and the curry chickpeas, and ask how they build the Filipino Cover Band cocktail."
+  },
+  {
+    "id": "2bba20dc-6af4-4228-b4f0-bb31e3e562e9",
+    "name": "Nexus",
+    "pitch": "This is the basement lounge under One and One, where the long Irish bar upstairs turns into a no-cover dance floor on weekend nights. The crowd skews early twenties and fresh out of school, and both floors are packed by midnight.",
+    "perfect": "your early-twenties friends want to dance without paying cover",
+    "insider": "It opens at 8 on Fridays and Saturdays and runs until 4, and there is no cover to get downstairs."
+  },
+  {
+    "id": "9e27d8d1-bc8a-44ae-9b1d-104e9963ba1c",
+    "name": "Nowhere Bar",
+    "pitch": "A low-ceilinged, below-ground gay dive on 14th Street, lit mostly by disco ball, with cheap, well-made drinks, a jukebox, and a pool table you have to shake to wake up. It is packed wall to wall most nights, a cover sometimes appears, and the bartenders expect a tip with every round.",
+    "perfect": "you want a dark, unfussy gay bar with no pretense",
+    "insider": "Bring cash: drinks are cheap for the city and tipping in cash keeps the bartenders on your side."
+  },
+  {
+    "id": "284ee142-435a-4307-a041-0ea7fb743f3b",
+    "name": "Nowon",
+    "pitch": "Korean-American gastropub on 6th Street with a loud, dim, R&B-scored room and a menu that keeps changing, anchored by the famous cheeseburger and the ricotta toast. The seven-course Classic Mixtape at $52 is the way to go with a group, and the staff keep plates moving and the table clear.",
+    "perfect": "a loud, fun group dinner with a tasting menu",
+    "insider": "Regulars split on the famous cheeseburger, so the truffle steak burger and the honey tots are the safer picks."
+  },
+  {
+    "id": "3d02caad-4424-4a1c-8eed-ff9d567bd0f5",
+    "name": "Nublu (New One)",
+    "pitch": "The Avenue C club with a center-of-the-room stage, its own record label, and a gorgeous lit interior lined with images of Black music legends, booking jazz, disco nights, and whatever else fits. Producer Mondays is the thing to see, a chaotic, crowded jam that regulars call the best musical night of their week.",
+    "perfect": "you want live music that is actually adventurous",
+    "insider": "Come on a Monday for Producer Mondays, pay the entry fee, and know the water is free if you are not drinking."
+  },
+  {
+    "id": "b886ce33-eb57-40d4-852d-d93c9cf70d8b",
+    "name": "Nuyorican Poets Cafe",
+    "pitch": "The storied Loisaida poetry slam room, decades on, where spoken word artists bare their souls to a packed crowd for a cheap ticket. The bar is just wine, beer, and soft drinks, seats are first come, and doors can open late, so line up early.",
+    "perfect": "you want a Friday night poetry slam",
+    "insider": "Buy tickets online ahead of the Friday slam and grab a seat at the bar when the doors open."
+  },
+  {
+    "id": "9454ff04-8dc2-43e8-8258-9e0328f4d97d",
+    "name": "Omar's Kitchen & Rum Bar",
+    "pitch": "A small, colorful Jamaican kitchen and rum bar on Clinton Street, six years in, where the curried oxtail, saltfish fritters, and jerk chicken gnocchi come out with real flavor and big portions. The cocktails are the other half of the draw: tamarind, sorrel, rum punches, and a shaken piña colada, with a DJ some nights.",
+    "perfect": "a lively dinner with rum cocktails and oxtail",
+    "insider": "Order the tamarind cocktail and the oxtail, and pick the fritters over the wings."
+  },
+  {
+    "id": "1e933309-02f8-42bb-a3f7-8a384df319ee",
+    "name": "One and One",
+    "pitch": "A big, multi-level Irish sports bar at 1st and Houston with game screens, mini corn dogs, a long happy hour, and a dance lounge downstairs on weekends. Omar the manager is why people throw birthdays here, though on a packed World Cup afternoon the room runs hot and the kitchen lags.",
+    "perfect": "you need seats for a big match",
+    "insider": "The Cobb salad is a sleeper, and the mini corn dogs are the bar snack to order with a pint."
+  },
+  {
+    "id": "b0ef74a1-48b6-44e8-bac8-7cdd9507a070",
+    "name": "Otto’s Shrunken Head",
+    "pitch": "The neighborhood's rock-and-roll tiki bar on far 14th Street, with glowing tiki mugs, a vintage photo booth, and rockabilly, ska, and punk bands in the back room. Longtime regulars grumble that the drinks got pricey and the punk edge softened, so come for the music and the room more than the cocktails.",
+    "perfect": "a rockabilly night with a flaming volcano bowl",
+    "insider": "Check the calendar for Subway to Skaville, the ska and rocksteady night, and eat beforehand since there is no food."
+  },
+  {
+    "id": "96bbbe0f-035b-4293-a521-2c7f417c8713",
+    "name": "Pangea",
+    "pitch": "A low-key Italian-Mediterranean restaurant on 2nd Avenue with a tight, intimate cabaret room in the back that books real downtown performers. The food is simple and fine rather than the point, so eat early and treat dinner as the opening act.",
+    "perfect": "dinner and a cabaret show in one stop",
+    "insider": "Book the show and arrive early enough to finish dinner before it starts, since the room is small and shows begin on time."
+  },
+  {
+    "id": "110b6ee7-6b5a-4974-9895-a6f09c066946",
+    "name": "Panna II Garden Indian Restaurant",
+    "pitch": "The chili-pepper-light-draped Indian restaurant on 1st Avenue that just had its movie moment, still cheap, still packed, and still handing out complimentary ice cream after a spicy meal. The room is sensory overload, the tables are tight, and the owner's recommendations are worth taking.",
+    "perfect": "you want cheap, loud, over-the-top Indian dinner",
+    "insider": "It is cash or Venmo only, you bring your own beer, and the samosas and paneer are the dishes to start with."
+  },
+  {
+    "id": "a9e6a4fc-83a2-4510-8b6a-1eee72e59ff4",
+    "name": "Paquito's",
+    "pitch": "A no-frills 1st Avenue Mexican counter that has been turning out oversized burritos and tacos since the mid-nineties, guacamole included in the price and a mean hot sauce on the side. The food is consistently good and cheap for the neighborhood, but the counter service can be distracted, so check your order and state any allergy twice.",
+    "perfect": "a huge burrito on the cheap, late",
+    "insider": "Get the shrimp burrito, which comes with guacamole and a small salad at no extra charge."
+  },
+  {
+    "id": "621c90fb-accd-4a06-a2a4-81c984cc8f70",
+    "name": "Pardon my French",
+    "pitch": "A cozy retro bistro on Avenue B that locals keep coming back to for the escargot, bone marrow, mussels with a mountain of fries, and duck confit. The dining room gets loud and the steak is the weak spot, so sit in the back garden or at the bar and order everything else.",
+    "perfect": "a French bistro dinner with a garden",
+    "insider": "Ask for the back garden in warm weather, and get the moules marinières for the fries alone."
+  },
+  {
+    "id": "ee17ed6c-b43f-4cbc-9a5b-2bf25e7244fb",
+    "name": "Paul's Palace",
+    "pitch": "The old-school 2nd Avenue burger joint, kitschy decor and all, that serves giant hand-formed burgers and steak fries at fair prices with quick, no-fuss service. In a smash-burger world it is the last of its kind, and regulars have been coming since the nineties for exactly that reason.",
+    "perfect": "you want a huge classic burger, no frills",
+    "insider": "It is cash only, the steak fries are the right side, and the oversized burger sign outside is the photo."
+  },
+  {
+    "id": "7206cd18-1f94-45ed-9ec9-999aa646f246",
+    "name": "PDT (Please Don't Tell)",
+    "pitch": "The speakeasy you enter through the phone booth inside Crif Dogs, still dark, still booked up, still mixing creative cocktails you can pair with a hot dog and tater tots. The hostess may quote a long wait even when the room is quiet, so reserve ahead rather than winging it.",
+    "perfect": "a first date that needs a party trick",
+    "insider": "Reserve in advance, ask for the little corner booth, and try the Cha Nom Thai."
+  },
+  {
+    "id": "f068a89b-fa01-4eef-b5cc-53addf759f64",
+    "name": "Petite Boucherie",
+    "pitch": "The small corner outpost of Boucherie at Christopher and Gay Street, with big windows, an open kitchen, and the same Paris-postcard feel at a gentler scale. Steak frites, onion soup, and the roast chicken are the orders, and the bartenders will match a cocktail to your plate.",
+    "perfect": "a date night that wants a Paris stand-in",
+    "insider": "Sit at the bar and let the bartender pair a cocktail, and know the chicken is the sleeper hit."
+  },
+  {
+    "id": "6c5f5de9-f983-4b17-a24f-c60844059425",
+    "name": "Phebe's Tavern & Grill",
+    "pitch": "A Bowery institution since the sixties, a big casual bar and grill where the fish and chips, French onion soup, and fries come in cheaper than most diners and the Guinness is poured right. Game nights and weekends get young and rowdy, so for a quiet meal go on a weekday afternoon.",
+    "perfect": "a cheap, filling meal near Astor Place with a game on",
+    "insider": "Dogs are welcome, and the French onion soup and natural-cut fries are the orders at the bar."
+  },
+  {
+    "id": "e942f724-0e0d-4cf3-8a89-5b046548b124",
+    "name": "Phoenix",
+    "pitch": "A relaxed gay and lesbian mainstay on 13th Street with a jukebox, a good events calendar, and Sunday live music with free barbecue in the summer. The bartenders range from generous to chilly depending on the night, and there is a card minimum, so bring cash.",
+    "perfect": "a Sunday afternoon with music and free barbecue",
+    "insider": "There is a twenty-dollar card minimum and the ATM is unreliable, so arrive with cash."
+  },
+  {
+    "id": "38927918-d17c-4d26-a5f1-258710231702",
+    "name": "Pineapple Club",
+    "pitch": "A sprawling two-floor tropical cocktail bar on 6th Street where the inventive drinks, like a clarified cucumber martini or a beet cocktail, outshine a hit-or-miss food menu. The front upstairs gets crushed, so push toward the back where there is room and the bartenders come to you.",
+    "perfect": "fun cocktails with a group before going out",
+    "insider": "Stick to the oysters and bao on the food side, and expect to be hurried along during happy hour."
+  },
+  {
+    "id": "a48566eb-0d06-4b4e-b899-b3523564ab97",
+    "name": "Plado",
+    "pitch": "A warm Mediterranean tasting bar on 2nd Street built for sharing rounds of small plates, with a seasonal menu, taro gnocchi, short rib that falls apart, and staff who handle allergies carefully. Seasoning can run shy, so ask for salt without guilt, and the Italy-versus-Spain cheese board is the right opener.",
+    "perfect": "a birthday dinner that can share everything",
+    "insider": "Start with the Italy versus Spain board with burrata and follow with the short rib."
+  },
+  {
+    "id": "6df53c40-f368-4e17-ad71-333aaf3f02d3",
+    "name": "Planet Rose",
+    "pitch": "The red-walled, zebra-seated karaoke dive on Avenue A where the main room sings together, you pay a couple of dollars a song, and Missy behind the bar remembers you a year later. The private room is a steal for groups, with house liquor included, and it is open until 4 every night.",
+    "perfect": "ten friends need a karaoke room with booze included",
+    "insider": "Book the private room through Missy for groups, or just hand in a song code at the bar and wait for your name."
+  },
+  {
+    "id": "89673411-2858-4a26-a1a6-58a98a8cc8bc",
+    "name": "Poco",
+    "pitch": "A loud, big-windowed Avenue B brunch spot where the draw is bottomless mimosas and sangria pitchers, refilled fast, more than the Spanish-leaning plates. The French toast and hash browns are the plates to order, and check drink prices before you commit, since the bill can run higher than the menu suggests.",
+    "perfect": "a boozy brunch that is about the drinks",
+    "insider": "The bottomless deal is worth it because refills actually arrive, and the French toast is the plate to get."
+  },
+  {
+    "id": "10fb2fff-6d4c-4f91-a0eb-2c721fb0eb87",
+    "name": "Populares Mexican Restaurant",
+    "pitch": "A modern, artsy Mexican spot on Avenue B that stays late, with spicy margaritas, mezcal chicken, warm churros, and a tres leches French toast at brunch. Service is sweet but slow on drinks, so settle in and order the next round early.",
+    "perfect": "a late dinner with good margaritas",
+    "insider": "Order the mezcal chicken, ask the bartender for a drink recommendation, and save room for the churros."
+  },
+  {
+    "id": "d3a207d2-2647-4118-9750-d3d1d4705622",
+    "name": "Pretty Ricky's",
+    "pitch": "A roomy Rivington Street neighborhood bar with photo-covered walls, a back room with windows open to the street, a big craft beer list, and one of the better happy hours in the area. The burger and oysters are solid, and the bartenders treat walk-ins like regulars.",
+    "perfect": "a cheap happy hour that does not feel cheap",
+    "insider": "Happy hour has an espresso martini on tap for seven dollars, and drinks can lag the food, so order a round early."
+  },
+  {
+    "id": "8cfa4fd9-af8b-4a1d-9ddc-8bee787d1fa3",
+    "name": "Proletariat",
+    "pitch": "A tiny, raucous craft beer bar on St Marks Place with a rare, rotating list on the wall, smaller pours so you can try more, and a knowledgeable bartender instead of table service. There is a vegan, British-leaning kitchen too, and the rarebit is the plate to get.",
+    "perfect": "beer nerds want something rare without a reservation",
+    "insider": "Ask for half pours to work through the list, and order the rarebit."
+  },
+  {
+    "id": "2468e1ae-2862-4376-8a19-b2e777f978af",
+    "name": "Punjabi",
+    "pitch": "The East Houston counter where cab drivers and locals have eaten for decades: pick two numbered vegetarian dishes from the steam table for about eight dollars, get them over rice, and eat standing up. It is homey, not oily, and very cheap, and the saag and the samosa chaat are the ones to pick.",
+    "perfect": "a cheap, fast, homecooked vegetarian lunch",
+    "insider": "Point at the numbers you want, confirm the price before you pay, and get the saag and the bread pakora."
+  },
+  {
+    "id": "cdba6df8-8764-44bd-a97f-2803e7074053",
+    "name": "Pylos ",
+    "pitch": "A snug, long 7th Street Greek room under a ceiling of hanging clay pots, where the grilled octopus, dolmades in lemon sauce, and sesame-crusted baked feta with marmalade are the dishes people dream about afterward. Tables are close and prices run above the usual Greek spot, so it works best as a date.",
+    "perfect": "a Greek date night with wine",
+    "insider": "Sit at the bar if you have no reservation, and order the octopus and the dolmades."
+  },
+  {
+    "id": "96077337-f1be-4bb1-8cfd-f183f8d036eb",
+    "name": "Rebel",
+    "pitch": "A rustic, intimate Haitian restaurant and lounge on Clinton Street with griyo, soup joumou, stewed goat, black rice, and cocktails strong enough to transport you. A DJ plays in the evenings, service is friendly if blunt, and a Wednesday walk-in is easy.",
+    "perfect": "you want real Haitian food and a late-night lounge",
+    "insider": "Order the griyo with a side of rice, the Creole wings, and the lemon drop martini from the bar."
+  },
+  {
+    "id": "87f52de7-bdc0-4211-bb12-7608ea23b06f",
+    "name": "Remedy",
+    "pitch": "A 24-hour East Houston diner that has outlived most of its kind, with huge portions, a sprawling menu, chicken and waffles, turkey bacon, a tuna melt, and a window seat on the street at three in the morning. Staff are warm but can rush you, and the weekend brunch is a fixed price with a drink included.",
+    "perfect": "you need breakfast at three in the morning",
+    "insider": "The rigatoni alla vodka and the French onion soup are the late-night orders, and the window tables face Houston."
+  },
+  {
+    "id": "a43ec63e-5edf-46ee-bfc3-58c07192a755",
+    "name": "Rosella",
+    "pitch": "An Avenue A sushi counter that sources locally and bends the rules, with a house soy sauce, inventive crudo, a fish sausage slider, and a carrot cake that gets mentioned alongside the omakase. Service is the kind that notices you over-ordered and says so, and sitting at the counter turns dinner into a show.",
+    "perfect": "a celebratory sushi dinner that is not traditional",
+    "insider": "Book the sushi counter, order the miso soup to start, and leave room for the carrot cake."
+  },
+  {
+    "id": "8bebf6c1-7c83-4253-8355-871d1c41a1e8",
+    "name": "Rosie's Mexican Restaurant ",
+    "pitch": "A big, bustling Mexican restaurant on 2nd Street where the hand-pressed tortillas are made from Oaxacan maize, the margaritas are some of the city's best, and the staff treat regulars and first-timers the same. Portions of rice and beans run small for the prices, so lean on happy hour and the tacos.",
+    "perfect": "a margarita-first group dinner on a weekend",
+    "insider": "Sit at the bar for happy hour, where the quesadilla is four dollars, and order the seasonal watermelon margarita."
+  },
+  {
+    "id": "655dd45f-8625-4d5c-b172-329b041de842",
+    "name": "Royale",
+    "pitch": "The Avenue C neighborhood bar and burger joint with a year-round patio, a well-made cocktail list, and a classic burger that regulars prefer to the smash version. It is quiet on a winter Monday and a Knicks-game madhouse in the spring, with a happy hour that holds either way.",
+    "perfect": "a patio burger and a cocktail, late",
+    "insider": "Order the classic Royale burger over the smash burger and let Maya or DJ mix your drink."
   }
 ]

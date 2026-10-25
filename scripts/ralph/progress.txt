@@ -366,3 +366,24 @@ Started: 2026-10-24
 - Files touched: `scripts/ralph/data/editorial.json`, `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
 - Validation: `node scripts/ralph/editorial-append.mjs /tmp/batch3a.json` -> `appended 32; editorial.json now has 138 of 313 review-context ids`. Coverage check over indexes 134 to 178: every index is either in `editorial.json` or in the skip list above (32 + 13 = 45). `git status --short` lists only `editorial.json`, not `review-context.json`.
 ---
+
+## 2026-10-24 - 3.5b
+- Wrote editorial copy for 33 places: review-context key indexes 179 through 223 (Motorino East Village through Royale, alphabetical), minus the 12 skipped below. `scripts/ralph/data/editorial.json` now has 171 entries. Next task (3.5c) starts at index 224 (`node /tmp/dump.js 224 247 > /tmp/dump_a.txt; node /tmp/dump.js 247 269 > /tmp/dump_b.txt`, then read both files with the Read tool; the inline tool result is too large for `cat`). The dump script is still at `/tmp/dump.js`; its source is in the 3.5 batch 1 entry.
+- Same workflow as 3.5a: `/tmp/batch3b.json` with `id`, `pitch`, `perfect`, `insider`; a `node -e` snippet fills `name` from `review-context.json` by id; then `node scripts/ralph/editorial-append.mjs /tmp/batch3b.json`. Passed the validator first try.
+- Skipped (no copy written) in indexes 179 to 223, for the user to confirm, rename, or delete. "No hours" means Google returned no opening hours at enrichment, which it does for permanently closed places:
+  - Ngam: has hours, but every 2026 visit names the restaurant Bánh Anh Em (Vietnamese) at 99 3rd Ave; the Thai restaurant has changed hands. Rename and re-enrich, or delete.
+  - Nomad: no hours; newest visit 2022-04 (suspected closed; verify).
+  - Nublu (62 Avenue C): no hours; the two 2026 visits describe the 151 Ave C room (stairs beside the stage, second bar on the loft), so this row looks like a stale duplicate of "Nublu (New One)", which got copy. Delete or merge.
+  - Oiji: no hours; a 2023-12 visit says it closed and moved to Oiji Mi (Flatiron).
+  - Paprika Italian Cuisine: no hours; visits 2011 to 2014.
+  - Pinks: has hours, but every visit describes Apollo Bagels, the open-faced bagel shop now at 242 E 10th St (7 AM to 5 PM); the bar is gone. Rename to Apollo Bagels, fix the tags (food, not Late-Night-Food) and it can get copy, or delete.
+  - Pouring Ribbons: no hours; newest visit 2020-02.
+  - Prime and Beyond: no hours; visits 2012 to 2016, 20 ratings total.
+  - Purple Ginger: empty address; no hours; visits 2012 to 2015.
+  - ReVision Lounge: no hours; all four 2026 visits are one- or two-out-of-five event bookings about the owner's conduct and a shooting outside; nothing to recommend from. Judgment call like Hawkers Thai; delete or override.
+  - Rizzos Fine Pizza: no hours; newest visit 2020-01 (suspected closed; verify).
+  - Root & Bone: no hours; newest visit 2022-03 (suspected closed; verify).
+- Other notes for the user: Populares has no hours and its newest visit is 2024-09 (copy written; verify it is open). Nai Tapas Bar, Pardon my French, PDT, Poco and Proletariat also have no hours but 2025 or 2026 visits, so copy was written. Nexus (12 1st Ave) is the basement lounge of One and One (76 E 1st St, same corner); copy describes it that way, so the two rows overlap on purpose. Nuyorican Poets Cafe's newest visit is 2023-10 but it has hours (Mon, Wed, Fri only), so copy was written. Omar's Kitchen, Rebel (Clinton St), Petite Boucherie (Christopher St), Pretty Ricky's (Rivington), Punjabi and Remedy (E Houston) are outside the East Village but got copy. Nowhere Bar (tip pressure, occasional cover), Phoenix (bartender), Pineapple Club (rushed at happy hour) and Paquito's (an allergy incident at the counter) have 2026 conduct complaints; the pitches note them in neutral terms.
+- Files touched: `scripts/ralph/data/editorial.json`, `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: `node scripts/ralph/editorial-append.mjs /tmp/batch3b.json` -> `appended 33; editorial.json now has 171 of 313 review-context ids`. Coverage check over indexes 179 to 223: every index is either in `editorial.json` or in the skip list above (33 + 12 = 45, 0 missing). `git status --short` lists only `editorial.json`, not `review-context.json`.
+---
