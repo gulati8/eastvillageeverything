@@ -107,7 +107,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: `curl -s -o /dev/null -w '%{http_code}' https://eastvillageeverything.nyc/privacy` prints 200 after deploy. Prefix: `feat(site)`.
 - [x] **5.3 Support page at `/support`.** Blocked by: 5.1. Contact email and a one-paragraph description.
   Done when: `curl -s -o /dev/null -w '%{http_code}' https://eastvillageeverything.nyc/support` prints 200. Prefix: `feat(site)`.
-- [ ] **5.4 Screenshots.** Blocked by: 4.3. Capture from the iOS Simulator (`xcrun simctl io booted screenshot`) on iPhone 17 Pro Max (6.9") and an iPhone with a 6.5" display, against prod data: list, detail, search, filters, saved. Save to `docs/app-store/screenshots/<size>/`.
+- [x] **5.4 Screenshots.** Blocked by: 4.3. Capture from the iOS Simulator (`xcrun simctl io booted screenshot`) on iPhone 17 Pro Max (6.9") and an iPhone with a 6.5" display, against prod data: list, detail, search, filters, saved. Save to `docs/app-store/screenshots/<size>/`.
   Done when: the files exist at the pixel sizes App Store Connect requires. Prefix: `docs(app-store)`.
 - [x] **5.5 Listing copy.** Write `docs/app-store/listing.md`: name, subtitle, description, keywords, category, age rating answers (4+), and the App Privacy questionnaire answers (Identifiers: Device ID, used for app functionality, not linked to identity, not used for tracking; Diagnostics: crash data, not linked).
   Done when: the file exists. Prefix: `docs(app-store)`.
