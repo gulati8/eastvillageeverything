@@ -85,8 +85,12 @@ Local prerequisites:
 - `SENTRY_AUTH_TOKEN` exported in the shell. The Xcode build uploads source maps and dSYMs to Sentry and fails without it. EAS stores the token as a secret for cloud builds, but secrets are never delivered to local builds, so export it yourself (the root `.env` holds it as `SENTRY_KEY`):
 
   ```bash
-  export SENTRY_AUTH_TOKEN=$(grep '^SENTRY_KEY=' ../../.env | cut -d= -f2-)
+  export SENTRY_AUTH_TOKEN="$(grep '^SENTRY_KEY=' ../../.env | cut -d= -f2- | sed -E 's/^"//; s/"$//')"
   ```
+
+  The value in `.env` is wrapped in double quotes; the `sed` strips them. A
+  quoted token is rejected by Sentry as `Invalid token`. Check with
+  `npx sentry-cli info` before a long build.
 
 ### Submit to App Store Connect
 
