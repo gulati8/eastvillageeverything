@@ -45,6 +45,10 @@ export interface Place {
   photo_hero_url?: string;
   photo_credit?: string;
   google_place_id?: string;
+  /** Google Places photo resource name (`places/<id>/photos/<ref>`), set by enrichment. */
+  google_photo_name?: string | null;
+  /** Display name of the Google photo's author, shown as attribution. */
+  google_photo_attribution?: string | null;
   hours_json?: HoursJson | null;
   google_price_level?: number;
   enrichment_status?: string;

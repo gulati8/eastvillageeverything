@@ -102,6 +102,7 @@ jobs:
           PG_PASS_B64=$(echo -n '${{ secrets.POSTGRES_PASSWORD }}' | base64 -w 0)
           SESSION_B64=$(echo -n '${{ secrets.SESSION_SECRET }}' | base64 -w 0)
           REDIS_PASS_B64=$(echo -n '${{ secrets.REDIS_PASSWORD }}' | base64 -w 0)
+          GOOGLE_KEY_B64=$(echo -n '${{ secrets.GOOGLE_PLACES_API_KEY }}' | base64 -w 0)
 
           # Send command to create directory, write files, and set up .env
           COMMAND_ID=$(aws ssm send-command \
@@ -116,7 +117,8 @@ jobs:
               \"SESSION=\$(echo '$SESSION_B64' | base64 -d) && echo \\\"SESSION_SECRET=\$SESSION\\\" | sudo tee -a /srv/eve/.env > /dev/null\",
               \"REDIS_PASS=\$(echo '$REDIS_PASS_B64' | base64 -d) && echo \\\"REDIS_PASSWORD=\$REDIS_PASS\\\" | sudo tee -a /srv/eve/.env > /dev/null\",
               \"echo \\\"CORS_ORIGINS=https://eastvillageeverything.nyc,https://www.eastvillageeverything.nyc\\\" | sudo tee -a /srv/eve/.env > /dev/null\",
-              \"echo \\\"NEXT_ADMIN_URL=https://eastvillageeverything.nyc/admin\\\" | sudo tee -a /srv/eve/.env > /dev/null\"
+              \"echo \\\"NEXT_ADMIN_URL=https://eastvillageeverything.nyc/admin\\\" | sudo tee -a /srv/eve/.env > /dev/null\",
+              \"GOOGLE_KEY=\$(echo '$GOOGLE_KEY_B64' | base64 -d) && echo \\\"GOOGLE_PLACES_API_KEY=\$GOOGLE_KEY\\\" | sudo tee -a /srv/eve/.env > /dev/null\"
             ]" \
             --query 'Command.CommandId' \
             --output text)

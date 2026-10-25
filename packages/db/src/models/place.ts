@@ -81,6 +81,7 @@ export class PlaceModel {
         p.photo_thumb_url, p.photo_hero_url,
         p.neighborhood_id,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
+        p.google_photo_name, p.google_photo_attribution,
         COALESCE(
           array_agg(t.value ORDER BY pt.sort_order, t.sort_order) FILTER (WHERE t.value IS NOT NULL),
           ARRAY[]::varchar[]
@@ -196,6 +197,7 @@ export class PlaceModel {
         p.photo_thumb_url, p.photo_hero_url,
         p.neighborhood_id,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
+        p.google_photo_name, p.google_photo_attribution,
         COALESCE(
           array_agg(t.value ORDER BY pt.sort_order, t.sort_order) FILTER (WHERE t.value IS NOT NULL),
           ARRAY[]::varchar[]

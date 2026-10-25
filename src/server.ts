@@ -3,27 +3,16 @@ import cors from 'cors';
 import path from 'path';
 import session from 'express-session';
 import RedisStore from 'connect-redis';
-import { Redis } from 'ioredis';
 import { csrfSync } from 'csrf-sync';
 import rateLimit from 'express-rate-limit';
 
-import apiRoutes from './routes/api.js';
+import { redisClient } from './redis.js';
+import apiRoutes, { isPhotoProxyPath } from './routes/api.js';
 import adminRoutes from './routes/admin.js';
 import publicRoutes from './routes/public.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// Redis client for sessions
-const redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-
-redisClient.on('error', (err) => {
-  console.error('Redis connection error:', err);
-});
-
-redisClient.on('connect', () => {
-  console.log('Connected to Redis');
-});
 
 // Trust proxy (required for secure cookies behind reverse proxy like Caddy)
 app.set('trust proxy', 1);
@@ -100,12 +89,15 @@ app.get('/health', (req, res) => {
 
 // Rate limiting for the public API. Mobile app + any other caller share the bucket.
 // Higher cap in dev to avoid tripping during Expo reload cycles.
+// The photo proxy (`/api/places/:id/photo`) is exempt here: a list screen loads
+// 20 thumbnails at once, so it has its own 600/min limiter in routes/api.ts.
 const apiLimiter = rateLimit({
   windowMs: 60_000, // 1 minute
   max: process.env.NODE_ENV === 'production' ? 100 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests' },
+  skip: (req) => isPhotoProxyPath(req.path),
 });
 app.use('/api', apiLimiter);
 

@@ -8,13 +8,20 @@
  *
  * Refresh mode:
  *   npx tsx scripts/enrich-places.ts --refresh
- *   Re-fetches hours, price and coordinates for places with a google_place_id that
- *   are stale (>7 days).
+ *   Re-fetches hours, price, coordinates and the Google photo reference for
+ *   places with a google_place_id that are stale (>7 days).
+ *
+ * Both modes also store the first Google photo's resource name and author
+ * attribution (`google_photo_name`, `google_photo_attribution`). The photo
+ * bytes are never stored; the API proxies them on demand.
  *
  * Flags:
  *   --limit N   Process at most N places (useful for testing against prod).
  *   --dry-run   Call Google as usual but write nothing to the database; each
  *               place logs the row it would have written instead.
+ *   --force     With --refresh: ignore the 7-day staleness window and refresh
+ *               every place that has a google_place_id (for example after a
+ *               new field such as the photo reference is added).
  *
  * Required environment variables:
  *   DATABASE_URL       — PostgreSQL connection string
@@ -42,6 +49,7 @@ if (!apiKey) {
 
 const isRefresh = process.argv.includes('--refresh');
 const isDryRun = process.argv.includes('--dry-run');
+const isForce = process.argv.includes('--force');
 
 /**
  * Parse `--limit N` (or `--limit=N`). Returns null when absent.
@@ -180,11 +188,15 @@ interface PlaceDetails {
   priceLevel: string | null;
   lat: number | null;
   lng: number | null;
+  /** Photo resource name, `places/<id>/photos/<ref>`, or null when Google has none. */
+  photoName: string | null;
+  /** Display name of the first photo's first author, for attribution. */
+  photoAttribution: string | null;
 }
 
 /**
- * Fetch regularOpeningHours, priceLevel and location for a given Google place_id.
- * Returns the raw fields or null on failure.
+ * Fetch regularOpeningHours, priceLevel, location and the first photo for a
+ * given Google place_id. Returns the raw fields or null on failure.
  */
 async function fetchPlaceDetails(
   googlePlaceId: string,
@@ -207,7 +219,7 @@ async function fetchPlaceDetails(
         signal: controller.signal,
         headers: {
           'X-Goog-Api-Key': apiKey as string,
-          'X-Goog-FieldMask': 'regularOpeningHours,priceLevel,location',
+          'X-Goog-FieldMask': 'regularOpeningHours,priceLevel,location,photos',
         },
       }
     );
@@ -223,6 +235,10 @@ async function fetchPlaceDetails(
       regularOpeningHours?: unknown;
       priceLevel?: string;
       location?: { latitude?: number; longitude?: number };
+      photos?: Array<{
+        name?: string;
+        authorAttributions?: Array<{ displayName?: string }>;
+      }>;
     };
 
     const lat = data.location?.latitude;
@@ -232,11 +248,17 @@ async function fetchPlaceDetails(
       console.error(`  Place Details: no location for "${placeName}" (${googlePlaceId})`);
     }
 
+    const firstPhoto = data.photos?.[0];
+    const photoName = typeof firstPhoto?.name === 'string' && firstPhoto.name.length > 0 ? firstPhoto.name : null;
+    const photoAttribution = firstPhoto?.authorAttributions?.[0]?.displayName?.trim() || null;
+
     return {
       regularOpeningHours: data.regularOpeningHours ?? null,
       priceLevel: data.priceLevel ?? null,
       lat: hasLocation ? lat : null,
       lng: hasLocation ? lng : null,
+      photoName,
+      photoAttribution,
     };
   } catch (err: unknown) {
     if (err instanceof Error && err.name === 'AbortError') {
@@ -267,6 +289,8 @@ function describeWrite(details: PlaceDetails): string {
     `hours_json=${details.regularOpeningHours ? `${periods} period(s)` : 'NULL'}, ` +
     `google_price_level=${toNumericPrice(details.priceLevel) ?? 'NULL'}, ` +
     `lat=${details.lat ?? 'NULL'}, lng=${details.lng ?? 'NULL'}, ` +
+    `google_photo_name=${details.photoName ?? 'NULL'}, ` +
+    `google_photo_attribution=${details.photoAttribution ?? 'NULL'}, ` +
     `enrichment_status=ok, enriched_at=NOW()`
   );
 }
@@ -287,15 +311,19 @@ async function markEnriched(
          google_price_level = $3,
          lat = COALESCE($4, lat),
          lng = COALESCE($5, lng),
+         google_photo_name = $6,
+         google_photo_attribution = $7,
          enrichment_status = 'ok',
          enriched_at = NOW()
-     WHERE id = $6`,
+     WHERE id = $8`,
     [
       googlePlaceId,
       details.regularOpeningHours ? JSON.stringify(details.regularOpeningHours) : null,
       toNumericPrice(details.priceLevel),
       details.lat,
       details.lng,
+      details.photoName,
+      details.photoAttribution,
       id,
     ]
   );
@@ -312,14 +340,18 @@ async function refreshEnriched(id: string, details: PlaceDetails): Promise<void>
          google_price_level = $2,
          lat = COALESCE($3, lat),
          lng = COALESCE($4, lng),
+         google_photo_name = $5,
+         google_photo_attribution = $6,
          enrichment_status = 'ok',
          enriched_at = NOW()
-     WHERE id = $5`,
+     WHERE id = $7`,
     [
       details.regularOpeningHours ? JSON.stringify(details.regularOpeningHours) : null,
       toNumericPrice(details.priceLevel),
       details.lat,
       details.lng,
+      details.photoName,
+      details.photoAttribution,
       id,
     ]
   );
@@ -391,7 +423,8 @@ async function runBackfill(): Promise<{
       await markEnriched(place.id, googlePlaceId, details);
       console.log(
         `  OK: ${googlePlaceId}` +
-          (details.lat !== null ? ` @ ${details.lat},${details.lng}` : ' (no location)')
+          (details.lat !== null ? ` @ ${details.lat},${details.lng}` : ' (no location)') +
+          (details.photoName ? ' +photo' : ' (no photo)')
       );
       ok++;
     } catch (err) {
@@ -414,13 +447,13 @@ async function runRefresh(): Promise<{
     `SELECT id, name, google_place_id
      FROM places
      WHERE google_place_id IS NOT NULL
-       AND (enriched_at IS NULL OR enriched_at < NOW() - INTERVAL '7 days')
+       ${isForce ? '' : "AND (enriched_at IS NULL OR enriched_at < NOW() - INTERVAL '7 days')"}
      ORDER BY enriched_at NULLS FIRST, name
      ${limit !== null ? `LIMIT ${limit}` : ''}`
   );
 
   const places = result.rows;
-  console.log(`Refresh: found ${places.length} stale place(s) to re-enrich`);
+  console.log(`Refresh: found ${places.length} ${isForce ? '' : 'stale '}place(s) to re-enrich`);
 
   let ok = 0;
   let failed = 0;
@@ -443,7 +476,8 @@ async function runRefresh(): Promise<{
       await refreshEnriched(place.id, details);
       console.log(
         `  OK` +
-          (details.lat !== null ? ` @ ${details.lat},${details.lng}` : ' (no location)')
+          (details.lat !== null ? ` @ ${details.lat},${details.lng}` : ' (no location)') +
+          (details.photoName ? ' +photo' : ' (no photo)')
       );
       ok++;
     } catch (err) {
@@ -463,6 +497,7 @@ async function runRefresh(): Promise<{
 async function main(): Promise<void> {
   console.log(
     `Mode: ${isRefresh ? 'refresh' : 'backfill'}` +
+      (isRefresh && isForce ? ' (force: ignoring staleness)' : '') +
       (limit !== null ? ` (limit ${limit})` : '') +
       (isDryRun ? ' [DRY RUN: no database writes]' : '')
   );
