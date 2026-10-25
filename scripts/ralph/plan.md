@@ -90,7 +90,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
 ## Phase 5: App Store listing
 
 - [x] **5.1 [HUMAN] Decide the support email** and write it in `progress.txt`. Used by 5.2, 5.3, and the listing.
-- [ ] **5.2 Privacy policy page at `/privacy`.** Blocked by: 5.1. On the Express public site, matching the existing site's look. Content: anonymous device ID sent with API requests; crash reports via Sentry including device model and OS version; saved places stored on device only; no accounts, no location, no ads, no third-party analytics. Contact email from 5.1.
+- [x] **5.2 Privacy policy page at `/privacy`.** Blocked by: 5.1. On the Express public site, matching the existing site's look. Content: anonymous device ID sent with API requests; crash reports via Sentry including device model and OS version; saved places stored on device only; no accounts, no location, no ads, no third-party analytics. Contact email from 5.1.
   Done when: `curl -s -o /dev/null -w '%{http_code}' https://eastvillageeverything.nyc/privacy` prints 200 after deploy. Prefix: `feat(site)`.
 - [ ] **5.3 Support page at `/support`.** Blocked by: 5.1. Contact email and a one-paragraph description.
   Done when: `curl -s -o /dev/null -w '%{http_code}' https://eastvillageeverything.nyc/support` prints 200. Prefix: `feat(site)`.
