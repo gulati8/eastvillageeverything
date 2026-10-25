@@ -536,3 +536,7 @@ Started: 2026-10-24
 - Validation: `node scripts/app-store-metadata.mjs` -> name 23/30, subtitle 30/30, promo 144/170, description 1851/4000, keywords 98/100, 10 screenshots copied. `fastlane deliver --skip_binary_upload --skip_app_version_update` -> exit 0. `verify_listing.rb` against App Store Connect -> app 6765464747, categories FOOD_AND_DRINK/TRAVEL, en-US name/subtitle/privacy URL set, version `1.0.0` state PREPARE_FOR_SUBMISSION, copyright `2026 Gulati Labs`, promo 144ch, description 1851ch, keywords as in listing.md, support and marketing URLs set, APP_IPHONE_65 and APP_IPHONE_67 each 5 screenshots in state COMPLETE. `curl` on /privacy and /support -> 200. No TypeScript changed, so no typecheck or test run.
 - Learnings (for 5.8): the human still has to enter App Review Information (contact name, phone, email, and the notes from `listing.md`), the App Privacy answers, age rating, pricing and availability. If a phone number is added as a `| Phone | `+1 ...` |` row in `listing.md`, the generator and deliver will set the review contact and notes on the next run. The `-x` of `deliver` prints the full option table including a masked `api_key`; the key content itself was never printed.
 ---
+
+## 2026-10-24 - 4.4
+- Device pass on the release candidate from TestFlight: user confirmed good. Ticked.
+---

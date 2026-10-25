@@ -99,7 +99,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: `npx expo-doctor` passes 18 of 18 checks and `npm test` passes. Prefix: `chore(mobile)`.
 - [x] **4.3 Release candidate build.** Blocked by: 1.6, 2.8, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11. Bump `ios.buildNumber`, export `SENTRY_AUTH_TOKEN` from root `.env` `SENTRY_KEY`, run `eas build --local --profile production --platform ios --output ./build-<n>.ipa`, then `eas submit --profile production --platform ios --path ./build-<n>.ipa`.
   Done when: EAS reports the submission accepted and the Sentry project has a new artifact bundle. Prefix: `chore(mobile)`.
-- [ ] **4.4 [HUMAN] Device pass on the release candidate.** Blocked by: 4.3. Install from TestFlight. Cold launch, offline launch (cached list shows), pull to refresh, search, tag filters, saved places persist across relaunch, detail screen for 10 places, phone and website links open.
+- [x] **4.4 [HUMAN] Device pass on the release candidate.** Blocked by: 4.3. Install from TestFlight. Cold launch, offline launch (cached list shows), pull to refresh, search, tag filters, saved places persist across relaunch, detail screen for 10 places, phone and website links open.
   Done when: all pass. Bugs go in `progress.txt` and become `fix(mobile)` tasks, then 4.3 repeats.
 
 ## Phase 5: App Store listing
