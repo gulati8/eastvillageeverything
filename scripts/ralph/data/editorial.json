@@ -1426,5 +1426,250 @@
     "pitch": "A whiskey bar on 2nd Ave with the bottles arranged by region, barrel-aged cocktails and better-than-pub food, including tots and a well-seasoned burger. The happy hour runs until 8 PM with three-dollar sliders and sidewalk seating, which is the cheapest good afternoon in the neighborhood.",
     "perfect": "you want whiskey, sliders and a sidewalk seat before eight.",
     "insider": "Happy hour until 8 PM gets you a six-dollar beer and three-dollar chicken or pork sliders."
+  },
+  {
+    "id": "acf3de1d-c581-434c-abe3-eaa66200d62e",
+    "name": "The Grafton",
+    "pitch": "An Irish pub that takes its sport seriously, with a proper pint of Guinness, a patio out back and bartenders who stay friendly when the room is packed. Drinks are not cheap and the patio shuts around 10, so claim a table inside before a big match.",
+    "perfect": "the rugby is on and you want a real pint.",
+    "insider": "Doors open at 9 on weekend mornings for early kickoffs, and a solo seat at the bar is the easiest way in."
+  },
+  {
+    "id": "c332a638-fb47-4469-9684-1324292c7496",
+    "name": "The Gray Mare",
+    "pitch": "A dark, wood-lined tavern on 2nd Ave where the lighting and the drinks do the heavy lifting and conversation still works at the bar. The kitchen is fine rather than memorable, so come for the long weekday happy hour and treat the food as a side quest.",
+    "perfect": "you want a dim bar where you can actually talk.",
+    "insider": "Happy hour runs weekdays from 3 to 8, and the calamari is big enough to split."
+  },
+  {
+    "id": "21c55bd3-6ca7-4e00-ba86-0da150ffc631",
+    "name": "The Hairy Lemon Sports Bar",
+    "pitch": "The Ave B sports pub that stays on its feet when a Knicks game fills every inch, with wings and shepherd's pie that hold up and bartenders who keep pouring. Bathrooms get rough late and you may get nudged to order quickly, but the energy on a big game night is hard to beat.",
+    "perfect": "the game matters and you want a loud room.",
+    "insider": "There is a side room you can book for a birthday, and the wings are the order."
+  },
+  {
+    "id": "00dd28ab-7175-413a-8c62-8fb149288420",
+    "name": "The Immigrant",
+    "pitch": "A candlelit sliver of an old tenement on 9th St with an eclectic wine list, generous pours and a charcuterie board built for two. Service runs hot and cold lately, with some nights warm and others brisk about turning tables, so go early on a weeknight and settle in at the bar.",
+    "perfect": "a second-date glass of wine by candlelight.",
+    "insider": "There are no reservations and the cocktail list is short, but the espresso martini is the one to order."
+  },
+  {
+    "id": "2f05c002-1216-4681-9f77-409625f06659",
+    "name": "The Izakaya",
+    "pitch": "A narrow 6th St izakaya that fries with a light hand, from silky agedashi tofu to chicken nanban, and the set menus for two or four take the ordering out of your hands. It leans rich and fried, and the bill climbs fast, so bring an appetite and someone to split it with.",
+    "perfect": "you want sake and small plates without decisions.",
+    "insider": "Order the addictive cabbage twice, and note it stays open until 2 on Thursdays."
+  },
+  {
+    "id": "b0f70ece-dfda-463b-a084-dbb14c187055",
+    "name": "The laurels",
+    "pitch": "A 2nd Ave bar and brunch spot where the servers carry the place, the sidewalk tables fill on summer nights, and drinks run cheap until 7 even on Fridays. The eggs are a gamble, so lean toward the crispy chicken sandwich, the French toast and the truffle fries.",
+    "perfect": "a sunny sidewalk table and a cheap early cocktail.",
+    "insider": "The booths are tiny, so ask for a regular table or sit outside."
+  },
+  {
+    "id": "b1dda5bc-dfc7-4136-bb3d-9c1b7707e317",
+    "name": "The Library",
+    "pitch": "A graffiti-covered dive on Ave A with B movies on the back wall, books on the shelves and a jukebox that leans alt. Beers are cheap and strong drinks are stronger, but the bartenders run the room their way, so arrive with the right attitude and tip up front.",
+    "perfect": "you want a cheap drink and a movie on the wall.",
+    "insider": "Grab a table in the back where the movies play, and skip the jukebox on a staff birthday night."
+  },
+  {
+    "id": "ce95de6c-5ddf-472b-a43b-245077b5cbf8",
+    "name": "The Mayfly",
+    "pitch": "A roomy Houston St bar that does bottomless brunch, dollar wings, trivia and a lot of private parties, with mac and cheese and a solid burger to soak it up. When a party takes over the back the noise and the wait climb, so for a quiet lunch check the room first and stick to beer.",
+    "perfect": "you need a bar that will host your whole group.",
+    "insider": "Party bookings get to run their own playlist, and there are no spending minimums."
+  },
+  {
+    "id": "4b7feb4b-d58d-40b2-94b6-c85787fe854d",
+    "name": "The Penny Farthing",
+    "pitch": "An exposed-brick 3rd Ave tavern that splits into a bar side and a dining side, with brunch that overdelivers and daily drink specials worth planning around. The door and the host can be inconsistent about who waits and who must order food for a table, so a reservation on busy nights saves friction.",
+    "perfect": "a cheap espresso martini on a Wednesday.",
+    "insider": "Five-dollar espresso martinis on Wednesdays and Aperol spritzes on Thursdays, both after 4."
+  },
+  {
+    "id": "7e2f9acc-36f3-40f6-aa3f-e543369a7344",
+    "name": "The Smith",
+    "pitch": "The big, busy 3rd Ave standby that gets the crowd-pleasers right, from the double burger and truffle mac to a warm pretzel with beer cheese that stalls the whole table. It fills up and the tables get tight, so book ahead and leave room for the sticky toffee pudding.",
+    "perfect": "a group dinner nobody will argue about.",
+    "insider": "The ricotta gnocchi runs small, so order two if it is your main, and there is a photo booth downstairs."
+  },
+  {
+    "id": "9967ed6a-2c4a-40d6-804f-21bd42a672d7",
+    "name": "The Spotted Owl Tavern",
+    "pitch": "A vintage-feeling Ave A bar with a pool table in the back that always has a game going and chess, backgammon and Yahtzee behind the counter if you ask. Bartenders can be curt on a bad night, so come early in the week when the room is calm and the table is open.",
+    "perfect": "a game of pool on a quiet Tuesday.",
+    "insider": "Ask the bartender for a board game, and expect the pool table to be contested Thursday through Saturday."
+  },
+  {
+    "id": "96550ac8-3e71-4f3c-816c-380f042bf5a9",
+    "name": "The Stone",
+    "pitch": "John Zorn's music-only room for experimental and avant-garde sets, where a different musician curates each month and every dollar at the door goes to the players. Expect folding chairs in tight rows, no food or drink and sets that start on time and finish by 10.",
+    "perfect": "you want to hear something you cannot name yet.",
+    "insider": "Tickets are $20, paid only at the door, and the shows wrap by 10 so you can go out afterward."
+  },
+  {
+    "id": "2a720026-2293-4f9c-91c4-d424037680b7",
+    "name": "The Summit Bar",
+    "pitch": "A warm, chandelier-lit cocktail bar on Ave C that doubles as a daytime cafe, with oysters at happy hour, a hummus platter people fixate on and a house dog who may join your table. The regulars are treated like family, and the staff mostly extend that to newcomers too.",
+    "perfect": "a quiet cocktail far enough east to feel secret.",
+    "insider": "Doors open at 9 in the morning Tuesday through Saturday, and the popcorn is a trap you will not regret."
+  },
+  {
+    "id": "20dbe681-feca-4627-9eaa-d5a9b020254e",
+    "name": "The Ten Bells",
+    "pitch": "A dark Broome St den for natural wine and Spanish-leaning tapas, with a dollar-oyster happy hour that runs on weekends too. Seating is first come, first served and nobody will explain that, so grab any open seat, check your bill, and order the steak tartare.",
+    "perfect": "a cheap oyster and a funky glass before dinner.",
+    "insider": "Happy hour runs on weekends too, and the mushroom croquetas and patatas bravas are the tapas to start with."
+  },
+  {
+    "id": "84fe0217-3ca5-4df9-8a29-3d25197be818",
+    "name": "The Wayland",
+    "pitch": "A rustic corner bar at the far end of 9th St where the Sazerac is dry and precise and the happy-hour oysters come small and briny. It is tight inside and the bar gets rowdy, so aim for the big bench by the window if you are more than two.",
+    "perfect": "a serious cocktail without a serious room.",
+    "insider": "The window bench by the piano is the only spot for a group, so reserve it for a 4:30 start."
+  },
+  {
+    "id": "c4e465d1-5007-49fb-9714-ad256c05b8d7",
+    "name": "The Winslow",
+    "pitch": "A gin-focused British pub on 14th St with a long list of martinis and tonics, a stage for live bands and a back room that handles 30 people without a fuss. Early evenings can be oddly strict about table service when a band is due, so for a casual group drink sit at the bar.",
+    "perfect": "you want a proper gin martini and a band later.",
+    "insider": "Book the Back Room for a party and you get your own bartender for the night."
+  },
+  {
+    "id": "32218721-9a23-450b-8917-5b2b3c30cce3",
+    "name": "The Wren",
+    "pitch": "A rustic Bowery barroom with sharp, fairly priced cocktails and hearty pub food that also does a strong weekend brunch of French toast and thick-cut bacon. Management keeps a tight hand on the room, so pace yourself if you want to stay for a second round.",
+    "perfect": "a late drink on the Bowery that still feels warm.",
+    "insider": "Walk-ins get squeezed in even near closing, but a reservation gets you a table rather than a standing spot at the bar."
+  },
+  {
+    "id": "f8d21f07-03e5-4d22-a664-cc589fcda3ed",
+    "name": "The York",
+    "pitch": "A small, friendly Ave B pub with a smashburger that outpunches its price and a happy-hour combo of burger, fries and a beer that is one of the best deals in the neighborhood. Order at the bar, grab whatever seat is free and do not skip the Caesar or the brussels sprouts.",
+    "perfect": "you want a great cheap burger and a stiff drink.",
+    "insider": "The happy-hour combo comes with Tecate or Coors, and the breakfast sandwich is quietly better than the burger."
+  },
+  {
+    "id": "2a3ffd2a-d78e-41d5-b54e-052623ca195a",
+    "name": "Tile Bar",
+    "pitch": "A tiny corner dive on 1st Ave with a jukebox, a cheap happy hour and a crowd that skews older and local. The bartenders set the terms, which lately means one tab for a big group and no patience for questions, so keep it small and quiet and you will be fine.",
+    "perfect": "you want a cheap beer with no scene at all.",
+    "insider": "Groups are made to run a single tab, so bring two friends, not eight."
+  },
+  {
+    "id": "07910dfb-af3a-4891-87fa-78c0321828f0",
+    "name": "Tre",
+    "pitch": "A small Ludlow St Italian spot known for a Thursday night deal of three courses and two hours of unlimited wine at a price that includes the tip. The pastas swing from very good to gloopy depending on the night, so stick to the carbonara and the spicy sausage vodka pasta and book ahead.",
+    "perfect": "a long, boozy dinner on a budget.",
+    "insider": "Walk-ins can usually land two seats at the bar, and the bruschetta is the appetizer to split."
+  },
+  {
+    "id": "61d1e7f0-b080-430a-9e15-eb98eb99badf",
+    "name": "Tuome",
+    "pitch": "Chef Chen's 5th St dining room does inventive Asian-leaning cooking, with snow crab noodles, scallop dumplings and a lamb that regulars still talk about. The prix fixe weeks draw mixed feelings and the courses lean fried, so order from the regular menu and start with the Tom Yum tomatoes.",
+    "perfect": "a celebration dinner that still feels downtown.",
+    "insider": "Closed Sunday and Monday, and the beignets are the dessert people remember."
+  },
+  {
+    "id": "0239580f-607d-47ef-a6d6-9de042aa4744",
+    "name": "Two Perrys",
+    "pitch": "A warm little Ave C bar run by its owners, where the cocktails are built with care and the burger has a quiet reputation as one of the city's best. It is only open Wednesday through Saturday, and the hospitality is the kind that makes you plan your week around it.",
+    "perfect": "you want the owners to pour your drink.",
+    "insider": "Only open Wednesday through Saturday from 5, so check the day before you walk over."
+  },
+  {
+    "id": "0651d26d-4a06-4303-ad75-e1bf87862ba9",
+    "name": "Upstate",
+    "pitch": "A tiny 1st Ave oyster bar where the fish comes in daily with no freezer in sight and the oysters are the reason to go. Six oysters and a draft for $13 from 5 to 7 fills the room by half past, so book or arrive right at opening.",
+    "perfect": "oysters and a beer before a real dinner.",
+    "insider": "Happy hour is chef's choice, three East Coast and three West Coast, and a little slice of cake arrives with the check."
+  },
+  {
+    "id": "3242fa07-cbb7-41c2-a0ea-e8b98d61db5a",
+    "name": "Verlaines",
+    "pitch": "A Rivington St lounge that has run on lychee martinis for two decades, still cheap at happy hour and still packed by 8 on a Wednesday. The room is leafy and dim and takes groups of any size, but the deal is strong enough to sneak up on you.",
+    "perfect": "a cheap, sweet martini to start a night out.",
+    "insider": "Happy hour runs 5 to 10 and the bar fills around 7, so come early if you are more than three."
+  },
+  {
+    "id": "3816512a-dd79-49bd-9d0d-6a017f63495f",
+    "name": "Vin Sur Vingt Wine Bar",
+    "pitch": "A small French wine bar on 2nd Ave where the staff speak French, know the list cold and steer you to a glass without any fuss. Warm light, good music and tartines of the day make it easy to stay for one more.",
+    "perfect": "an unhurried glass of French wine on a weeknight.",
+    "insider": "Ask for the tartine of the day, and in winter the mulled wine is the move."
+  },
+  {
+    "id": "f9052ee4-c55b-4d9f-9f4d-af72018d959e",
+    "name": "Webster Hall",
+    "pitch": "The 1886 ballroom on 11th St that is still the neighborhood's big concert room, with multiple levels, several bars and security that keeps crowd surfers in check. Lines run long and cold and the door is strict on ID, so bring a passport if your license is from abroad.",
+    "perfect": "the band you love is playing a big room.",
+    "insider": "If the line is long, the hotel across the street has a clean public bathroom downstairs."
+  },
+  {
+    "id": "a870f119-ad15-435d-b232-fd848d46ab23",
+    "name": "Westville",
+    "pitch": "The Ave A branch of the vegetable-forward neighborhood standby, where a market plate of four sides is a full meal and the specials board is worth reading. Service is friendly and the bill splits easily for a group, though the kitchen has slipped on fish once or twice lately.",
+    "perfect": "you want vegetables that feel like a treat.",
+    "insider": "Build a market plate with the yucca fries and the kale, and weekend brunch runs until 4."
+  },
+  {
+    "id": "3778f41c-1df6-4225-b6d4-0ed35f77b236",
+    "name": "Whiskey Town",
+    "pitch": "A small 3rd St party bar with DJs, a disco ball, pop hits and a staff that goes all out when you book a birthday. It is more dance floor than whiskey library despite the name, so come to move, not to sip.",
+    "perfect": "a birthday that needs a disco ball.",
+    "insider": "Themed nights like the Harry Styles party are the draw, and a cold Monday late is when the regulars come out."
+  },
+  {
+    "id": "34e60e4c-8770-4c4f-8910-735f01116c93",
+    "name": "Whitmans",
+    "pitch": "A small 9th St burger counter known for the Juicy Lucy, a patty stuffed with pimiento cheese, plus a crisp smash burger and hand-cut fries. The fried pickles are strange at first and then impossible to stop eating, and there are games downstairs while you wait.",
+    "perfect": "a cheese-stuffed burger on a casual night.",
+    "insider": "A lettuce wrap is available off menu, and the loaded tots beat the sweet potato fries."
+  },
+  {
+    "id": "c1d1d8e0-433e-4e97-8987-c7b3bab7f66d",
+    "name": "Winebar ",
+    "pitch": "A speakeasy-feeling Japanese wine bar on 1st Ave where a DJ spins records and the natural-wine list rotates often. The kitchen does chicken karaage, a katsu sando and udon, and they have dropped beer entirely, so budget around $40 a head and come for the wine.",
+    "perfect": "wine, vinyl and a katsu sando on a Tuesday.",
+    "insider": "Open Tuesday through Saturday from 6 to 11, and the sofas are the seats to claim for a group."
+  },
+  {
+    "id": "5d0d8b12-5342-46fd-bbe2-2cc5360b4ab6",
+    "name": "Wonderland Bar",
+    "pitch": "A whimsical 2nd Ave cocktail bar where you might be seated inside a birdcage of flowers and the drinks arrive with a bit of theater. The Asian-leaning bar snacks like chicken skewers and pork dumplings are better than they need to be, and the music stays at a level where you can still talk.",
+    "perfect": "a date that wants a little theater with the drinks.",
+    "insider": "Ask for the birdcage table, and the Paper Plane comes with a surprise to start."
+  },
+  {
+    "id": "e9304bbe-9316-4011-b5c8-b95c1c0c3a22",
+    "name": "Yellow Rose Tex Mex",
+    "pitch": "San Antonians run this 3rd Ave Tex-Mex room, and the queso, skillet cornbread and homemade tortillas are what to come for. The tacos and mole divide people sharply and the acoustics are rough, so sit at the bar, keep it to snacks and margaritas, and enjoy the service.",
+    "perfect": "queso and a margarita at the bar.",
+    "insider": "They host Spurs watch parties, and the lemon-filled donut is the dessert to finish on."
+  },
+  {
+    "id": "2b77a0e1-69d1-49e9-a6d3-da597a3f1c93",
+    "name": "Yubu",
+    "pitch": "A bright 7th St counter for yubu, fried tofu pockets stuffed with sushi rice and toppings like torched salmon, spicy tuna or bulgogi, at three for $10. It is a light lunch rather than a feast, with three vegan options and a mango matcha latte that earns its price.",
+    "perfect": "a quick, cheap lunch that is not a sandwich.",
+    "insider": "There is no restroom for guests, and a set of eight for $25 is the best value if you are two."
+  },
+  {
+    "id": "8a0b1100-a66d-4d85-b190-fd75015e7e1b",
+    "name": "Yuca Bar",
+    "pitch": "A long-running Ave A corner spot with open windows, Pan-Latin small plates and a happy hour that makes the cocktails cheap. The ceviches are the strength and the guacamole is the weak spot, and on late Thursdays the room gets too packed to reach the bar.",
+    "perfect": "a happy-hour cocktail by an open window on Ave A.",
+    "insider": "Shots are not part of happy hour, so stick to the $9 cocktails and the ceviche."
+  },
+  {
+    "id": "03a3404c-af90-4aea-82bf-0eb462d6497d",
+    "name": "Zerza Moroccan Kitchen",
+    "pitch": "A Moroccan counter inside Essex Market doing tagines, couscous and stuffed pita sandwiches with generous portions and a hug of a welcome. The chicken tagine has gone bland lately, so lean toward the lamb, the beef pita or the chicken tfaya and finish with mint tea.",
+    "perfect": "a big, cheap lunch while wandering Essex Market.",
+    "insider": "The stewed beef pita and the eggplant spread are the counter's best, and it closes at 8 most nights, 6 on Sundays."
   }
 ]
