@@ -24,7 +24,7 @@ import { PlaceRow } from '../components/PlaceRow';
 import { SearchBar } from '../components/SearchBar';
 import { FilterRail } from '../components/FilterRail';
 import { FilterSheet } from '../components/FilterSheet';
-import { TabBar, type TabKey } from '../components/TabBar';
+import { TabBar, TAB_BAR_CLEARANCE, type TabKey } from '../components/TabBar';
 import { EveListSkeleton } from '../components/EveListSkeleton';
 import { EmptyState } from '../components/EmptyState';
 import { ErrorState } from '../components/ErrorState';
@@ -185,9 +185,7 @@ export function PlaceList() {
   );
 
   const handleTabPress = useCallback((tab: TabKey) => {
-    if (tab === 'home' || tab === 'saved') {
-      setActiveTab(tab);
-    }
+    setActiveTab(tab);
   }, []);
 
   // ---------------------------------------------------------------------------
@@ -342,7 +340,7 @@ export function PlaceList() {
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
             }
-            contentContainerStyle={styles.listContent}
+            contentContainerStyle={[styles.listContent, { paddingBottom: TAB_BAR_CLEARANCE + insets.bottom }]}
             showsVerticalScrollIndicator={false}
           />
         )}
@@ -438,6 +436,5 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 22,
     paddingTop: 2,
-    paddingBottom: 128,
   },
 });

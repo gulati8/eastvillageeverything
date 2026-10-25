@@ -1,144 +1,132 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useTheme } from '../theme/useTheme';
+import { BookmarkIcon } from '../icons/BookmarkIcon';
 
-export type TabKey = 'home' | 'saved' | 'map' | 'you';
+export type TabKey = 'home' | 'saved';
 
 export interface TabBarProps {
   activeTab?: TabKey;
   onTabPress?: (tab: TabKey) => void;
 }
 
-const TAB_HEIGHT = 76;
+/** Outer height of the floating capsule. */
+export const CAPSULE_HEIGHT = 56;
+/** Gap between the capsule and the bottom safe-area edge. */
+export const CAPSULE_LIFT = 12;
+/** Inset between the capsule edge and the active pill / segments. */
+const SEGMENT_INSET = 4;
+const ICON_SIZE = 20;
+const ICON_STROKE = 2.4;
+const SLIDE_MS = 220;
+
+/**
+ * Bottom padding a scrolling list needs (before adding `insets.bottom`) so its
+ * last row scrolls clear of the capsule with some breathing room.
+ */
+export const TAB_BAR_CLEARANCE = CAPSULE_HEIGHT + CAPSULE_LIFT + 24;
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'home', label: 'Home' },
   { key: 'saved', label: 'Saved' },
-  { key: 'map', label: 'Map' },
-  { key: 'you', label: 'You' },
 ];
 
-function TabIcon({ tab, color }: { tab: TabKey; color: string }) {
-  const common = {
-    stroke: color,
-    strokeWidth: 1.9,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-  };
-
+function HomeIcon({ color }: { color: string }) {
   return (
-    <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-      {tab === 'home' && (
-        <Path d="M4 10.75L12 4.5L20 10.75V19.25H15.25V14H8.75V19.25H4V10.75Z" {...common} />
-      )}
-      {tab === 'saved' && (
-        <Path d="M7 4.75C7 4.33579 7.33579 4 7.75 4H16.25C16.6642 4 17 4.33579 17 4.75V19L12 15.75L7 19V4.75Z" {...common} />
-      )}
-      {tab === 'map' && (
-        <>
-          <Path d="M4.5 6.75L9.5 4.75L14.5 6.75L19.5 4.75V17.25L14.5 19.25L9.5 17.25L4.5 19.25V6.75Z" {...common} />
-          <Path d="M9.5 4.75V17.25M14.5 6.75V19.25" {...common} />
-        </>
-      )}
-      {tab === 'you' && (
-        <>
-          <Circle cx={12} cy={8} r={3.25} {...common} />
-          <Path d="M5.75 19.25C6.55 16.45 8.65 15 12 15C15.35 15 17.45 16.45 18.25 19.25" {...common} />
-        </>
-      )}
+    <Svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M4 10.75L12 4.5L20 10.75V19.25H15.25V14H8.75V19.25H4V10.75Z"
+        stroke={color}
+        strokeWidth={ICON_STROKE}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </Svg>
   );
+}
+
+function TabIcon({ tab, color, active }: { tab: TabKey; color: string; active: boolean }) {
+  if (tab === 'saved') {
+    return <BookmarkIcon color={color} size={ICON_SIZE} filled={active} strokeWidth={ICON_STROKE} />;
+  }
+  return <HomeIcon color={color} />;
 }
 
 export function TabBar({ activeTab = 'home', onTabPress }: TabBarProps) {
   const { colors, isDark, typography } = useTheme();
   const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
 
-  const totalHeight = TAB_HEIGHT + insets.bottom;
-  const blurTint = isDark ? 'dark' : 'light';
+  const capsuleWidth = Math.round((windowWidth * 2) / 3);
+  const segmentWidth = (capsuleWidth - SEGMENT_INSET * 2) / TABS.length;
+  const activeIndex = Math.max(0, TABS.findIndex((t) => t.key === activeTab));
 
-  const fallbackBg = colors.paper + 'FA';
+  const pillStyle = useAnimatedStyle(
+    () => ({
+      transform: [{ translateX: withTiming(activeIndex * segmentWidth, { duration: SLIDE_MS }) }],
+    }),
+    [activeIndex, segmentWidth],
+  );
 
   return (
     <View
       style={[
-        styles.container,
+        styles.capsule,
         {
-          height: totalHeight,
-          borderTopColor: colors.line,
-          backgroundColor: colors.paper,
+          width: capsuleWidth,
+          bottom: insets.bottom + CAPSULE_LIFT,
+          backgroundColor: colors.paper + 'E6',
+          shadowColor: isDark ? '#000000' : colors.ink,
         },
       ]}
-      pointerEvents="box-none"
+      testID="tab-bar"
     >
-      {/* Blur background layer */}
-      <BlurView
-        tint={blurTint}
-        intensity={12}
-        style={StyleSheet.absoluteFill}
-      />
+      {/* Clipped backdrop: blur + hairline border, rounded to the capsule */}
       <View
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: fallbackBg },
-        ]}
+        style={[styles.clip, { borderColor: colors.line }]}
         pointerEvents="none"
-      />
-
-      {/* Tab row */}
-      <View
-        style={[
-          styles.row,
-          {
-            paddingTop: 8,
-            paddingHorizontal: 22,
-            paddingBottom: insets.bottom + 2,
-          },
-        ]}
       >
+        <BlurView tint={isDark ? 'dark' : 'light'} intensity={12} style={StyleSheet.absoluteFill} />
+      </View>
+
+      <View style={styles.row}>
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.pill,
+            { width: segmentWidth, backgroundColor: colors.ink },
+            pillStyle,
+          ]}
+        />
+
         {TABS.map(({ key, label }) => {
           const isActive = key === activeTab;
-          const labelColor = isActive ? colors.ink : colors.ink3;
-          const iconColor = isActive ? colors.ink : colors.ink3;
-
-          const tabContent = (
-            <>
-              <TabIcon tab={key} color={iconColor} />
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    fontFamily: typography.ui600.fontFamily,
-                    color: labelColor,
-                  },
-                ]}
-                numberOfLines={1}
-              >
-                {label}
-              </Text>
-            </>
-          );
-
-          if (key === activeTab && onTabPress == null) {
-            return (
-              <View key={key} style={styles.tab}>
-                {tabContent}
-              </View>
-            );
-          }
+          const tint = isActive ? colors.paper : colors.ink3;
 
           return (
             <Pressable
               key={key}
               onPress={() => onTabPress?.(key)}
-              style={styles.tab}
+              style={styles.segment}
               accessibilityRole="tab"
+              accessibilityLabel={label}
               accessibilityState={{ selected: isActive }}
+              testID={`tab-${key}`}
             >
-              {tabContent}
+              <TabIcon tab={key} color={tint} active={isActive} />
+              <Text
+                style={[
+                  styles.label,
+                  { fontFamily: typography.ui600.fontFamily, color: tint },
+                ]}
+                numberOfLines={1}
+              >
+                {label}
+              </Text>
             </Pressable>
           );
         })}
@@ -148,27 +136,45 @@ export function TabBar({ activeTab = 'home', onTabPress }: TabBarProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  capsule: {
     position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderTopWidth: 1,
+    alignSelf: 'center',
+    height: CAPSULE_HEIGHT,
+    borderRadius: 999,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  clip: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
   },
   row: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    padding: SEGMENT_INSET,
   },
-  tab: {
+  pill: {
+    position: 'absolute',
+    top: SEGMENT_INSET,
+    left: SEGMENT_INSET,
+    height: CAPSULE_HEIGHT - SEGMENT_INSET * 2,
+    borderRadius: 999,
+  },
+  segment: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 999,
   },
   label: {
-    fontSize: 11,
-    lineHeight: 14,
+    fontSize: 13,
+    lineHeight: 16,
+    letterSpacing: 0.3,
   },
 });
