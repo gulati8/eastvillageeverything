@@ -1,0 +1,47 @@
+# fastlane deliver configuration for the iOS app (App Store Connect listing).
+#
+# Metadata and screenshots are generated, not edited here:
+#   node scripts/app-store-metadata.mjs        # from the repo root; reads docs/app-store/listing.md
+#
+# Upload the listing for version 1.0.0 without touching the binary (run from apps/mobile):
+#   set -a; source ../../.env; set +a         # ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH
+#   fastlane deliver --skip_binary_upload --skip_app_version_update
+#
+# The App Store Connect API key never lives in the repo; the three ASC_* vars
+# come from the root .env (task 5.6 in scripts/ralph/plan.md).
+
+app_identifier "com.eastvillageeverything.app"
+app_version "1.0.0"
+platform "ios"
+
+api_key({
+  key_id: ENV.fetch("ASC_KEY_ID"),
+  issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+  filepath: File.expand_path(ENV.fetch("ASC_KEY_PATH")),
+  in_house: false
+})
+
+metadata_path "./fastlane/metadata"
+screenshots_path "./fastlane/screenshots"
+overwrite_screenshots true
+
+# No HTML preview prompt; the run is non-interactive.
+force true
+
+# This config only syncs the listing. Submission is a human step (6.1).
+submit_for_review false
+run_precheck_before_submit false
+
+# fastlane 2.241.1 workaround. UploadMetadata#review_attachment_file calls
+# version.fetch_app_store_review_detail unguarded and dies with "No data" when
+# the version has no App Review contact yet (ours is entered by hand because
+# App Store Connect requires a phone number, see docs/app-store/listing.md).
+# Only the no-attachment, no-record case is skipped; everything else re-raises.
+Deliver::UploadMetadata.prepend(Module.new do
+  def review_attachment_file(version)
+    super
+  rescue RuntimeError => e
+    raise unless e.message == "No data" && options[:app_review_attachment_file].nil?
+    FastlaneCore::UI.message("No App Review contact on App Store Connect yet; skipping the review attachment step")
+  end
+end)

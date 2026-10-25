@@ -2,8 +2,11 @@
 
 Source of truth for the App Store Connect listing of the iOS app in
 `apps/mobile/` (bundle id `com.eastvillageeverything.app`, ASC app id
-`6765464747`, version 1.0.0). Task 5.7 generates the fastlane `metadata/en-US/`
-tree from this file; task 5.8 copies the questionnaire answers by hand.
+`6765464747`, version 1.0.0). `node scripts/app-store-metadata.mjs` generates
+the fastlane `apps/mobile/fastlane/metadata/` tree and the screenshot folder
+from this file (it reads the fenced blocks, the URLs table, the Category
+bullets and the Review contact table, so keep their shape); task 5.8 copies
+the questionnaire answers by hand.
 
 Every claim below is checked against the app as built. If a feature changes,
 update this file in the same commit.
@@ -43,7 +46,7 @@ Every bar in the East Village in one list. Happy hours, pool tables, trivia, liv
 them.
 
 ```
-East Village Everything is a guide to the bars and late-night spots of the East Village, Manhattan. Over 350 places in one list, with the details that matter when you're already out: where the happy hour is still going, who has a pool table or a dart board, where there's trivia tonight, and what's open late.
+East Village Everything is a guide to the bars and late-night spots of the East Village, Manhattan. Over 300 places in one list, with the details that matter when you're already out: where the happy hour is still going, who has a pool table or a dart board, where there's trivia tonight, and what's open late.
 
 BROWSE AND SEARCH
 Scroll the whole neighborhood or search by name. Each place shows its address, hours, phone number, website and tags, plus the current specials and our notes on what it's good for.
@@ -73,8 +76,9 @@ About 1,900 of 4000 characters.
 
 Facts the description relies on, and where they come from:
 
-- Over 350 places: 352 rows in the production `places` table (progress.txt,
-  "before 0.1").
+- Over 300 places: 313 rows in the production `places` table after the 3.3
+  duplicate and closed-place cleanup (`GET /api/places` returns 313; 225 of
+  them have hours).
 - Tag names: the production `GET /api/tags` response. Spelled as the tags
   display, not as the slugs.
 - Open now, closes in, live music tonight, late close: `src/signals/signal.ts`
@@ -100,9 +104,8 @@ Facts the description relies on, and where they come from:
 - Privacy and support URLs: tasks 5.2 and 5.3. Both must be live before this
   description is uploaded.
 
-Do not mention a map. The tab bar shows Map and You tabs, but
-`handleTabPress` in `src/screens/PlaceList.tsx` ignores both; only Home and
-Saved switch. Reviewers tap every tab. See the review notes below.
+Do not mention a map. Since 3.11 the tab bar has only Home and Saved
+(`src/components/TabBar.tsx`); there is no map screen.
 
 ## Keywords
 
@@ -132,8 +135,8 @@ neighborhood guide and most visitors to the East Village are not residents.
 | Marketing URL | `https://eastvillageeverything.nyc` | live |
 | Copyright | `2026 Gulati Labs` | `app.json` owner `gulati_labs` |
 
-Support email: see task 5.1 in `scripts/ralph/plan.md`; not decided yet. Add
-it here when it is.
+Support email: `amit@gulatilabs.me` (task 5.1). It is on the support page and
+in the review contact below.
 
 ## Age rating
 
@@ -225,20 +228,28 @@ Identifiers, Diagnostics." No "Data Used to Track You" section.
 
 ## Review notes
 
-Paste into App Review Information > Notes. There is no login, so leave the
-demo account fields blank.
+Goes in App Review Information > Notes. There is no login, so the demo
+account fields stay blank.
 
 ```
 East Village Everything is a read-only directory of bars and restaurants in the East Village neighborhood of Manhattan. No account is needed; all content loads from our public API at https://eastvillageeverything.nyc/api/places. The app sends a random per-install identifier so we can rate-limit and debug; it is not linked to any person. Crash reports go to Sentry.
 
-The tab bar has four tabs. Home and Saved work. Map and You are visible but not yet active in 1.0; tapping them does nothing. They will be enabled in a later release.
-
 The age rating answers Infrequent or Mild for alcohol references because the app lists bars and their happy hours. It does not sell or deliver alcohol.
 ```
 
-Disclosing the inactive tabs up front is cheaper than a "placeholder content"
-rejection under Guideline 2.1. If the Map and You tabs are hidden before the
-release build, delete that paragraph.
+The 1.0 build has two tabs, Home and Saved, and both work, so there is no
+placeholder content to disclose.
+
+### Review contact
+
+App Review Information > Contact Information. The phone number is not in
+this file; add it in App Store Connect (task 5.8).
+
+| Field | Value |
+| --- | --- |
+| First name | `Amit` |
+| Last name | `Gulati` |
+| Email | `amit@gulatilabs.me` |
 
 ## What's New (version 1.0.0)
 
@@ -246,9 +257,11 @@ release build, delete that paragraph.
 First release.
 ```
 
-## Open items from other tasks
+## Inputs from other tasks
 
-- 5.1: support email. Add to the URLs section and to the support page.
-- 5.2, 5.3: privacy and support pages must return 200 before upload.
+All in place as of 5.7:
+
+- 5.1: support email `amit@gulatilabs.me`.
+- 5.2, 5.3: `/privacy` and `/support` return 200 on production.
 - 5.4: screenshots, 6.9" and 6.5" sets, under `docs/app-store/screenshots/`.
-- 2.7: hours and coordinates must be live or the "open now" copy is false.
+- 2.7: hours are live on 225 of 313 places, so the "open now" copy holds.

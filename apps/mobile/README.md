@@ -100,6 +100,20 @@ eas submit --profile production --platform ios --path apps/mobile/build-<buildNu
 
 The first run interactively prompts for App Store Connect auth (Apple ID + 2FA, or an ASC API key). EAS caches the credential for future runs, so subsequent submits can run non-interactively.
 
+### App Store listing (metadata and screenshots)
+
+The listing copy lives in `docs/app-store/listing.md` and the screenshots in `docs/app-store/screenshots/`. Neither is edited in App Store Connect by hand; regenerate the fastlane inputs and upload with `fastlane deliver` (Homebrew `fastlane`, config in `fastlane/Deliverfile`):
+
+```bash
+# from the repo root
+node scripts/app-store-metadata.mjs            # writes apps/mobile/fastlane/metadata and screenshots/
+cd apps/mobile
+export ASC_KEY_ID=... ASC_ISSUER_ID=... ASC_KEY_PATH=...   # from the root .env (never commit these)
+fastlane deliver --skip_binary_upload --skip_app_version_update
+```
+
+`fastlane/verify_listing.rb` prints what App Store Connect currently holds. App Review contact and notes are entered by hand in App Store Connect because the API requires a phone number that is not kept in the repo; the generator emits `metadata/review_information/` only once a `Phone` row exists in `listing.md`.
+
 ### TestFlight internal testers
 
 Internal testers live in the `Team (Expo)` group in App Store Connect. The `submit.production.ios.groups` field in `eas.json` references this group exactly so future submits auto-attach the new build. The group itself must be created manually in App Store Connect once. Add testers to it via TestFlight → Internal Testing → `Team (Expo)` → + Testers.

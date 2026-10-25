@@ -115,7 +115,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: the file exists. Prefix: `docs(app-store)`.
 - [x] **5.6 [HUMAN] Create an App Store Connect API key for fastlane.** App Store Connect > Users and Access > Integrations > App Store Connect API > generate a key with the App Manager role. Download the `.p8` once. Save it outside the repo (for example `~/.appstoreconnect/AuthKey_<KEYID>.p8`) and put `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_PATH` in the root `.env`.
   Done when: the three vars are in `.env`.
-- [ ] **5.7 Upload metadata and screenshots with fastlane deliver.** Blocked by: 5.2, 5.3, 5.4, 5.5, 5.6. Add `apps/mobile/fastlane/` with a `Deliverfile` and a `metadata/en-US/` tree generated from `listing.md`, plus the screenshots. Run `fastlane deliver --skip_binary_upload --skip_app_version_update` using the key from 5.6. Set privacy policy URL and support URL.
+- [x] **5.7 Upload metadata and screenshots with fastlane deliver.** Blocked by: 5.2, 5.3, 5.4, 5.5, 5.6. Add `apps/mobile/fastlane/` with a `Deliverfile` and a `metadata/en-US/` tree generated from `listing.md`, plus the screenshots. Run `fastlane deliver --skip_binary_upload --skip_app_version_update` using the key from 5.6. Set privacy policy URL and support URL.
   Done when: App Store Connect shows the copy, URLs, and screenshots on version 1.0.0. Prefix: `feat(app-store)`.
 - [ ] **5.8 [HUMAN] Finish the parts fastlane cannot set.** Blocked by: 5.7. App Privacy questionnaire answers (from `listing.md`), age rating, pricing (free), availability, and the EU Digital Services Act trader question under Business > Compliance.
   Done when: App Store Connect shows the version as ready to submit with no missing-item warnings.
