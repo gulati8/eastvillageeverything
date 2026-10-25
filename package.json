@@ -36,7 +36,8 @@
     "enrich:refresh": "tsx scripts/enrich-places.ts --refresh",
     "enrich:dry-run": "tsx scripts/enrich-places.ts --dry-run",
     "report:content": "tsx scripts/content-report.ts",
-    "review-context": "tsx scripts/pull-review-context.ts"
+    "review-context": "tsx scripts/pull-review-context.ts",
+    "load-editorial": "tsx scripts/load-editorial.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1043.0",
