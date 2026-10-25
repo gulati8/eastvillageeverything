@@ -15,6 +15,7 @@ import { ApiError } from '../api/errors';
 import { formatPhone } from '../format/phone';
 import { transformPlace } from '../data/transformPlace';
 import { PhotoFallback } from '../components/PhotoFallback';
+import { PhotoAttribution } from '../components/PhotoAttribution';
 import { Skeleton } from '../components/Skeleton';
 import { BookmarkIcon } from '../icons/BookmarkIcon';
 import { useTheme } from '../theme/useTheme';
@@ -165,6 +166,8 @@ export function PlaceDetail({ id }: { id: string }) {
             ) : null}
           </View>
         </View>
+
+        <PhotoAttribution attribution={place.photoAttribution} style={styles.photoAttribution} />
 
         <View style={styles.contentArea}>
           {specials ? (
@@ -336,6 +339,10 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     marginTop: -4,
     fontWeight: '500',
+  },
+  photoAttribution: {
+    marginTop: 10,
+    paddingHorizontal: 22,
   },
   contentArea: {
     paddingHorizontal: 22,

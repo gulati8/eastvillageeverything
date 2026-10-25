@@ -30,6 +30,8 @@ export interface PlaceV2Display {
   /** Detail hero image: photo_hero_url, falling back to photo_url. */
   photoHero: string | null;
   photoCredit: string | null;
+  /** Google photo author shown as "Photo: <name>" under the detail hero; null for admin uploads. */
+  photoAttribution: string | null;
   specials: string | null;
   notes: string | null;
   pitch: string | null;

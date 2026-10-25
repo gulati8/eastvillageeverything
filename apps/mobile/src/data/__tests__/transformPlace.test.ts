@@ -5,7 +5,7 @@ jest.mock('@eve/shared-types', () => ({
   EVE_TIMEZONE: 'America/New_York',
 }));
 
-import type { HoursJson, PlaceResponse } from '@eve/shared-types';
+import type { HoursJson, PlaceDetailResponse, PlaceResponse } from '@eve/shared-types';
 import { todayHoursLabel, transformPlace } from '../transformPlace';
 
 // ---------------------------------------------------------------------------
@@ -132,6 +132,17 @@ describe('transformPlace', () => {
 
     it('maps photo_credit to photoCredit', () => {
       expect(transformPlace(makePlaceResponse({ photo_credit: 'Amit' })).photoCredit).toBe('Amit');
+    });
+
+    it('maps photo_attribution (detail response) to photoAttribution', () => {
+      const detail: PlaceDetailResponse = { ...makePlaceResponse(), photo_attribution: 'Jane Doe' };
+      expect(transformPlace(detail).photoAttribution).toBe('Jane Doe');
+    });
+
+    it('sets photoAttribution to null when the field is null, blank, or absent (list row)', () => {
+      expect(transformPlace({ ...makePlaceResponse(), photo_attribution: null }).photoAttribution).toBeNull();
+      expect(transformPlace({ ...makePlaceResponse(), photo_attribution: '  ' }).photoAttribution).toBeNull();
+      expect(transformPlace(makePlaceResponse()).photoAttribution).toBeNull();
     });
 
     it('maps specials', () => {

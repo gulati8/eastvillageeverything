@@ -1,4 +1,4 @@
-import type { HoursJson, PlaceResponse } from '@eve/shared-types';
+import type { HoursJson, PlaceDetailResponse, PlaceResponse } from '@eve/shared-types';
 import { getETWeekday } from '../signals/hours';
 import type { HoursSummary, PlaceV2Display } from './placeV2Display';
 
@@ -45,7 +45,12 @@ function summarizeHours(p: PlaceResponse): HoursSummary | null {
   };
 }
 
-export function transformPlace(p: PlaceResponse): PlaceV2Display {
+/**
+ * Accepts a list row (PlaceResponse) or a detail response; `photo_attribution`
+ * only exists on the latter, so list-seeded detail renders have it null until
+ * the detail fetch lands.
+ */
+export function transformPlace(p: PlaceResponse | PlaceDetailResponse): PlaceV2Display {
   const tags = Array.isArray(p.tags) ? p.tags : [];
 
   return {
@@ -62,6 +67,7 @@ export function transformPlace(p: PlaceResponse): PlaceV2Display {
     photoThumb: firstPhoto(p.photo_thumb_url, p.photo_url),
     photoHero: firstPhoto(p.photo_hero_url, p.photo_url),
     photoCredit: p.photo_credit ?? null,
+    photoAttribution: normalizeString('photo_attribution' in p ? p.photo_attribution : null),
     specials: p.specials ?? null,
     notes: p.notes ?? null,
     pitch: p.pitch ?? null,

@@ -13,6 +13,7 @@ const place = (tags: string[]): PlaceV2Display => ({
   photoThumb: null,
   photoHero: null,
   photoCredit: null,
+  photoAttribution: null,
   specials: null,
   notes: null,
   pitch: null,
