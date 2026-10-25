@@ -540,3 +540,7 @@ Started: 2026-10-24
 ## 2026-10-24 - 4.4
 - Device pass on the release candidate from TestFlight: user confirmed good. Ticked.
 ---
+
+## 2026-10-25 - 5.8
+- App Store Connect done through Chrome: App Privacy published (Device ID, Crash Data, Performance Data; each App Functionality, not linked, not tracking; label reads "Data Not Linked to You: Identifiers, Diagnostics"). Age rating questionnaire saved, calculated 13+ (alcohol references Infrequent, everything else None/No). Price $0.00 in 175 regions; availability all 175 regions on release. DSA: already set to non-trader, active. Ticked.
+---

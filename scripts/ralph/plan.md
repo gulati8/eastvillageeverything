@@ -117,7 +117,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
   Done when: the three vars are in `.env`.
 - [x] **5.7 Upload metadata and screenshots with fastlane deliver.** Blocked by: 5.2, 5.3, 5.4, 5.5, 5.6. Add `apps/mobile/fastlane/` with a `Deliverfile` and a `metadata/en-US/` tree generated from `listing.md`, plus the screenshots. Run `fastlane deliver --skip_binary_upload --skip_app_version_update` using the key from 5.6. Set privacy policy URL and support URL.
   Done when: App Store Connect shows the copy, URLs, and screenshots on version 1.0.0. Prefix: `feat(app-store)`.
-- [ ] **5.8 [HUMAN] Finish the parts fastlane cannot set.** Blocked by: 5.7. App Privacy questionnaire answers (from `listing.md`), age rating, pricing (free), availability, and the EU Digital Services Act trader question under Business > Compliance.
+- [x] **5.8 [HUMAN] Finish the parts fastlane cannot set.** Blocked by: 5.7. App Privacy questionnaire answers (from `listing.md`), age rating, pricing (free), availability, and the EU Digital Services Act trader question under Business > Compliance.
   Done when: App Store Connect shows the version as ready to submit with no missing-item warnings.
 
 ## Phase 6: submit
