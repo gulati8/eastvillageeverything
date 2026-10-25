@@ -122,7 +122,7 @@ Today `STORAGE_BACKEND` is `local` on prod with no volume, and the admin runs in
 
 ## Phase 6: submit
 
-- [ ] **6.1 [HUMAN] Select the release candidate build and submit for review** in App Store Connect. Blocked by: 3.12, 4.4, 5.8. Choose manual release.
+- [ ] **6.1 [HUMAN] Select the release candidate build and submit for review** in App Store Connect. Blocked by: 4.4, 5.8. Choose manual release.
 - [ ] **6.2 Watch review.** Blocked by: 6.1. If rejected, add the rejection reason as a task under the relevant phase in this file and resolve it.
   Done when: status is Pending Developer Release.
 - [ ] **6.3 [HUMAN] Release.** Blocked by: 6.2.
