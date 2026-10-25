@@ -344,3 +344,25 @@ Started: 2026-10-24
 - Files touched: `scripts/ralph/data/editorial.json`, `scripts/ralph/progress.txt`.
 - Validation: `node scripts/ralph/editorial-append.mjs /tmp/batch2.json` -> `appended 54; editorial.json now has 106 of 313 review-context ids`. Done when count check: editorial 106 vs 313 - 16 (batch 1 skips) - 12 (batch 2 skips) = 285, so the box stays unticked; every entry has all three fields non-empty. `git status` does not list `review-context.json`.
 ---
+
+## 2026-10-24 - 3.5a
+- Wrote editorial copy for 32 places: review-context key indexes 134 through 178 (Kazuza through Motel No tell, alphabetical), minus the 13 skipped below. `scripts/ralph/data/editorial.json` now has 138 entries. Next task (3.5b) starts at index 179 (`node /tmp/dump.js 179 202 > /tmp/dump_a.txt; node /tmp/dump.js 202 224 > /tmp/dump_b.txt`, then read both files; two dumps of ~22 places each are about 230 lines apiece and read fine). The dump script is still at `/tmp/dump.js`; its source is in the 3.5 batch 1 entry.
+- Same workflow as batch 2: `/tmp/batch3a.json` with `id`, `pitch`, `perfect`, `insider`; a `node -e` snippet fills `name` from `review-context.json` by id; then `node scripts/ralph/editorial-append.mjs /tmp/batch3a.json`. Passed the validator first try.
+- Skipped (no copy written) in indexes 134 to 178, for the user to confirm, rename, or delete. "No hours" means Google returned no opening hours at enrichment, which it does for permanently closed places:
+  - Klimat Lounge: has hours, but every recent visit (2026) is a booked private party and all of them call it "B Lounge"; it now operates as a private event venue under another name, so there is no walk-in recommendation to write. Judgment call; override if you want it listed as a party venue.
+  - Kobo by Nai Mediterranean Restaurant and Bar: no hours; newest of 55 ratings is 2024-02 (suspected closed; verify, this is just past the stale-review cutoff).
+  - Kyo Ya: no hours; newest review 2019-04.
+  - L'Apicio: Google matched a coworking space (one 2016 review); the restaurant is gone.
+  - L'asso: row address is 192 Mott St (Nolita) and Google matched the Asian noodle-bowl place now at that address, not the pizzeria; changed hands.
+  - Lamias Fish Market: no hours; newest review 2023-11 (suspected closed; verify).
+  - Lois: no hours; newest review 2020-09.
+  - Lost City Oyster House: no hours; newest review 2020-04, and the reviews call it "the Lost Lady".
+  - Luzzo's Group: all 2026 reviews describe Olio e Più East Village (one calls it "this new location"); the pizzeria at 211 1st Ave has changed hands. Rename the row to Olio e Più and re-enrich, or delete.
+  - Mark: Google matched a "Building" at 33 St Marks Pl with no reviews, no hours, no rating; nothing to ground copy in (the row name is probably truncated).
+  - Matilda: has hours, but the 2026 reviews name the restaurant Fiaschetteria Pistoia, which now occupies 647 E 11th St; changed hands. Rename and re-enrich, or delete.
+  - Milk Bar East Village: no hours; reviews are 2018 to 2021 plus one generic 2024-06 write-up about the brand; the 251 E 13th St shop appears closed.
+  - Momofuku Milk Bar: duplicate of the row above (same address, 251 E 13th St); Google matched Momofuku Noodle Bar (ramen, pork buns, open kitchen) at 171 1st Ave, so the stored place id, hours and coordinates on this row are Noodle Bar's. Either rename the row to Momofuku Noodle Bar with the 1st Ave address and it can get copy, or delete it.
+- Other notes for the user: Lei Bar's Google match is Niagara (same corner, 112 Ave A); the copy describes the tiki room under Niagara. Lobby Bar @ Bowery Hotel matched the hotel itself; copy is written for the lobby bar from the one cocktails-only visit plus atmosphere notes. Mace (W 8th St), Le French Diner (Orchard), Marshall Stack (Rivington) and Mercury Lounge (E Houston) are outside the East Village but got copy. Kelly's Sports Bar, Lei Bar, Lucy's, Maiden Lane, Mona's and Kazuza all have 2026 complaints about staff conduct, tip pressure, or the door, including discrimination allegations at Kazuza, Lei Bar and Mona's; the pitches note brusque service or a regulars-first door in neutral terms and do not repeat the allegations. Lydia's is described as the Ohio State bar on game days, from the newest review. Mona's bluegrass night is Sunday in the newest (2026-06) review and Monday in a 2025 one; the insider uses Sunday.
+- Files touched: `scripts/ralph/data/editorial.json`, `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
+- Validation: `node scripts/ralph/editorial-append.mjs /tmp/batch3a.json` -> `appended 32; editorial.json now has 138 of 313 review-context ids`. Coverage check over indexes 134 to 178: every index is either in `editorial.json` or in the skip list above (32 + 13 = 45). `git status --short` lists only `editorial.json`, not `review-context.json`.
+---

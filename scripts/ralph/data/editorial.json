@@ -740,5 +740,229 @@
     "pitch": "A relaxed Greek spot on the Bowery with a lounge up front, big portions and classic plates: hummus with a proper herb hit, a chicken gyro platter, grilled octopus with lemon potatoes. It is quiet early in the evening, which makes it a comfortable pre-show dinner.",
     "perfect": "an unhurried Greek dinner before a Bowery show",
     "insider": "Start with the spinach pie and the hummus; the portions are big enough that two mezze and one grill plate feeds two."
+  },
+  {
+    "id": "c965a284-ca54-4ffe-9daf-890485292506",
+    "pitch": "A hookah lounge on Avenue A where the music runs loud and late, with hummus and Middle Eastern plates to keep the table going. Service is warm when the room is slow, but ask about hookah and drink prices up front because the bill climbs fast.",
+    "perfect": "you want hookah and loud music until 4 AM.",
+    "insider": "Order the Love 66 hookah with mint and come on a Thursday for the dancehall sets.",
+    "name": "Kazuza"
+  },
+  {
+    "id": "6e96683b-58ce-4f4b-82c7-64dc407f28e9",
+    "pitch": "A plain Irish sports bar at the bottom of Avenue A, heavy on hockey, Guinness, and Irish crisps, with a pool table in the basement. The bartenders can be brusque and the room shows its age, so treat it as a game-day stop rather than a night out.",
+    "perfect": "the Rangers are on and you need a stool.",
+    "insider": "The pool table is downstairs by the bathrooms and still takes quarters.",
+    "name": "Kelly's Sports Bar"
+  },
+  {
+    "id": "e864e94b-7b27-4d63-ae17-13789307768f",
+    "pitch": "The 14th Street KFC is the fried chicken you can get at 2 in the morning, and that is the whole case for it. Counter staff are friendly enough but the kitchen is hot and harried, so check your box before you walk out.",
+    "perfect": "it is 1 AM and only a drumstick will do.",
+    "insider": "Order at the counter instead of online, where the sauces and drinks tend to get forgotten.",
+    "name": "KFC"
+  },
+  {
+    "id": "8930d5aa-2e33-4e03-820a-4ac09241238f",
+    "pitch": "Three floors of Soviet kitsch on East 4th, with a theater downstairs, a red-curtained bar in the middle, and a louder, younger room up top. No cover, strong martinis around $17, and a crowd that skews a little older and a lot more literary than St Marks.",
+    "perfect": "you want a reading, a martini, and red velvet.",
+    "insider": "The theater on the ground floor charges about $20 for a show, but the bars upstairs have no cover.",
+    "name": "KGB"
+  },
+  {
+    "id": "e64e14c0-3a0a-4cc7-8409-a5fce58ffd0d",
+    "pitch": "A 30-year-old lounge at 1st and 1st with DJs on the weekends, a long happy hour, and bartenders who remember you after one visit. It gets very loud once the music starts, so come to dance or to sink into the couches in back, not to talk.",
+    "perfect": "you want a cheap drink and a dance floor.",
+    "insider": "There is no kitchen, but you can bring your own food in, so order a pizza nearby and carry it over.",
+    "name": "La Linea"
+  },
+  {
+    "id": "d7a6dbd6-504b-49c7-90c6-4c7edd46a334",
+    "pitch": "A roomy, colorful cantina on St Marks that is bigger inside than it looks, with fresh guacamole, strong salsas, and frozen margaritas in hibiscus and passionfruit. Bottomless brunch pours on the weaker side, so go for the food and the happy hour margs instead.",
+    "perfect": "a group needs margaritas and a table without a wait.",
+    "insider": "Marquita Tuesday is the night regulars show up for, and the chicken torta with red sauce is the sleeper order.",
+    "name": "La Palapa "
+  },
+  {
+    "id": "6c9f5501-793d-4e88-9cc0-2f94981cf492",
+    "pitch": "A plush, dimly lit vegan spot behind a small red door on 7th Street, where bao bun trios, kimchi mac and cheese, and corn ribs land as well with meat eaters as with vegans. Weekend brunch adds chilaquiles and chocolate chip pancakes, and the room fills by noon.",
+    "perfect": "a vegetarian friend deserves the romantic table.",
+    "insider": "Look for the small red door; the signage is easy to miss, and brunch walk-ins of three were seated without a wait.",
+    "name": "Ladybird"
+  },
+  {
+    "id": "4282d26b-8c42-4518-a89a-f4cb6848ba79",
+    "pitch": "A decades-old Tuscan trattoria on a quiet block of East 4th, with rigatoni cooked properly al dente, a wood-fired pizza, and servers who have been there forever. Portions are sized so two people can share a few plates, and it stays far from the St Marks crush.",
+    "perfect": "you want pasta on a block nobody wanders down.",
+    "insider": "The focaccia that arrives unasked is charged per person, so wave it off if you do not want it.",
+    "name": "Lavagna"
+  },
+  {
+    "id": "59b3044d-8a96-45e4-b6b6-5a696f27b2ec",
+    "pitch": "A tiny counter bistro on Orchard where the whole kitchen is in front of you and almost every seat is a date. The grilled octopus, hanger steak with gratin, and chickpea pancake are the orders, and the room is loud and tight in the best way.",
+    "perfect": "two of you want Paris without a reservation.",
+    "insider": "Get in line around 4:45 on a weekend for the 5:30 open; later arrivals leave a number and get called back.",
+    "name": "Le French Diner"
+  },
+  {
+    "id": "237433b0-8bc7-4368-af38-1b88440c931d",
+    "pitch": "The tiki room under Niagara on the corner of 7th and A, with a dance floor, a photo booth, and a happy hour that runs until 8. The music and the crowd are the draw; the bartenders can be curt about ordering and tipping, so keep a round going.",
+    "perfect": "you want to dance on Avenue A before midnight.",
+    "insider": "The photo booth in back takes $10, and you are expected to keep ordering if you hold a table.",
+    "name": "Lei Bar"
+  },
+  {
+    "id": "4e031eed-3276-41af-9f56-3a6a7d30a694",
+    "pitch": "A warm saloon on 3rd Ave that doubles as the neighborhood's party room, with a long beer list, sliders people go back for thirds of, and sidewalk tables with their own TVs. Entrees run past $20, but the 4 to 8 happy hour brings wine and mixed drinks down to about $8.",
+    "perfect": "a big game and a sidewalk seat line up.",
+    "insider": "The sidewalk seating has TVs, so you can watch the game outside, and the staff will drag over extra chairs.",
+    "name": "Linen Hall"
+  },
+  {
+    "id": "6a4572b9-11d9-4cba-aa1c-7a569e83117c",
+    "pitch": "A friendly bar on 2nd Ave with a Victorian-meets-mugshots look, a $7 cocktail of the week, and a kitchen that takes its truffle fries and chicken sandwich seriously. The servers and bartenders are the reason people come back, so sit at the bar and talk.",
+    "perfect": "happy hour with coworkers needs real food too.",
+    "insider": "The cocktail of the week is $7, and the semi-private room upstairs takes groups of 35 or so.",
+    "name": "Little Rebel"
+  },
+  {
+    "id": "f569afed-5da0-414d-94ed-ba1984d31afc",
+    "pitch": "The Bowery Hotel's lobby is a wood-paneled, candlelit living room where the cocktails are impeccable and the people-watching includes the occasional celebrity. Service treats a walk-in drinker like a guest, and the outdoor lounge is the place to be when the weather allows.",
+    "perfect": "you want one expensive, perfect cocktail in old New York.",
+    "insider": "Come for a couple of cocktails in the lobby; you do not need a room key to sit down.",
+    "name": "Lobby Bar @ Bowery Hotel"
+  },
+  {
+    "id": "a1bb6d85-fa79-411d-bc0c-ce8dbf971554",
+    "pitch": "A low-lit cocktail bar on 7th Street with a few connected rooms, a speakeasy feel, and drinks like the floral Astral Plane and the smooth Handsome Devil. Weekends it packs with a college-age crowd and seats vanish, so come early or midweek.",
+    "perfect": "you want cocktails underground before the crowd arrives.",
+    "insider": "Happy hour is 5 to 7, which is also the only window with seats; after 10 on weekends expect a wait and a strict door.",
+    "name": "Lovers of Today"
+  },
+  {
+    "id": "138a021e-e25f-43f3-ace2-56d2f568d5db",
+    "pitch": "A classic, cramped French bistro at 1st and 1st that has been doing steak frites, escargots, and profiteroles the same way for decades. Tables sit elbow to elbow and service can stretch when it is full, which is most nights, so book ahead.",
+    "perfect": "you want steak au poivre at midnight.",
+    "insider": "Book a table; the bar is too tight to wait at comfortably, and skip the tarte tatin for the profiteroles.",
+    "name": "Lucien"
+  },
+  {
+    "id": "625157a2-90c0-4c94-b57f-3003ede7d45b",
+    "pitch": "A ten-year-old dive across from Tompkins Square with cheap beer-and-shot combos, a good jukebox, and a backyard with a swing. The bartenders are quick and friendly, and a burger and fries will run you under $20, which is rare on this block.",
+    "perfect": "you want a backyard beer across from the park.",
+    "insider": "Grab the swing on the back patio during happy hour; bar seats are tight, and lingering without ordering is frowned on.",
+    "name": "Lucky"
+  },
+  {
+    "id": "4e63905a-7eeb-42f0-a327-3de0f03b940c",
+    "pitch": "Lucy's is the Avenue A dive with the pool tables, the jukebox, and a name that has meant something on this block for decades. Lately the door and the bartenders have a reputation for favoring regulars, so arrive easygoing and do not expect a warm welcome.",
+    "perfect": "you want pool and a jukebox, not conversation.",
+    "insider": "The pool tables are the reason to come, but they are sometimes locked, so ask before you settle in.",
+    "name": "Lucys"
+  },
+  {
+    "id": "e51eca66-ae39-4277-ac82-44b7065228b1",
+    "pitch": "A roomy sports bar on 1st Ave with TVs wrapped around the back room, a pool table, a photo booth, and a real menu of oversized burgers and wings. On fall Saturdays it is the Ohio State bar in Manhattan, so plan around that if scarlet is not your color.",
+    "perfect": "your group wants a game, wings, and elbow room.",
+    "insider": "Tuesday trivia comes with two snacks for $15 and $8 happy hour drinks; the snacks are full meals.",
+    "name": "Lydia's"
+  },
+  {
+    "id": "b266a90c-1388-4e5c-804b-e86aea2fffe8",
+    "pitch": "A small brick-walled cocktail bar off 6th Ave where every drink is built around a spice, from the bourbon-based Vanilla to a savory gin Basil with tomato notes. Happy hour brings $12 cocktails and $2 oysters, but the oysters can take a while, so order them first.",
+    "perfect": "you want a cocktail menu that reads like a spice rack.",
+    "insider": "Order the oysters the moment you sit down at happy hour, and ask for the namesake Mace cocktail.",
+    "name": "Mace"
+  },
+  {
+    "id": "16843ac0-6896-42a3-a15c-8e724f2aff1c",
+    "pitch": "A minimalist bar facing Tompkins Square that serves tinned fish, perfectly toasted bread, and cheap beer, with trivia, karaoke, and watch parties through the week. Bring the dog and sit outside, and be ready for a tip screen that starts at 20 percent.",
+    "perfect": "you want tinned fish and a park-facing seat.",
+    "insider": "Order a tin, the bread, and a spiked coconut water for the outside tables on a summer afternoon.",
+    "name": "Maiden Lane"
+  },
+  {
+    "id": "19e1e540-075d-4cdc-ac88-8aa6bea63590",
+    "pitch": "A no-frills Avenue B dive with Buck Hunter, trivia nights, a good playlist, and bartenders who improvise cocktails when the back bar runs short. It is the kind of place you come for one and stay through the game.",
+    "perfect": "you want trivia and a pickleback without pretense.",
+    "insider": "Trivia night hands the losing team a free shot, and the bartenders will build you a cocktail off-menu.",
+    "name": "Mama's Bar"
+  },
+  {
+    "id": "db2fcb34-995f-4c55-b50a-ebdf1b791b0b",
+    "pitch": "A laid-back Rivington corner bar that has lasted 20 years on good taps, rock on the jukebox, and clean bathrooms. It is beer and wine with a few sakes and a solid non-alcoholic beer, and it is quiet enough on weeknights to read a book at the bar.",
+    "perfect": "you want a serious beer list and no scene.",
+    "insider": "The happy hour pours a Firestone Walker for about $6, and the little sake cartons are worth a look.",
+    "name": "Marshall Stack"
+  },
+  {
+    "id": "94bbd29f-d916-4660-8d19-417dd51facb2",
+    "pitch": "A lively French spot on St Marks with a terrace, live singers who move from Mexican to Greek standards, and a room that ends up dancing. The food holds up, with a proper chicken cordon bleu, onion soup, mussels, and a French toast worth a brunch trip.",
+    "perfect": "dinner should turn into singing and plate-breaking.",
+    "insider": "The DJ comes on after 10:45 and the bar packs out, so book dinner early if you want to hear yourself.",
+    "name": "MARY LOUS"
+  },
+  {
+    "id": "8035f803-571e-4c1c-aa25-d9a02b8efe71",
+    "pitch": "A dark, gothic little mezcal bar on 6th Street with flights, a long list of smoky cocktails, and an owner who takes care of the room. Non-drinkers get a real mango margarita without the booze, and the upstairs nook is where you want to be on a cold night.",
+    "perfect": "you want a mezcal flight in candlelight.",
+    "insider": "Ask for the upstairs nook, and come on a weekend when the live music is playing.",
+    "name": "Mayamezcal"
+  },
+  {
+    "id": "49ddc64c-7fde-4606-8a86-69929b8fa805",
+    "pitch": "Southern Thai cooking on 1st Street that is salt-forward, herb-heavy, and properly spicy, with a cocktail list that keeps up. Minced pork with a crispy egg, massaman with roti, and the raw marinated shrimp are the orders, and dinner lands around $30 a head.",
+    "perfect": "you want Thai food that does not pull punches.",
+    "insider": "Order the kra prow with the fried egg on top and the roti with curry; portions run small, so get extra.",
+    "name": "MayRee "
+  },
+  {
+    "id": "939aa06a-95f5-429e-aaeb-e52d08c6f3d3",
+    "pitch": "The oldest saloon in the neighborhood still pours exactly two things, light ale and dark ale, two mugs at a time onto a sawdust floor. It is packed with tourists and regulars alike, the food is a burger and a hot dog, and none of that matters.",
+    "perfect": "someone visiting needs to see old New York.",
+    "insider": "Cash only, and ordering a round means two small mugs per person; try the dark.",
+    "name": "McSorley's Old Ale House"
+  },
+  {
+    "id": "02dae682-2dac-4d0f-8d0b-ffabf0847e6e",
+    "pitch": "A small standing-room venue on Houston that has broken in indie bands since the nineties, with a sound system much better than the size suggests. There is a bar up front, benches along the walls, and no food, so eat first and get there for the opener.",
+    "perfect": "you want to be ten feet from the band.",
+    "insider": "Stand right up front; it is not too loud even there, and the back fills early on sold-out nights.",
+    "name": "Mercury Lounge"
+  },
+  {
+    "id": "6e1202b8-388b-4593-96cb-0188c677f48a",
+    "pitch": "A bright Jamaican beach shack on Avenue A with fall-off-the-bone jerk chicken, coconut rice and peas, caramelized plantains, and a rum punch that hits harder than it tastes. Weekend DJs play dancehall and reggae, and the happy hour drops cocktails to about $8.",
+    "perfect": "you want jerk chicken and a rum punch outside.",
+    "insider": "Come for happy hour and get the plantains and oxtail spring rolls; the cod fritters divide people.",
+    "name": "Miss Lilies 7A Cafe"
+  },
+  {
+    "id": "d75e2e82-2e6b-4492-8e9c-8bb800204f56",
+    "pitch": "A playful, tiled cocktail bar on 1st Ave with drinks named like jokes, from a frozen Painkiller to a matcha McFloozy, plus dumplings and crispy rice to soak them up. The staff are fast and upbeat, and happy hour runs every night they are open.",
+    "perfect": "you want cocktails that are fun on purpose.",
+    "insider": "Order the cosmo and the French fries, and hit the happy hour, which runs every night they are open.",
+    "name": "Mister Paradise"
+  },
+  {
+    "id": "27d24896-2c75-48e0-9917-2c883a667030",
+    "pitch": "A long, narrow Alphabet City dive with a pool table in the back room, Skee-Ball, a good Guinness pour, and live bluegrass and jazz that are far better than a bar this cheap should have. The staff are busy and no-frills, and they expect a tip on every round.",
+    "perfect": "you want live bluegrass and a cheap pint.",
+    "insider": "The bluegrass jam starts at 9 on Sunday nights and jazz takes Tuesdays at 9; the pool table is through the back room.",
+    "name": "Mona's"
+  },
+  {
+    "id": "3c6782b4-caaa-4fc9-96ae-56ea595a9640",
+    "pitch": "A Korean fried chicken spot on 4th Street dressed like a jazz library, with a wall of records spinning overhead and flowers everywhere. The wings, cabbage pancake, and crispy chicken rolls are the safe orders; the galbi jjim and porridge have let people down for the price.",
+    "perfect": "the table cares as much about the room as the food.",
+    "insider": "Stick to the wings and the baechu jeon, and ask for a seat near the record wall.",
+    "name": "Mono+Mono "
+  },
+  {
+    "id": "4dc53b46-75df-4bf9-9ffc-b6360d5f7ca7",
+    "pitch": "A retro, disco-ball-in-the-bathroom bar on Avenue A that does a $25 bottomless brunch where you pick your drink, not just mimosas. It gets loud enough that conversation is work, but the staff are generous and the eggs Benedict with salmon is better than it needs to be.",
+    "perfect": "bottomless brunch should be cheap and loud.",
+    "insider": "Bottomless is 90 minutes for $25 and any drink counts; get the Benedict with salmon and skip the burrito.",
+    "name": "Motel No tell"
   }
 ]
