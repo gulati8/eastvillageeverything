@@ -362,5 +362,383 @@
     "pitch": "A British-style curry house on 2nd Ave where a robot wheels your food to the table and a cup of tomato soup arrives before you have ordered. The spicing is deep rather than strictly traditional, the portions are generous, and the lamb biryani is loaded.",
     "perfect": "you miss a proper London curry house",
     "insider": "Order the samosa chaat and a paratha to start, and ask about the papadum if you are vegan; it is not."
+  },
+  {
+    "id": "f913c5f3-e292-4a73-8116-7d65a54c5e37",
+    "name": "Coopers Craft and Kitchen",
+    "pitch": "A gastropub on 2nd Ave with a long craft beer and cider list and bar food people actually come back for: truffle fries, grilled cheese with smoked tomato soup, nachos that hold up. The big front windows open onto the street in warm weather and the room works for two or a table of ten.",
+    "perfect": "a weekday happy hour with real food",
+    "insider": "Weekday happy hour runs into trivia night, and one weekday has $10 sandwiches, so grab a seat by the open window early."
+  },
+  {
+    "id": "9cf2d5d9-a2d5-482d-b443-f2353de47bc7",
+    "name": "Coyote Ugly Saloon",
+    "pitch": "The 14th St outpost of the saloon chain, with bartenders dancing on the bar, bras hanging from the ceiling and leopard-print tables, loud and rowdy by design. Go for frozen margaritas and the show, not a quiet drink, and expect a crowd once the evening gets going.",
+    "perfect": "you want a loud, rowdy bar-top show night",
+    "insider": "Come late afternoon on a weekday if you want the wings and a bar seat before the crowd and the dancing start."
+  },
+  {
+    "id": "17602982-c064-4a14-9032-a58246a8360b",
+    "name": "Cozy Cafe",
+    "pitch": "A hookah lounge on E 1st St where the owner greets you at the door, the couches are deep and nobody rushes you out. It runs until 4 a.m. every night, which makes it the natural landing spot after a comedy show or a game.",
+    "perfect": "you need a late, unhurried place to land after midnight",
+    "insider": "You can queue your own music from the table, so bring a playlist, and ask for the Blue Mist if you cannot decide."
+  },
+  {
+    "id": "1cad9dac-dc51-45e1-880f-0b6c92d8fcba",
+    "name": "Crab Du Jour",
+    "pitch": "A small, casual Cajun seafood boil spot on 1st Ave where the bags of crab legs, shrimp and crawfish come with gloves and a bib. Portions are generous and a combo feeds two, though seasoning has been uneven lately and there is no alcohol, so think messy early dinner rather than night out.",
+    "perfect": "you want to crack crab legs with your hands",
+    "insider": "Order the combo for two and ask for extra seasoning on the bag; the kitchen goes light unless you say so."
+  },
+  {
+    "id": "11446bd8-b4e8-43e2-8922-1c030194f599",
+    "name": "Craft + Carry",
+    "pitch": "A craft beer bar and bottle shop on St Marks with rotating drafts, cans to go and staff who will steer you to the right IPA or sour without a lecture. There is a backyard, a bowling arcade machine in the back and a happy hour that keeps it honest.",
+    "perfect": "you want a guided flight and a backyard pint",
+    "insider": "Ask for a flight and let the bartenders pick; then grab a four-pack to go from the fridge on your way out."
+  },
+  {
+    "id": "f7293478-021d-4cb5-a5c5-4a35a105ecac",
+    "name": "Dba",
+    "pitch": "An old-school 1st Ave beer bar with a chalkboard wall of taps, a deep whiskey shelf and a back garden that fills on warm afternoons. Open noon to 4 a.m. every day, dog-friendly, and there is a Nintendo Switch on the bar if the conversation runs out.",
+    "perfect": "you want a serious beer list without the attitude",
+    "insider": "Order the pickle martini, made with the bar's own brine, and ask the pint price up front since the receipt is not itemized."
+  },
+  {
+    "id": "6012e049-7b68-4c5a-8d61-8b5c152822b3",
+    "name": "Death & Co.",
+    "pitch": "The East Village cocktail bar that wrote the book, literally, and still earns it: dark room, bow-tied bartenders and a menu that changes between a summer and a winter list. The drinks are the point; the snacks are fine but not why you are here.",
+    "perfect": "a cocktail-focused date where the bartender guides you",
+    "insider": "Arrive right at 6 p.m. opening and ask for a bar seat; tell the bartender what you like and let them go off menu."
+  },
+  {
+    "id": "dec313b3-5862-4b41-ba58-c81930343fe3",
+    "name": "Ding-A-Ling Bar",
+    "pitch": "An Ave C bar open Wednesday through Saturday with resident DJs, sweet spritzes and martinis finished with candy garnishes, and a loose tiki-meets-Hong Kong look. Walking in on a Friday is easy, the room goes until 4 a.m., and the staff treat first-timers like regulars.",
+    "perfect": "you want DJs and a martini without a line",
+    "insider": "Wednesday is the night to go for the martinis; the bar is closed Sunday through Tuesday, so plan around it."
+  },
+  {
+    "id": "e857e8f5-825c-4fe0-a6a8-c6b5f217c85a",
+    "name": "Dirt Candy",
+    "pitch": "A vegetable tasting menu that converts meat eaters, five courses each built around a single vegetable, with a vegan version and cocktails that pick up the theme. Tips are included, the menu changes with the season and it is not cheap, so save it for an occasion.",
+    "perfect": "an anniversary dinner that happens to be vegetarian",
+    "insider": "Reservations go fast; watch for cancellations and take the chef's counter, where you can see dessert being plated."
+  },
+  {
+    "id": "c1525e8a-e8cc-4f2c-bd57-45bbd4cb652b",
+    "name": "Doc Holliday's",
+    "pitch": "A roadhouse dive on Ave A that has not changed in thirty years: country on the jukebox, a pool table in back and bartenders who are not there to coddle you. It is loud and standing-room by late night, and the drinks are stronger than they are cheap.",
+    "perfect": "you want a country jukebox and zero pretense",
+    "insider": "Tip in cash on every round and you will get along fine with the bartenders; go before 9 p.m. if you want the pool table."
+  },
+  {
+    "id": "332a9776-59b8-46df-8af4-1b710fdd7501",
+    "name": "Donnybrook",
+    "pitch": "A roomy Clinton St pub that changes with the clock: laptops and quiet pints on a weekday afternoon, games on the TVs by evening and a packed, dancing room on Friday and Saturday. The happy hour is one of the better deals on the Lower East Side and the bartenders are quick.",
+    "perfect": "a cheap afternoon pint that turns into a night",
+    "insider": "Tap-to-pay has not worked here, so bring a physical card or cash, and grab the sidewalk tables before dinner."
+  },
+  {
+    "id": "7064cec2-c3eb-4cec-8d8f-5849cbd3c7cc",
+    "name": "Double Down",
+    "pitch": "The New York branch of the Las Vegas punk dive: stickers and graffiti on every surface, loud music, pool tables and some of the cheapest beer on Ave A. It is gritty on purpose and open noon to 4 a.m. every day, so it works for a snow-day afternoon as well as a last stop.",
+    "perfect": "you want a two-dollar beer and loud punk",
+    "insider": "Try the bacon martini the Vegas original is known for, bring a government ID that will pass a hard look, and head to the back patio."
+  },
+  {
+    "id": "91267b4e-7ae3-477a-8d6e-2150c2b2bbbf",
+    "name": "Downtown social",
+    "pitch": "A 2nd Ave sports bar with enough TVs that you will see your game, friendly servers who stick around through a packed soccer match and bar food that is fresher than it needs to be. On a quiet Sunday afternoon the sidewalk tables are an easy place for a few beers.",
+    "perfect": "the match is on and you want a table",
+    "insider": "Order the Caesar wrap with your beers; the kitchen does it well and it travels to the outdoor tables."
+  },
+  {
+    "id": "8b44e42a-80a0-444a-8044-51f0beda765a",
+    "name": "Dream baby",
+    "pitch": "From the street it reads as a dim cocktail lounge with banquettes and candles, good for a weekday nightcap. Walk to the back and turn left and there is a second room with its own bar, a DJ and a disco ball spinning late 90s and 2000s hits on weekends.",
+    "perfect": "you want to dance without a club line",
+    "insider": "The cocktail list is written on the mirror behind the bar; the dance room in back is the move after 11 on Friday and Saturday."
+  },
+  {
+    "id": "fd25f830-8e52-4be4-b155-9bfbf77074ca",
+    "name": "Drom",
+    "pitch": "A basement music venue on Ave A that books a global roster, from Nordic folk bands to jazz and hip-hop, with a sound system that outclasses the room. Eat before you come: the kitchen is an afterthought, a service charge is automatic and the aisles get tight once the show starts.",
+    "perfect": "you want a seated show with a world-music lineup",
+    "insider": "Eat beforehand and bring cash for the bar; a 20 percent service charge is added automatically and there is no tap water."
+  },
+  {
+    "id": "65a573d6-d0a0-4aa1-abb6-5e22b40b944d",
+    "name": "Drop Off Service/The Dancing Bull",
+    "pitch": "A former laundromat on Ave A turned into the neighborhood's living room, all wood and brick, with a long craft draft list and a happy hour that has kept regulars for a decade. There is no kitchen, which is fine, because the point is a pint and a conversation that runs long.",
+    "perfect": "a long, cheap afternoon pint with old friends",
+    "insider": "Ask for the hand-pulled cask ale, and come early for the happy hour, when a gin and tonic runs about $7."
+  },
+  {
+    "id": "9952c64a-d808-4514-bff6-a59face403fc",
+    "name": "East 12th Osteria",
+    "pitch": "A corner Italian at 12th and 1st with house-made pasta, a pistachio gnocchi people talk about and a habit of sending out limoncello or cannoli at the end of the meal. Service has had off nights recently, but the room is warm and it is easy to order several pastas and share.",
+    "perfect": "a share-the-pastas dinner with a group",
+    "insider": "Ask for the pasta as small plates so the table can taste three or four, and leave room for the free cannoli."
+  },
+  {
+    "id": "a489540b-269c-4b22-bd12-8adede8dc809",
+    "name": "Eastpoint Bar",
+    "pitch": "A polished sports bar on Ave B that packs out for Knicks games and still gets drinks and tacos to the table. There is a downstairs room that opens later for birthdays and late nights, and the staff are the reason regulars keep coming back.",
+    "perfect": "a Knicks game with food that beats wings",
+    "insider": "It is strictly 21 and over, even at the tables, so leave the younger friend at home; head downstairs after 11 on weekends."
+  },
+  {
+    "id": "2ac36166-e4be-4e70-b320-172a94450f4b",
+    "name": "El Camion",
+    "pitch": "A cantina on Ave A for margaritas, guacamole and plates that arrive colorful and full, with a brunch that leans boozy. Eat in rather than ordering out; the takeout tacos have been rushed, but at the table the kitchen and servers pay attention.",
+    "perfect": "a margarita brunch with a group on Ave A",
+    "insider": "Order La Vampirita to drink and the esquites to start, and try the Coca-Cola braised carnitas as a main."
+  },
+  {
+    "id": "56b212f5-c86b-46be-a087-0b9a3ae6c899",
+    "name": "El Diablito",
+    "pitch": "A tiny, bright taqueria on E 3rd St with about fifteen seats, a friendly counter and tacos that come out fast and oversized. The birria with consommé and the carne asada are the orders, and the price is a relief for the neighborhood.",
+    "perfect": "a quick, cheap taco lunch near Tompkins",
+    "insider": "Taco Tuesday gets you three hefty tacos for about $13; the first chip basket is free and the second is $2."
+  },
+  {
+    "id": "395e44a3-63df-4c63-abc4-fc4d80d78188",
+    "name": "Eleven B",
+    "pitch": "An old-school family pizzeria on Ave B that does a proper New York plain slice and the red-sauce Italian standards, pasta and chicken Marsala included. The regulars at the counter in back have been coming for years and will talk to anyone.",
+    "perfect": "a plain slice and a side of neighborhood talk",
+    "insider": "Order the plain slice at the counter and eat it in the little room in back with the regulars on a Saturday."
+  },
+  {
+    "id": "77a7b301-7061-4ab3-a7a6-87eee243cadc",
+    "name": "Elsa",
+    "pitch": "A daytime spot on E 3rd St, open 10 to 4, built around enormous sage biscuits that stand in for the bun on sandwiches like avocado, bacon, fig jam and Swiss. There is outdoor seating and the Sunday brunch wait is usually short compared with the avenues.",
+    "perfect": "a biscuit brunch without the Avenue B line",
+    "insider": "Get the avocado and bacon biscuit sandwich; the fried chicken version comes buried in bacon, so ask for less if that is not your thing."
+  },
+  {
+    "id": "f391e21d-0fd8-476c-9820-ce03817f623a",
+    "name": "Empellon al pastor",
+    "pitch": "A loud, order-at-the-bar taqueria on St Marks with murals on the walls and ceiling, drafts of beer, cider and wine, and a crowd that spills onto the sidewalk tables in summer. The nachos are the value play and feed a group; the tacos are good but priced like cocktails.",
+    "perfect": "pre-game nachos and a draft on St Marks",
+    "insider": "Happy hour is weekdays 4 to 7; the bacon-wrapped hot dog and the late-night breakfast burrito are the sleeper orders."
+  },
+  {
+    "id": "caf6d616-39ef-4a47-9769-b8c1f844df73",
+    "name": "Empellon Cocina",
+    "pitch": "The Empellón taqueria on West 4th St, with a front and back dining room, sidewalk tables and a chip order that arrives with a flight of seven salsas. The brussels sprout and fish tacos are small but dense with flavor, and the cucumber margarita is the drink.",
+    "perfect": "a taco and margarita stop in the West Village",
+    "insider": "Happy hour runs Monday to Friday, 5 to 7; start with chips and the seven salsas and use them on the tacos."
+  },
+  {
+    "id": "5f78dec3-33ac-43b0-be3c-e3e3309faafd",
+    "name": "Ethos",
+    "pitch": "A small plant and flower shop on Ave A that doubles as an incense, crystal and statue emporium, open 8 to 9 every day. Staff will build a succulent arrangement to your budget and tell you the price as they go, which is rarer than it should be.",
+    "perfect": "you need a last-minute plant or bouquet on Ave A",
+    "insider": "Ask them to assemble a succulent planter on the spot; pick the pot first and they price each piece as they add it."
+  },
+  {
+    "id": "1a6a713a-2398-4509-815a-9ce16fbfcf90",
+    "name": "Fish Bar",
+    "pitch": "A tiny dive on E 5th St painted floor to ceiling with fish and sharks, dollar bills on the ceiling and rock on the speakers. A can of beer and a shot runs about $10, there is a special every day, and it goes from low-key afternoon to packed late night.",
+    "perfect": "a ten-dollar beer-and-shot with longtime regulars",
+    "insider": "Order the Kurt Cobain, the house drink, and take the daily special; Saturday opens at 2 p.m. for day drinking."
+  },
+  {
+    "id": "5d447deb-6371-4a02-acd2-e482730ddb12",
+    "name": "Fools Gold",
+    "pitch": "A big, industrial-looking beer and whiskey bar on Houston with around thirty drafts, flights of both and a kitchen that does sliders, poutine and truffle fries well past midnight. The happy hour is a real deal and the staff stay fast even when it is wall to wall on a Friday.",
+    "perfect": "a cheap happy hour before a night on Houston",
+    "insider": "Order a beer flight and a whiskey flight to split, and try the smoked old fashioned; trivia is a weeknight draw."
+  },
+  {
+    "id": "68dc817b-64d8-48cd-b69b-5fe8113ea920",
+    "name": "Frankie's ",
+    "pitch": "A small old-school Italian on 2nd Ave with a big menu, homemade pasta and a sidewalk setup that is one of the nicer places to eat outside in warm weather. Service is friendly but can be uneven; the food, especially the mushroom tagliatelle, is the reason to go.",
+    "perfect": "a sidewalk pasta dinner on a warm night",
+    "insider": "Sit at the bar and let the bartender pick the wine; ask for a slice of lemon with the sausage pasta."
+  },
+  {
+    "id": "544df5dd-63e5-44fe-9b8a-d09f98f86758",
+    "name": "Giano",
+    "pitch": "A warm Italian on E 7th St run by Italians who treat the room like a dinner party, with fresh pasta that leaves people saying it was the best they have had. Some find the seasoning heavy, but the ravioli in sage butter and the caprese are hard to argue with.",
+    "perfect": "a dinner where the owners remember your face",
+    "insider": "Order the spinach and ricotta ravioli in sage butter, and look at the dessert wine section of the list before the tiramisu."
+  },
+  {
+    "id": "f616b22f-50eb-4366-99e5-c2017c43c0ec",
+    "name": "Gomi Korean Wine Bar",
+    "pitch": "A small, dim wine bar on Ave A whose owner grew up Korean in Brazil, so the plates run from kimchi dumplings to coxinhas and picanha, and the list has soju and sake alongside the wine. Sit at the bar and let him pour; the recommendations are the whole experience.",
+    "perfect": "a date where someone else picks the wine",
+    "insider": "Ask about oyster night and the happy hour fried chicken wings, and request the Brazilian hot sauce with the picanha."
+  },
+  {
+    "id": "5e212605-5896-43d0-8d39-230565775b39",
+    "name": "Good night sonnys",
+    "pitch": "A tile-floored cocktail and oyster bar on 1st Ave from the Wayland crew, open until 4 a.m. with a kitchen that keeps going late. The cocktails are the draw and the happy hour oysters are the deal, with the whipped codfish dip and clams casino as the supporting cast.",
+    "perfect": "late oysters and a cocktail after the show",
+    "insider": "Happy hour oysters have run about a dozen for $18; finish with the brown butter pecan bread pudding."
+  },
+  {
+    "id": "56036d40-c20d-4ff1-a7be-0425069d4457",
+    "name": "Grey Lady",
+    "pitch": "A New England seafood shack transplanted to Delancey St, with dollar oysters every day until 7, including weekends, and a crab dip that is actually mostly crab. Service can lag when it is full, but the outdoor tables and the lobster mac make the wait easy.",
+    "perfect": "dollar oysters on a weekend afternoon",
+    "insider": "Wednesday is the night: half-price bottles of wine, $6 drafts and the dollar oysters, with a $20 burger and martini combo at the bar."
+  },
+  {
+    "id": "9aca0318-d10e-4f66-814d-3dbd47ff2ab7",
+    "name": "Gruppo",
+    "pitch": "A bar-like neighborhood pizzeria on Ave B that does cracker-thin crust and lets you split a pie half and half. The Shroomtown, with three kinds of mushrooms, is the one people come back for, and the staff happily bring anchovies or extra cheese on the side.",
+    "perfect": "a thin-crust pie and a glass of wine on B",
+    "insider": "Order half Shroomtown, half sausage with caramelized onions, start with the Mediterranean salad and save room for the bread pudding."
+  },
+  {
+    "id": "648933ea-3fa4-453b-aafb-685ece75eeda",
+    "name": "Gyu-Kaku",
+    "pitch": "The Cooper Square branch of the Japanese yakiniku chain, where you grill pork belly, kalbi and steak at the table and finish by toasting marshmallows over the coals. The all-you-can-eat option is the value move for a hungry group, and the hosts keep the room moving even when the entrance is mobbed.",
+    "perfect": "a hands-on group dinner that ends with marshmallows",
+    "insider": "Book ahead and go all-you-can-eat; the pork belly and the kalbi chuck rib are the cuts to load up on."
+  },
+  {
+    "id": "3c6d6890-ba9d-427a-be24-dc79575f7869",
+    "name": "Hair of the dog",
+    "pitch": "An Orchard St sports bar that is all screens by day and a packed, DJ-driven twenty-something party by Saturday night, with a kitchen that turns out better chicken tenders than it has any right to. The happy hour deals are strong; full-price rounds late on a weekend are not.",
+    "perfect": "a match on every screen and a cheap happy hour",
+    "insider": "Happy hour runs until 8 and includes weekends, when an espresso martini has gone for $7; sit by the Stanton St windows away from the bar."
+  },
+  {
+    "id": "18847149-e0d3-4617-b744-f5d126521b61",
+    "name": "Hasaki",
+    "pitch": "An E 9th St sushi house that has been here since 1984, quiet and unhurried, where the counter omakase runs about $96 for twelve pieces, a hand roll, an appetizer and dessert. It is one of the better values in the neighborhood for this level of fish and a sure thing for an anniversary.",
+    "perfect": "a calm anniversary omakase that will not break you",
+    "insider": "Book the counter omakase with the chef; the kasugo and mackerel are the pieces to watch for, and yes, the toilet seat is heated."
+  },
+  {
+    "id": "063029a1-7419-43fe-88c1-01b39d033fb8",
+    "name": "Hawksmoor NYC (GRAMERCY)",
+    "pitch": "The British steakhouse's New York home in a vaulted former ballroom on E 22nd St, where everything is cooked over charcoal and the rib-eye picks up a crust most steakhouses cannot match. It is far from the East Village and priced accordingly, but the service turns a birthday into an occasion.",
+    "perfect": "a milestone birthday that calls for a proper steak",
+    "insider": "Mention the celebration in your booking note, order the sticky toffee pudding, and look for the lunch set menu for a gentler bill."
+  },
+  {
+    "id": "26e8d392-b692-4ab8-a818-083be81d92f8",
+    "name": "Headless Widow",
+    "pitch": "A rustic cocktail bar on 1st Ave with an Old Fashioned worth ordering, a happy hour that stretches it and a kitchen that does a flaky fish and chips and good mussels. Hosts can be firm about seating small parties at the bar when tables are empty, so ask nicely or come as a group.",
+    "perfect": "a quiet cocktail and fish and chips midweek",
+    "insider": "Order the fish and chips at the bar during happy hour; it is closed Mondays, and Saturday and Sunday open an hour earlier at 4."
+  },
+  {
+    "id": "e9a8755d-90d5-43ec-997f-763b8abeb7a3",
+    "name": "Hearth Restaurant ",
+    "pitch": "A long-running Tuscan-American room at 12th and 1st with an open kitchen, warm sourdough with grass-fed butter and a roast half chicken that stays juicy, cooked without seed oils. Solo diners may be steered to the bar, which is honestly the better seat for watching the line.",
+    "perfect": "a serious dinner that still feels like the neighborhood",
+    "insider": "Order the variety burger, which does not look like much on the menu, and start with the focaccia and whipped ricotta."
+  },
+  {
+    "id": "757d6a29-971f-4b7e-9941-675cb7e04a6c",
+    "name": "Hekate Cafe & Elixir Bar",
+    "pitch": "An alcohol-free bar on Ave B with a witchy, candlelit look, where the layered elixirs and mocktails are built with as much care as any cocktail across the street. There are teas for a cold afternoon, tarot readers on a sliding scale, a shelf of books to borrow and dogs under the tables.",
+    "perfect": "a sober night out that still feels like one",
+    "insider": "Tell the bartender what flavors you like and let them improvise; the Healer, with lavender and thyme, is the one to start with."
+  },
+  {
+    "id": "ce4c7674-d0c6-4ecc-bb40-6c4148ce2445",
+    "name": "Holiday Cocktail Lounge",
+    "pitch": "The St Marks dive that got a full makeover and kept the dive-y feel, with a long cocktail list, strong well drinks and a kitchen that turns out a very good pretzel. The catch is price: beer runs well over $10, so order a cocktail and treat it as a proper bar.",
+    "perfect": "a good cocktail on St Marks without a reservation",
+    "insider": "Skip the Guinness, which is priced like a cocktail, and ask the bartender for a Tiny Crusher; the pretzel is the snack."
+  },
+  {
+    "id": "ad758091-a0a3-4395-9464-ba0dd57aa5b9",
+    "name": "Horus Cafe",
+    "pitch": "An Egyptian cafe and hookah bar on Ave B, open until 4 a.m. every night, where servers actually stop to talk and the mezze and kebabs are better than the lounge setting suggests. Hookah smoke drifts through the room, so sit outside if that bothers you.",
+    "perfect": "a late mezze plate and a hookah with friends",
+    "insider": "Ask for a sidewalk table if you want to skip the smoke, and order the mezze spread to share before the kebabs."
+  },
+  {
+    "id": "6449d077-2f49-41e7-8955-3673763fd003",
+    "name": "Ichibantel ",
+    "pitch": "A dark Japanese comfort-food hall off 1st Ave, open until 3 a.m., where you walk through a tunnel into a room with anime playing on a projector. The katsu curry, karaage and chicken nanban are the orders, and it is one of the few real late-night kitchens around.",
+    "perfect": "ramen or katsu curry at 2 in the morning",
+    "insider": "Groups get an automatic 25 percent service charge even when sitting apart, so check the bill; the chicken nanban travels well as takeout."
+  },
+  {
+    "id": "c79f4871-0b6b-41d1-8243-64e26d122554",
+    "name": "Il Posto Accanto",
+    "pitch": "A brick-walled Italian wine bar on E 2nd St run by an owner who is in the room and cooking, with a menu that changes with the market and pasta that is springy and light. Lunch is quiet and lovely; dinner fills with regulars who know to book.",
+    "perfect": "a long, quiet Italian lunch on a weekday",
+    "insider": "Ask them to hold a piece of lasagna when you reserve; it runs out, and the daily ragu is the other order."
+  },
+  {
+    "id": "7c61bd7c-47c7-4583-bdb7-f43bee90fea5",
+    "name": "International Bar",
+    "pitch": "A narrow, no-frills dive on 1st Ave open 10 a.m. to 4 a.m., where the door is locked and buzzed open and the inside is nothing but cheap drinks, a good jukebox and talkative regulars. Service depends on who is behind the bar, which is part of the deal at a place like this.",
+    "perfect": "a cheap whiskey chaser and a long argument",
+    "insider": "If the door seems locked, wait a beat; the bartender buzzes you in, and the sidewalk seats out front are the best in the house."
+  },
+  {
+    "id": "a5590950-656f-4b07-85dd-71e4e701f30b",
+    "name": "Ippudo",
+    "pitch": "The 4th Ave original of the tonkotsu ramen chain is still loud, still busy and still worth the wait for the rich broth and the pork buns. Expect to share a long communal table with strangers, and know that a group will not be seated until everyone has arrived.",
+    "perfect": "a rich bowl of ramen on a cold night",
+    "insider": "Order the Goma Q cucumbers and the karaage to start; arrive with your whole party, since incomplete groups wait outside."
+  },
+  {
+    "id": "d3a5dde7-eec3-417d-96d5-ff6d4c464e82",
+    "name": "Joe & Pat's NYC",
+    "pitch": "A 1st Ave pizzeria built around a cracker-thin crust, where the tri pie splits marinara, vodka and pesto across one pie. It is crowded and loud in a good way and handles big groups, and there is a happy hour that runs on weekends too.",
+    "perfect": "a thin-crust pie that a whole table will share",
+    "insider": "Order the tri pie with the arugula salad and a lambrusco spritz; the cauliflower crust is surprisingly the sleeper."
+  },
+  {
+    "id": "0866c8d2-27de-4620-9ff5-0e48aacf1012",
+    "name": "Josie's Bar",
+    "pitch": "A long-running E 6th St dive with a pool table, Buck Hunter and a jukebox, the kind of place to sit with a beer and talk to whoever is next to you. Fair warning: the staff and door can be brusque, so go in easy, order a drink first and do not expect a free water.",
+    "perfect": "a midweek beer and a game of pool",
+    "insider": "Buck Hunter and the pool table are the draw; water comes only with a drink order, so buy one before you ask."
+  },
+  {
+    "id": "e46d4ebd-1c4d-4523-81a3-d5c5c116c0c6",
+    "name": "Joyface",
+    "pitch": "A 70s-styled disco bar on Ave C with plush couches, a disco ball and a dance floor that is the whole point: people come to dance, not to sit. The door is selective and gets tense on busy Saturdays, so go on a quieter night or early and the room is a joy.",
+    "perfect": "you want to dance to disco, not stand around",
+    "insider": "Arrive before 10 p.m. or go on a Sunday or Tuesday, when you walk right in; Saturday after 10:30 means a wait and a minimum."
+  },
+  {
+    "id": "d9819db4-fb36-4a7d-a6a0-d4b77e12ffbb",
+    "name": "Juke Bar",
+    "pitch": "A small, dim cocktail bar on 2nd Ave with a backyard patio, a spicy margarita people keep ordering and sliders and truffle fries to go with it. It fills fast on weekend evenings, so a reservation or an early arrival makes the difference.",
+    "perfect": "a backyard cocktail on a Thursday that runs late",
+    "insider": "Book a table for weekend nights, ask for the patio, and try the lychee martini; Sunday brings a live band."
+  },
+  {
+    "id": "4d4dac54-c94b-4172-8991-084f50e64e66",
+    "name": "Kafana",
+    "pitch": "A homey Serbian bistro on Ave C with brick walls, old photos and the feel of a family kitchen where people linger for hours over grilled meats and roasted peppers. It is small and popular, so reserve, and it is cash only, so stop at an ATM first.",
+    "perfect": "a cold night calls for cevapi and red wine",
+    "insider": "Order the cevapi and the braised lamb shank to share, ask for a Serbian red, and bring cash, since cards are not accepted."
+  },
+  {
+    "id": "b80b5bf6-5c49-4285-9bb6-2f1d803ad238",
+    "name": "Kanoyama Japanese Restaurant",
+    "pitch": "A long-running 2nd Ave sushi house with larger-than-usual slices, a giant platter that feeds three and a counter omakase offered only two nights a week. The kitchen runs slow when takeout stacks up early, so sit down, order the fried vegetables and let the fish come.",
+    "perfect": "a group sushi platter that is actually generous",
+    "insider": "The omakase is only two nights a week and needs a reservation; the fried vegetables and chicken are the sleeper starters."
+  },
+  {
+    "id": "a6cc7afd-e5b6-45d8-b97a-c4d27cc0897d",
+    "name": "Karma Bar and Lounge NYC ",
+    "pitch": "A low-key hookah bar and lounge on 1st Ave where a beer and a shot at the end of the day costs what it should, the DJ keeps it moving and the staff are easy company. It is more chill than club, with sections you can claim for a group.",
+    "perfect": "a cheap beer and shot before the night starts",
+    "insider": "Happy hour runs until 8 p.m., so get there before then; a hookah has run about $20 with a small charge for fresh coals."
+  },
+  {
+    "id": "b5c42d10-ec61-4422-bea3-b4f640a35eb9",
+    "name": "Karvouna Mezze",
+    "pitch": "A relaxed Greek spot on the Bowery with a lounge up front, big portions and classic plates: hummus with a proper herb hit, a chicken gyro platter, grilled octopus with lemon potatoes. It is quiet early in the evening, which makes it a comfortable pre-show dinner.",
+    "perfect": "an unhurried Greek dinner before a Bowery show",
+    "insider": "Start with the spinach pie and the hummus; the portions are big enough that two mezze and one grill plate feeds two."
   }
 ]

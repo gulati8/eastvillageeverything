@@ -323,3 +323,24 @@ Started: 2026-10-24
 - Files touched: `scripts/ralph/data/editorial.json` (new), `scripts/ralph/editorial-append.mjs` (new), `scripts/ralph/progress.txt`.
 - Validation: `node scripts/ralph/editorial-append.mjs /tmp/batch1.json` -> `appended 51; editorial.json now has 51 of 313`, then batch1b -> `appended 1; ... 52 of 313`. Done when count check: editorial 52 vs 313 - 16 closed = 297, so the box stays unticked as the task expects. `git status` does not list `review-context.json`.
 ---
+
+## 2026-10-24 - 3.5 (batch 2, NOT done)
+- Wrote editorial copy for 54 places: review-context key indexes 68 through 133 (Coopers Craft and Kitchen through Karvouna Mezze, alphabetical), minus the 12 skipped below. `scripts/ralph/data/editorial.json` now has 106 entries. Next iteration starts at index 134 (`node /tmp/dump.js 134 200 > /tmp/dump.txt` then read the file; the dump for ~34 places is about 350 lines, and the 68-99 dump was too large for the tool result inline, so redirect to a file). The dump script is still at `/tmp/dump.js`; its source is in the 3.5 batch 1 entry's pattern (per-place header with index, name, id, address, tags, type, rating; hours; editorial/generative summary; reviews newest first truncated to 700 chars).
+- Workflow that worked: write the batch to `/tmp/batch2.json` with `id`, `pitch`, `perfect`, `insider` only, then a `node -e` snippet fills `name` from `review-context.json` by id (names have trailing spaces and odd spellings such as "Ichibantel " and "Frankie's ", so never type them), then `node scripts/ralph/editorial-append.mjs /tmp/batch2.json`. Passed the validator first try.
+- Skipped (no copy written) in indexes 68 to 133, for the user to confirm or delete. "No hours" means Google returned no opening hours at enrichment:
+  - Dahlias Restaurant: no hours; all reviews 2015 to 2016, two of which say it lost its liquor license and was closed.
+  - Dieci: no hours; reviews 2012 to 2016.
+  - East Village Social: no hours; newest review 2022-04 (suspected; verify).
+  - Eterea: no hours; newest review 2023-08 (suspected; verify; it may simply be missing hours).
+  - Exchange Alley: no hours; reviews 2012 to 2013, 5 ratings total.
+  - Good Beer: no hours; newest review 2021-12.
+  - Grape and Grain: no hours; newest review 2022-07, 7 ratings total.
+  - Grayson ( See The Grayson ): cross-reference row with an empty address; no hours; Google matched a hotel (newest review 2023-11 is about a hotel room).
+  - Hawkers Thai and Chinese: no hours; all five reviews (2018 to 2024-12) are one or two out of five and describe delivery food only; nothing to recommend from. Judgment call outside the stale-review rule; the user may want to delete the row or override.
+  - Hermana NYC: no hours; newest review 2022-05 (suspected; verify).
+  - Hi Note: has hours, but the newest review (2025-12) says Hi-Note has been replaced by a new cocktail bar at 188 Ave B (changed hands).
+  - Jeepney: no hours; newest review 2019-02.
+- Other notes for the user: Empellon Cocina's row address is 230 West 4th St, which is the Empellón taqueria in the West Village, and the copy describes that. East 12th Osteria's newest review calls it "Osteria Figa"; copy avoids naming it. Elsa's newest 2025 review calls the place "POST"; the row may be renamed. Ichibantel's row address is 401 E 13th St but a 2026 review says it moved to a larger space on Third Ave in 2023; verify the address. Fish Bar's newest review is a Google mismatch (a Tribeca cafe) and was ignored. Hawksmoor (E 22nd St), Grey Lady (Delancey), Donnybrook (Clinton St), Fools Gold (E Houston) and Hair of the Dog (Orchard St) are outside the East Village but got copy. Several places (Doc Holliday's, Double Down, Josie's Bar, Joyface, International Bar) have recent complaints about door or bartender conduct; the pitches note brusque service or a selective door in neutral terms without repeating the allegations.
+- Files touched: `scripts/ralph/data/editorial.json`, `scripts/ralph/progress.txt`.
+- Validation: `node scripts/ralph/editorial-append.mjs /tmp/batch2.json` -> `appended 54; editorial.json now has 106 of 313 review-context ids`. Done when count check: editorial 106 vs 313 - 16 (batch 1 skips) - 12 (batch 2 skips) = 285, so the box stays unticked; every entry has all three fields non-empty. `git status` does not list `review-context.json`.
+---
