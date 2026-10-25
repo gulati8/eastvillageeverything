@@ -62,4 +62,11 @@ router.get('/privacy', (_req: Request, res: Response) => {
   });
 });
 
+// Support page for the iOS app (App Store listing links here)
+router.get('/support', (_req: Request, res: Response) => {
+  res.render('public/support', {
+    contactEmail: SUPPORT_EMAIL
+  });
+});
+
 export default router;
