@@ -116,6 +116,8 @@ router.get('/places', async (req: Request, res: Response) => {
       created_at: place.created_at instanceof Date ? place.created_at.toISOString() : String(place.created_at),
       updated_at: place.updated_at instanceof Date ? place.updated_at.toISOString() : String(place.updated_at),
       pitch: place.pitch ?? null,
+      // The list row's italic line prefers `perfect` over tag labels (mobile PlaceRow).
+      perfect: place.perfect ?? null,
       crowd_level: place.crowd_level ?? null,
       price_tier: place.price_tier ?? null,
       ...listPhotoFields(place, req),

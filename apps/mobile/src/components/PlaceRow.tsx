@@ -9,6 +9,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../theme/useTheme';
 import type { PlaceV2Display } from '../data/placeV2Display';
+import { rowItalicLine } from '../data/rowItalicLine';
 import { PhotoFallback } from './PhotoFallback';
 import { SignalPip } from './SignalPip';
 import { BookmarkIcon } from '../icons/BookmarkIcon';
@@ -29,6 +30,7 @@ export function PlaceRow({ place, isLast = false, isSaved = false, onPress, onSa
   const { colors, typography } = useTheme();
 
   const specialsExcerpt = place.specials != null ? collapseText(place.specials) : null;
+  const italicLine = rowItalicLine(place);
 
   function handleSave(event: GestureResponderEvent) {
     event.stopPropagation();
@@ -100,6 +102,20 @@ export function PlaceRow({ place, isLast = false, isSaved = false, onPress, onSa
           </View>
         )}
 
+        {/* Italic line: `perfect` when written, else the first tag labels. Never blank for a tagged place. */}
+        {italicLine != null && (
+          <Text
+            testID="row-italic-line"
+            style={[
+              styles.italicLine,
+              { color: colors.ink2, fontFamily: typography.bodyItalic.fontFamily },
+            ]}
+            numberOfLines={1}
+          >
+            {italicLine}
+          </Text>
+        )}
+
         {specialsExcerpt != null && (
           <Text
             style={[
@@ -157,6 +173,11 @@ const styles = StyleSheet.create({
   },
   signalRow: {
     marginTop: 8,
+  },
+  italicLine: {
+    marginTop: 6,
+    fontSize: 13,
+    lineHeight: 18,
   },
   specialsLine: {
     marginTop: 6,

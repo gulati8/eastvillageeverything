@@ -1,7 +1,13 @@
 import type { PlaceResponse } from './place.js';
 import type { TagSummary, StructuredTags } from './tag.js';
 
-/** Response for GET /api/places (list) */
+/**
+ * Response for GET /api/places (list).
+ *
+ * List rows carry the editorial `pitch` and `perfect` strings (the mobile row's
+ * italic line shows `perfect`, falling back to tag labels); `insider`, `crowd`
+ * and `vibe` are detail-only.
+ */
 export type PlacesListResponse = PlaceResponse[];
 
 /**

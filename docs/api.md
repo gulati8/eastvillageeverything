@@ -66,6 +66,7 @@ Array of place objects. The list response includes a subset of fields suitable f
     "created_at": "ISO 8601 string",
     "updated_at": "ISO 8601 string",
     "pitch": "string | null",
+    "perfect": "string | null",
     "crowd_level": "string | null",
     "price_tier": "string | null",
     "photo_url": "string | null",
@@ -80,7 +81,8 @@ Notes:
 - `phone` is stored as digits only; format for display on the client.
 - `specials`, `categories`, `notes` store plain text with `\n` newlines. Render with `white-space: pre-wrap`.
 - `lat` and `lng` are nullable. Currently always `null`; Phase 2 will populate via geocoding.
-- `pitch`, `crowd_level`, `price_tier`, `photo_url`, `hours_json`, `cross_street` come from the editorial / Google Places enrichment columns (`scripts/enrich-places.ts`). They are nullable for places that have not been enriched.
+- `pitch`, `perfect`, `crowd_level`, `price_tier`, `photo_url`, `hours_json`, `cross_street` come from the editorial / Google Places enrichment columns (`scripts/enrich-places.ts`). They are nullable for places that have not been enriched.
+- `perfect` is the editorial "Perfect when ..." completion (no prefix). The mobile list row shows it as the italic line under the name, falling back to tag labels when null.
 
 ---
 
@@ -125,7 +127,7 @@ Returns a single place by UUID.
 }
 ```
 
-Fields the detail returns that the list does not: `perfect`, `insider`, `crowd`, `vibe`, `photo_credit`, `google_place_id`, `google_price_level`, `enrichment_status`, `enriched_at`. Use the detail endpoint when rendering a single place page.
+Fields the detail returns that the list does not: `insider`, `crowd`, `vibe`, `photo_credit`, `google_place_id`, `google_price_level`, `enrichment_status`, `enriched_at`. Use the detail endpoint when rendering a single place page.
 
 **Response 404**
 

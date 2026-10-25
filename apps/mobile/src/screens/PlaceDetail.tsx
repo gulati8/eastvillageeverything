@@ -16,7 +16,9 @@ import { formatPhone } from '../format/phone';
 import { transformPlace } from '../data/transformPlace';
 import { PhotoFallback } from '../components/PhotoFallback';
 import { PhotoAttribution } from '../components/PhotoAttribution';
+import { EditorialCopy } from '../components/EditorialCopy';
 import { DetailSaveButton } from '../components/DetailSaveButton';
+import { formatTagLabel } from '../format/text';
 import { Skeleton } from '../components/Skeleton';
 import { useSavedPlaces } from '../state/useSavedPlaces';
 import { useTheme } from '../theme/useTheme';
@@ -49,14 +51,6 @@ function BackButton({
       <Text style={[styles.backGlyph, { color: tint }]}>‹</Text>
     </Pressable>
   );
-}
-
-function formatTagLabel(tag: string): string {
-  return tag
-    .replace(/[-_]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function normalizeUrl(url: string): string {
@@ -172,6 +166,14 @@ export function PlaceDetail({ id }: { id: string }) {
         <PhotoAttribution attribution={place.photoAttribution} style={styles.photoAttribution} />
 
         <View style={styles.contentArea}>
+          <EditorialCopy
+            pitch={place.pitch}
+            perfect={place.perfect}
+            insider={place.insider}
+            crowd={place.crowd}
+            style={styles.editorial}
+          />
+
           {specials ? (
             <View style={[styles.specialsCard, { backgroundColor: colors.paper2, borderRadius: radii.md }]}>
               <Text style={[styles.specialsLabel, { color: colors.accent, fontFamily: typography.ui700.fontFamily }]}>
@@ -347,6 +349,9 @@ const styles = StyleSheet.create({
   contentArea: {
     paddingHorizontal: 22,
     paddingTop: 22,
+  },
+  editorial: {
+    marginBottom: 22,
   },
   specialsCard: {
     padding: 18,

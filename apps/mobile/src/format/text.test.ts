@@ -60,3 +60,50 @@ describe('brToNewlines', () => {
     expect(brToNewlines('a<Br/>b')).toBe('a\nb');
   });
 });
+
+import { ensureEndPunctuation, formatTagLabel, collapseWhitespace } from './text';
+
+describe('ensureEndPunctuation', () => {
+  it('appends a period when the text has no end punctuation', () => {
+    expect(ensureEndPunctuation('you want a quiet drink before dinner')).toBe(
+      'you want a quiet drink before dinner.',
+    );
+  });
+
+  it('leaves text that already ends in a period, question mark, exclamation or ellipsis alone', () => {
+    expect(ensureEndPunctuation('it is late.')).toBe('it is late.');
+    expect(ensureEndPunctuation('who knows?')).toBe('who knows?');
+    expect(ensureEndPunctuation('go now!')).toBe('go now!');
+    expect(ensureEndPunctuation('and then…')).toBe('and then…');
+  });
+
+  it('treats a closing quote or bracket after the punctuation as punctuated', () => {
+    expect(ensureEndPunctuation('she said “tonight.”')).toBe('she said “tonight.”');
+    expect(ensureEndPunctuation("he said 'now.'")).toBe("he said 'now.'");
+    expect(ensureEndPunctuation('(see above.)')).toBe('(see above.)');
+  });
+
+  it('trims surrounding whitespace before deciding', () => {
+    expect(ensureEndPunctuation('  late night  ')).toBe('late night.');
+    expect(ensureEndPunctuation('  late night.  ')).toBe('late night.');
+  });
+
+  it('returns an empty string for blank input', () => {
+    expect(ensureEndPunctuation('')).toBe('');
+    expect(ensureEndPunctuation('   ')).toBe('');
+  });
+});
+
+describe('formatTagLabel', () => {
+  it('turns a slug into title-cased words', () => {
+    expect(formatTagLabel('late-night_eats')).toBe('Late Night Eats');
+    expect(formatTagLabel('happy hour')).toBe('Happy Hour');
+    expect(formatTagLabel('  dive--bar  ')).toBe('Dive Bar');
+  });
+});
+
+describe('collapseWhitespace', () => {
+  it('collapses newlines and runs of spaces to single spaces', () => {
+    expect(collapseWhitespace('  a \n b\t\tc ')).toBe('a b c');
+  });
+});
