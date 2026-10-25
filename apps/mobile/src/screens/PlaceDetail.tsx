@@ -16,8 +16,9 @@ import { formatPhone } from '../format/phone';
 import { transformPlace } from '../data/transformPlace';
 import { PhotoFallback } from '../components/PhotoFallback';
 import { PhotoAttribution } from '../components/PhotoAttribution';
+import { DetailSaveButton } from '../components/DetailSaveButton';
 import { Skeleton } from '../components/Skeleton';
-import { BookmarkIcon } from '../icons/BookmarkIcon';
+import { useSavedPlaces } from '../state/useSavedPlaces';
 import { useTheme } from '../theme/useTheme';
 
 function BackButton({
@@ -70,6 +71,7 @@ export function PlaceDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error } = usePlace(id);
   const { colors, typography, radii } = useTheme();
   const insets = useSafeAreaInsets();
+  const { savedPlaceKeys, toggleSavedPlace } = useSavedPlaces();
 
   const backScrim = 'rgba(22,17,12,0.72)';
 
@@ -234,14 +236,12 @@ export function PlaceDetail({ id }: { id: string }) {
       </ScrollView>
 
       <BackButton topInset={insets.top} tint={colors.ink} scrim={backScrim} />
-      <Pressable
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel="Save spot"
+      <DetailSaveButton
+        name={place.name}
+        isSaved={savedPlaceKeys.has(place.key)}
+        onToggle={() => toggleSavedPlace(place.key)}
         style={[styles.floatingButton, styles.saveButton, { top: insets.top + 10, backgroundColor: backScrim }]}
-      >
-        <BookmarkIcon color={colors.ink} />
-      </Pressable>
+      />
 
       <View
         style={[
