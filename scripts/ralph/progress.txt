@@ -644,3 +644,7 @@ Started: 2026-10-24
 ## 2026-10-25 - 6.1
 - Submitted build 12 (1.0.0) for App Review; status Waiting for Review. Review contact and notes filled from listing.md. Release set to automatic, so 6.3 happens on approval with no action needed.
 ---
+
+## 2026-10-25 - listing fix
+- App Store description updated from "Over 300 places" to "Nearly 250 places" (prod has 249 after 3.12). Regenerated metadata with `node scripts/app-store-metadata.mjs` and re-uploaded with `fastlane deliver --skip_binary_upload --skip_app_version_update --skip_screenshots` (exit 0). Verified in App Store Connect; version still Waiting for Review.
+---

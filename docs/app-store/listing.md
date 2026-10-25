@@ -46,7 +46,7 @@ Every bar in the East Village in one list. Happy hours, pool tables, trivia, liv
 them.
 
 ```
-East Village Everything is a guide to the bars and late-night spots of the East Village, Manhattan. Over 300 places in one list, with the details that matter when you're already out: where the happy hour is still going, who has a pool table or a dart board, where there's trivia tonight, and what's open late.
+East Village Everything is a guide to the bars and late-night spots of the East Village, Manhattan. Nearly 250 places in one list, with the details that matter when you're already out: where the happy hour is still going, who has a pool table or a dart board, where there's trivia tonight, and what's open late.
 
 BROWSE AND SEARCH
 Scroll the whole neighborhood or search by name. Each place shows its address, hours, phone number, website and tags, plus the current specials and our notes on what it's good for.
@@ -76,9 +76,8 @@ About 1,900 of 4000 characters.
 
 Facts the description relies on, and where they come from:
 
-- Over 300 places: 313 rows in the production `places` table after the 3.3
-  duplicate and closed-place cleanup (`GET /api/places` returns 313; 225 of
-  them have hours).
+- Nearly 250 places: 249 rows in the production `places` table after the 3.12 cleanup (was 313 after the 3.3
+  duplicate and closed-place cleanup; `GET /api/places` now returns 249).
 - Tag names: the production `GET /api/tags` response. Spelled as the tags
   display, not as the slugs.
 - Open now, closes in, live music tonight, late close: `src/signals/signal.ts`
