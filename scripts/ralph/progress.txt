@@ -657,3 +657,10 @@ Started: 2026-10-24
 - Validation: `GEM_PATH=$(brew --prefix fastlane)/libexec GEM_HOME=$(brew --prefix fastlane)/libexec ruby apps/mobile/fastlane/review_status.rb` -> output above, exit 1 (queued).
 - Learnings / for the human: 6.1 was submitted with automatic release (`release_type` AFTER_APPROVAL) although the plan said to choose manual. The 6.2 Done when literally names Pending Developer Release, which this version can never reach; on approval it will go to READY_FOR_SALE and the app will be live, which also completes 6.3 with no action. Either switch Version Release to manual in App Store Connect while it is still Waiting for Review (then the Done when holds as written), or accept that the loop will treat READY_FOR_SALE as the pass condition for 6.2 and tick 6.3 yourself. If Apple rejects, `review_status.rb` exits 2; read the rejection in App Store Connect > App Review and add it to `plan.md` as 6.2 instructs.
 ---
+
+## 2026-10-25 - 6.2 (not done: still Waiting for Review, check 2)
+- Re-ran the review check. Version 1.0.0 (app 6765464747): state `WAITING_FOR_REVIEW`, release_type `AFTER_APPROVAL`, build 12 (`VALID`), review submission d9b20644-2ae8-4dc1-936d-a7d843f39d78 still `WAITING_FOR_REVIEW` (submitted 2026-10-25T04:21:43Z). Apple has not started review. Done when does not pass; 6.2 stays unticked. No code changed.
+- Files touched: `scripts/ralph/progress.txt` only.
+- Validation: `set -a && . ./.env && set +a && GEM_PATH=$(brew --prefix fastlane)/libexec GEM_HOME=$(brew --prefix fastlane)/libexec ruby apps/mobile/fastlane/review_status.rb` -> exit 1 (queued).
+- Learnings: the open question from the previous entry still stands. Release type is still automatic, so this version cannot reach PENDING_DEVELOPER_RELEASE; if the human wants the Done when to hold literally, switch Version Release to manual in App Store Connect while it is still Waiting for Review. Otherwise the loop will take READY_FOR_SALE (exit 0) as the pass condition.
+---
