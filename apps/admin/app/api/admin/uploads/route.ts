@@ -1,13 +1,17 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'node:crypto';
 import sharp from 'sharp';
 import { putObject } from '@eve/storage';
+import { PlaceModel, PlacePhotoModel } from '@eve/db';
+import type { PlacePhotoResponse } from '@eve/shared-types';
 import { adminErrorResponse, requireAdminRequest } from '../../../../lib/security';
 
 export const runtime = 'nodejs';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Derived sizes written alongside every upload. The mobile list rows load
@@ -29,6 +33,14 @@ async function makeVariant(src: Buffer, width: number, quality: number): Promise
     .toBuffer();
 }
 
+/**
+ * POST multipart `file` (+ optional `prefix`) → three storage objects.
+ *
+ * With an optional `place_id` the same request also attaches the upload to
+ * that place as its next photo (`PlacePhotoModel.add`, which mirrors the first
+ * photo into `places.photo_*`) and the response gains `photo` and `place_id`.
+ * Without `place_id` the response is the bare URL set (the tag form uses it).
+ */
 export async function POST(req: NextRequest) {
   try {
     await requireAdminRequest(req, { mutation: true });
@@ -53,6 +65,20 @@ export async function POST(req: NextRequest) {
   }
   if (!ALLOWED_MIME.has(file.type)) {
     return NextResponse.json({ error: `Unsupported MIME type: ${file.type}` }, { status: 415 });
+  }
+
+  // Resolve the place before touching storage so a bad id never leaves
+  // orphaned objects behind.
+  const placeIdRaw = fd.get('place_id');
+  let placeId: string | null = null;
+  if (placeIdRaw !== null && String(placeIdRaw).trim() !== '') {
+    placeId = String(placeIdRaw).trim();
+    if (!UUID_RE.test(placeId)) {
+      return NextResponse.json({ error: 'Invalid place_id.' }, { status: 400 });
+    }
+    if (!(await PlaceModel.findById(placeId))) {
+      return NextResponse.json({ error: 'That place no longer exists.' }, { status: 404 });
+    }
   }
 
   const prefixRaw = String(fd.get('prefix') ?? 'misc');
@@ -80,22 +106,55 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Could not read that image file.' }, { status: 422 });
   }
 
+  let urls: {
+    url: string; key: string; thumb_url: string; thumb_key: string; hero_url: string; hero_key: string;
+  };
   try {
     const [original, thumbResult, heroResult] = await Promise.all([
       putObject(buf, { key, contentType: file.type }),
       putObject(thumb, { key: thumbKey, contentType: 'image/jpeg' }),
       putObject(hero, { key: heroKey, contentType: 'image/jpeg' }),
     ]);
-    return NextResponse.json({
+    urls = {
       url: original.url,
       key: original.key,
       thumb_url: thumbResult.url,
       thumb_key: thumbResult.key,
       hero_url: heroResult.url,
       hero_key: heroResult.key,
-    });
+    };
   } catch (err) {
     console.error('admin upload: storage write failed', err);
     return NextResponse.json({ error: 'Storage write failed' }, { status: 500 });
+  }
+
+  if (!placeId) {
+    return NextResponse.json(urls);
+  }
+
+  try {
+    const row = await PlacePhotoModel.add(placeId, {
+      url: urls.url,
+      thumb_url: urls.thumb_url,
+      hero_url: urls.hero_url,
+    });
+    const photo: PlacePhotoResponse = {
+      id: row.id,
+      url: row.url,
+      thumb_url: row.thumb_url,
+      hero_url: row.hero_url,
+      credit: row.credit,
+      position: row.position,
+      attribution: null,
+    };
+    revalidatePath('/places');
+    revalidatePath(`/places/${placeId}/edit`);
+    return NextResponse.json({ ...urls, photo, place_id: placeId });
+  } catch (err) {
+    console.error('admin upload: attach to place failed', err);
+    const message = err instanceof Error && err.message === 'Place not found'
+      ? 'That place no longer exists.'
+      : 'The photo was uploaded but could not be attached to the place. Try again.';
+    return NextResponse.json({ error: message, ...urls }, { status: 500 });
   }
 }

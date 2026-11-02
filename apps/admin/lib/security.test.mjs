@@ -58,6 +58,13 @@ describe('admin security guards', () => {
     }
   });
 
+  it('guards every mutating photo action', () => {
+    const photos = src('./actions/photos.ts');
+    for (const name of ['removePlacePhoto', 'makeFirstPlacePhoto', 'setPlacePhotoCredit']) {
+      assertGuarded(photos, name, 'requireAdminMutation');
+    }
+  });
+
   it('guards login and logout against cross-origin form posts', () => {
     const login = src('./actions/login.ts');
     assertGuarded(login, 'loginAction', 'assertSameOriginAction');
@@ -70,5 +77,10 @@ describe('admin security guards', () => {
     const uploadsRoute = src('../app/api/admin/uploads/route.ts');
     assert.match(tagsRoute, /requireAdminRequest\(req\)/, 'tags API must require an admin session');
     assert.match(uploadsRoute, /requireAdminRequest\(req, \{ mutation: true \}\)/, 'upload API must require admin session and origin check');
+  });
+
+  it('answers signed-out API calls with JSON 401, not a login redirect', () => {
+    const middleware = src('../middleware.ts');
+    assert.match(middleware, /startsWith\('\/api\/'\)[^]*?NextResponse\.json\(\{ error: 'Signed out' \}, \{ status: 401 \}\)/, 'middleware must return 401 JSON for /api/* without a session');
   });
 });

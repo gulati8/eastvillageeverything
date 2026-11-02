@@ -25,6 +25,12 @@ export async function middleware(req: NextRequest) {
   const session = await readSession(cookie);
 
   if (!session) {
+    // API routes are called with fetch/XHR, which would follow a redirect to
+    // the login HTML and then fail on res.json() with no message. Answer
+    // with JSON so the client can say "signed out" and link to /login.
+    if (pathnameWithoutBase === '/api' || pathnameWithoutBase.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Signed out' }, { status: 401 });
+    }
     const url = req.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('next', pathnameWithoutBase);
