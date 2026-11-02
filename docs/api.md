@@ -70,6 +70,8 @@ Array of place objects. The list response includes a subset of fields suitable f
     "crowd_level": "string | null",
     "price_tier": "string | null",
     "photo_url": "string | null",
+    "photo_thumb_url": "string | null",
+    "photo_hero_url": "string | null",
     "hours_json": "object | null",
     "cross_street": "string | null"
   }
@@ -118,7 +120,21 @@ Returns a single place by UUID.
   "price_tier": "string | null",
   "cross_street": "string | null",
   "photo_url": "string | null",
+  "photo_thumb_url": "string | null",
+  "photo_hero_url": "string | null",
   "photo_credit": "string | null",
+  "photo_attribution": "string | null",
+  "photos": [
+    {
+      "id": "string | null",
+      "url": "string",
+      "thumb_url": "string | null",
+      "hero_url": "string | null",
+      "credit": "string | null",
+      "position": "number",
+      "attribution": "string | null"
+    }
+  ],
   "google_place_id": "string | null",
   "hours_json": "object | null",
   "google_price_level": "number | null",
@@ -127,7 +143,13 @@ Returns a single place by UUID.
 }
 ```
 
-Fields the detail returns that the list does not: `insider`, `crowd`, `vibe`, `photo_credit`, `google_place_id`, `google_price_level`, `enrichment_status`, `enriched_at`. Use the detail endpoint when rendering a single place page.
+Fields the detail returns that the list does not: `insider`, `crowd`, `vibe`, `photo_credit`, `photo_attribution`, `photos`, `google_place_id`, `google_price_level`, `enrichment_status`, `enriched_at`. Use the detail endpoint when rendering a single place page.
+
+Photos:
+- `photos` is every admin-uploaded photo of the place in `position` order. Position 0 is the list thumbnail, and the top-level `photo_url`, `photo_thumb_url`, `photo_hero_url` and `photo_credit` always describe that first entry, so clients that only show one photo can ignore `photos`.
+- When a place has no uploaded photo but enrichment found a Google photo, `photos` holds one entry whose `id` is `null`, whose three URLs point at the photo proxy (`/api/places/:id/photo?size=orig|thumb|hero`), and whose `attribution` is the Google author's name (`credit` is `null`). The top-level `photo_attribution` carries the same name.
+- When the place has no photo at all, `photos` is `[]` and the top-level photo fields are `null`.
+- Uploaded entries have `attribution: null`; the editor's caption, if any, is in `credit`.
 
 **Response 404**
 

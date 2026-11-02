@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { PlaceModel, TagModel, NeighborhoodModel } from '@eve/db';
-import type { Place, PlacesListResponse, PlaceDetailResponse, TagsFlatResponse, TagsStructuredResponse, TagSummary, NeighborhoodSummary } from '@eve/shared-types';
+import type { Place, PlacePhotoResponse, PlacesListResponse, PlaceDetailResponse, TagsFlatResponse, TagsStructuredResponse, TagSummary, NeighborhoodSummary } from '@eve/shared-types';
 import { redisClient } from '../redis.js';
 
 const router = Router();
@@ -62,14 +62,51 @@ function photoFields(place: Place, req: Request): PhotoFields {
       photo_attribution: null,
     };
   }
-  const proxy = (size: PhotoSize) =>
-    `${publicBaseUrl(req)}/api/places/${encodeURIComponent(place.id)}/photo?size=${size}`;
+  const proxy = googlePhotoProxy(place, req);
   return {
     photo_url: proxy('orig'),
     photo_thumb_url: proxy('thumb'),
     photo_hero_url: proxy('hero'),
     photo_attribution: place.google_photo_attribution ?? null,
   };
+}
+
+/** Builds proxy URLs for a place's Google photo at each size. */
+function googlePhotoProxy(place: Place, req: Request): (size: PhotoSize) => string {
+  return (size) =>
+    `${publicBaseUrl(req)}/api/places/${encodeURIComponent(place.id)}/photo?size=${size}`;
+}
+
+/**
+ * The detail response's `photos` list: every uploaded photo in position order
+ * (the first is the list thumbnail), else one Google proxy entry when
+ * enrichment found a photo, else empty. The top-level `photo_*` fields keep
+ * describing the first entry, so the 1.0.0 app needs nothing from this list.
+ */
+function photoList(place: Place, req: Request): PlacePhotoResponse[] {
+  const uploaded = place.photos ?? [];
+  if (uploaded.length > 0) {
+    return uploaded.map((photo) => ({
+      id: photo.id,
+      url: photo.url,
+      thumb_url: photo.thumb_url ?? null,
+      hero_url: photo.hero_url ?? null,
+      credit: photo.credit ?? null,
+      position: photo.position,
+      attribution: null,
+    }));
+  }
+  if (!place.google_photo_name) return [];
+  const proxy = googlePhotoProxy(place, req);
+  return [{
+    id: null,
+    url: proxy('orig'),
+    thumb_url: proxy('thumb'),
+    hero_url: proxy('hero'),
+    credit: null,
+    position: 0,
+    attribution: place.google_photo_attribution ?? null,
+  }];
 }
 
 function sendPhoto(res: Response, body: Buffer, contentType: string): void {
@@ -165,6 +202,7 @@ router.get('/places/:id', async (req: Request, res: Response) => {
       neighborhood_id: place.neighborhood_id,
       ...photoFields(place, req),
       photo_credit: place.photo_credit ?? null,
+      photos: photoList(place, req),
       google_place_id: place.google_place_id ?? null,
       hours_json: place.hours_json ?? null,
       google_price_level: place.google_price_level ?? null,
