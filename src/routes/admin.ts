@@ -130,7 +130,7 @@ router.get('/places/new', asyncHandler(async (req: Request, res: Response) => {
 router.post('/places', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-    cross_street, photo_credit
+    cross_street
   } = req.body;
 
   const errors: string[] = [];
@@ -168,7 +168,6 @@ router.post('/places', asyncHandler(async (req: Request, res: Response) => {
     crowd_level: crowd_level?.trim() || undefined,
     price_tier: price_tier?.trim() || undefined,
     cross_street: cross_street?.trim() || undefined,
-    photo_credit: photo_credit?.trim() || undefined,
   });
 
   res.redirect('/admin/places');
@@ -198,7 +197,7 @@ router.get('/places/:id/edit', asyncHandler(async (req: Request, res: Response) 
 router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
   const { name, address, phone, url, specials, categories, notes, tags,
     pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-    cross_street, photo_credit
+    cross_street
   } = req.body;
 
   const errors: string[] = [];
@@ -236,7 +235,6 @@ router.post('/places/:id', asyncHandler(async (req: Request, res: Response) => {
     crowd_level: crowd_level?.trim() || undefined,
     price_tier: price_tier?.trim() || undefined,
     cross_street: cross_street?.trim() || undefined,
-    photo_credit: photo_credit?.trim() || undefined,
   });
 
   if (!updated) {

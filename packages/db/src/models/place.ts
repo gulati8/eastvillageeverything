@@ -1,6 +1,7 @@
 import { query, withTransaction } from '../pool.js';
 import type { PoolClient } from 'pg';
 import type { Place } from '@eve/shared-types';
+import { PlacePhotoModel } from './placePhoto.js';
 
 export type { Place };
 
@@ -21,12 +22,11 @@ export interface PlaceInput {
   crowd_level?: string;
   price_tier?: string;
   cross_street?: string;
-  photo_url?: string;
-  photo_thumb_url?: string;
-  photo_hero_url?: string;
-  photo_credit?: string;
   neighborhood_id?: string | null;
 }
+
+// Photos are not part of PlaceInput: `PlacePhotoModel` owns `place_photos`
+// and mirrors the first photo into `places.photo_*` on every write.
 
 // Normalize phone to digits only
 function normalizePhone(phone: string | undefined): string | null {
@@ -183,7 +183,7 @@ export class PlaceModel {
   }
 
   /**
-   * Find a place by ID
+   * Find a place by ID, with its uploaded photos attached (ordered by position).
    */
   static async findById(id: string): Promise<Place | null> {
     const sql = `
@@ -210,7 +210,10 @@ export class PlaceModel {
     `;
 
     const result = await query<Place>(sql, [id]);
-    return result.rows[0] || null;
+    const place = result.rows[0];
+    if (!place) return null;
+    place.photos = await PlacePhotoModel.listForPlace(id);
+    return place;
   }
 
   /**
@@ -235,10 +238,9 @@ export class PlaceModel {
       const insertSql = `
         INSERT INTO places (name, address, phone, url, specials, categories, notes,
           pitch, perfect, insider, crowd, vibe, crowd_level, price_tier,
-          cross_street, photo_url, photo_credit, neighborhood_id,
-          photo_thumb_url, photo_hero_url)
+          cross_street, neighborhood_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
-                $15, $16, $17, $18, $19, $20)
+                $15, $16)
         RETURNING id
       `;
 
@@ -258,11 +260,7 @@ export class PlaceModel {
         data.crowd_level || null,
         data.price_tier || null,
         data.cross_street || null,
-        validateUrl(data.photo_url),
-        data.photo_credit || null,
         neighborhoodId,
-        validateUrl(data.photo_thumb_url),
-        validateUrl(data.photo_hero_url),
       ]);
 
       const place = placeResult.rows[0];
@@ -346,22 +344,6 @@ export class PlaceModel {
       if (data.cross_street !== undefined) {
         updates.push(`cross_street = $${paramIndex++}`);
         params.push(data.cross_street || null);
-      }
-      if (data.photo_url !== undefined) {
-        updates.push(`photo_url = $${paramIndex++}`);
-        params.push(validateUrl(data.photo_url));
-      }
-      if (data.photo_thumb_url !== undefined) {
-        updates.push(`photo_thumb_url = $${paramIndex++}`);
-        params.push(validateUrl(data.photo_thumb_url));
-      }
-      if (data.photo_hero_url !== undefined) {
-        updates.push(`photo_hero_url = $${paramIndex++}`);
-        params.push(validateUrl(data.photo_hero_url));
-      }
-      if (data.photo_credit !== undefined) {
-        updates.push(`photo_credit = $${paramIndex++}`);
-        params.push(data.photo_credit || null);
       }
       if (data.neighborhood_id !== undefined && data.neighborhood_id !== null) {
         updates.push(`neighborhood_id = $${paramIndex++}`);

@@ -153,7 +153,8 @@
             <div class="col-md-6">
               <div class="mb-3">
                 <label for="photo_credit" class="form-label">Photo Credit</label>
-                <input type="text" class="form-control" id="photo_credit" name="photo_credit" value="<%= place ? place.photo_credit || '' : '' %>" placeholder="Submitted by @username">
+                <input type="text" class="form-control" id="photo_credit" value="<%= place ? place.photo_credit || '' : '' %>" placeholder="None" disabled>
+                <div class="form-text">Edited with the photo in the new admin.</div>
               </div>
             </div>
             <div class="col-md-12">

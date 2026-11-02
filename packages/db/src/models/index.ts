@@ -1,4 +1,5 @@
 export { PlaceModel, type Place, type PlaceInput } from './place.js';
+export { PlacePhotoModel, type PlacePhoto, type PlacePhotoInput } from './placePhoto.js';
 export { TagModel, type Tag, type TagInput } from './tag.js';
 export { UserModel, type User, type UserPublic, type UserInput } from './user.js';
 export { NeighborhoodModel, type NeighborhoodInput } from './neighborhood.js';

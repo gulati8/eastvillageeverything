@@ -53,6 +53,38 @@ export interface Place {
   google_price_level?: number;
   enrichment_status?: string;
   enriched_at?: Date;
+  /** Uploaded photos ordered by position; attached by `PlaceModel.findById` only. */
+  photos?: PlacePhoto[];
+}
+
+/**
+ * One admin-uploaded photo of a place, as stored in `place_photos`.
+ * Position 0 is the list thumbnail; `places.photo_*` mirror that row.
+ */
+export interface PlacePhoto {
+  id: string;
+  place_id: string;
+  url: string;
+  thumb_url: string | null;
+  hero_url: string | null;
+  credit: string | null;
+  position: number;
+  created_at: Date;
+}
+
+/**
+ * A photo entry in `GET /api/places/:id`. Uploads carry their row `id`; the
+ * Google fallback entry (used when a place has no uploads) has `id: null`
+ * and the author's name in `attribution`.
+ */
+export interface PlacePhotoResponse {
+  id: string | null;
+  url: string;
+  thumb_url: string | null;
+  hero_url: string | null;
+  credit: string | null;
+  position: number;
+  attribution: string | null;
 }
 
 /**
