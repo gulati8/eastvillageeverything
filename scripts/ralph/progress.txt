@@ -195,3 +195,20 @@ Previous plan and log: scripts/ralph/archive/launch-plan.md, launch-progress.txt
   - Push `e288080` to `main` (also carried the local 4.1/5.1/6.1 chore commits): Build and Deploy run 41390458305 success, CI run 41390458327 success. Prod: `curl -s https://eastvillageeverything.nyc/api/places/0651d26d-4a06-4303-ad75-e1bf87862ba9 | jq '.photos | length'` → 1; `/admin/login` → 200.
 - Learnings: a Playwright "element intercepts pointer events" on a phone-sized `isMobile` context can mean the page overflows horizontally (Chrome zooms the layout viewport out, so hit-test coordinates drift); check `document.documentElement.scrollWidth` first. Header overflow at 390px is gone; nothing else on the edit page overflowed.
 ---
+
+## 2026-11-01 - BLOCKED on 5.1 [HUMAN] (second handoff, after 6.1)
+- Every agent task in `scripts/ralph/plan.md` (1.1, 1.2, 2.1, 2.2, 3.1, 3.2, 3.3, 4.1, 6.1) is ticked. 6.1 is live on prod (push `e288080`, Build and Deploy run 41390458305 success; `/admin/login` → 200 at the time of this entry). The only unticked task is **5.1 [HUMAN] Phone test at a real place**, and its full `Blocked by` list (1.2, 2.2, 3.2, 3.3, 4.1, 6.1) is ticked, so it is ready to run now. The 6.1 fix changed some of the words on screen, so the steps below replace the earlier handoff.
+- What the human needs to do, on a phone (hard-reload the admin first so the new bundle loads; if a card says "The admin was updated since you opened this page", tap Reload):
+  1. Open `https://eastvillageeverything.nyc/admin`, sign in, open a place from the list.
+  2. At the top of the edit page, under the "Photos" heading, there is now a full-width black "Add photo" button. Tap it, pick two photos from the camera roll, then tap it again and take one with the camera. For each file expect a dimmed placeholder with a percentage and progress bar, then a green card "Photo saved to <place name>". The hint under the heading should read "<n> photos · swipe for more" and the next card should peek in from the right.
+  3. Swipe to the second photo and tap "Feature": expect the cards to swap, the first card to carry the "Featured" badge, and a green card "Featured / The app shows this photo for <place name>." No other card has a badge or number.
+  4. Swipe to the third photo, tap "Remove", confirm the dialog: expect the card to disappear and a success card.
+  5. Type a credit on a photo card and tap away (or press Enter): expect "Credit saved".
+  6. Change a text field (e.g. notes) and tap Save: expect the button to read "Saving…", then the page to stay on the edit page with a green "<Name> saved" card.
+  7. Go back to the list with "← Places": expect the row's 56px thumbnail to be the photo you featured, with a small count badge showing the number of photos.
+  8. Error path: turn on airplane mode and tap "Add photo" with any file. Expect the placeholder to show "Upload failed" in red with "Try again" and "Discard", plus a red card "Connection dropped. Try again." Turn airplane mode off and tap "Try again": expect it to succeed.
+  9. Open the 1.0.0 app: the place should show your featured photo in the list row and at the top of the detail screen.
+- Also worth a glance: Verlaines (Google fallback only) should show "No photos yet" under the heading, the Google card with its caption, and the "Add photo" button above it. The admin header should no longer make the page zoom out on the phone (6.1 fixed a header overflow at 390px).
+- When done: tick 5.1 in `plan.md`. Anything that did not behave as written goes in this file and as a `fix(admin)` task under "## Phase 6" in `plan.md`, with the exact words you expected to see on screen; 5.1's `Blocked by` list then gains that task id.
+- No code changed this iteration. The `d634427` chore commit is local and rides along on the next push.
+---
