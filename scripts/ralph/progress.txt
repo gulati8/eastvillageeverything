@@ -157,3 +157,20 @@ Previous plan and log: scripts/ralph/archive/launch-plan.md, launch-progress.txt
   - Push `0689004` to `main` (also carried the local 3.3 progress commit): Build and Deploy run 41386661328 success, CI run 41386661326 success. Prod Done when: `curl -s -o /dev/null -w '%{http_code}' https://eastvillageeverything.nyc/admin/api/admin/version` -> 401 (body `{"error":"Signed out"}`); `/admin/login` -> 200; Upstate's `photos[0].url` still the `d2fb2232-…jpeg` S3 URL.
 - Learnings: under `next dev` the version id is not stable across HMR recompiles (curl saw one id, the browser's first fetch minutes later saw another with no restart in between), so in dev a false "updated" card can appear after editing admin code; `next start` evaluates the module once. The `error.tsx` stale branch could not be exercised locally: dev action ids are content hashes that survive a restart, so a post from the old tab still resolves; `isStaleActionError` is covered by its unit test and the real path is the prod case from 2026-10-27. Whether Next's production client exposes that message to the boundary (rather than a generic digest-only error) is unverified; `VersionWatch` catches the case before any Save regardless.
 ---
+
+## 2026-11-01 - BLOCKED on 5.1 [HUMAN]
+- Every agent task in `scripts/ralph/plan.md` (1.1, 1.2, 2.1, 2.2, 3.1, 3.2, 3.3, 4.1) is ticked and deployed to prod (last deploy: push `0689004`, Build and Deploy run 41386661328 success). The only unticked task is **5.1 [HUMAN] Phone test at a real place**, and its `Blocked by` list (1.2, 2.2, 3.2, 3.3, 4.1) is fully ticked, so it is ready to run now.
+- What the human needs to do (from the task text), on a phone:
+  1. Open `https://eastvillageeverything.nyc/admin`, sign in, open a place from the list.
+  2. In the photo strip at the top of the edit page, tap "Add photo" and pick two photos from the camera roll, then once more and take one with the camera. For each file expect a dimmed placeholder with a percentage and progress bar, then a green card "Photo <n> saved to <place name>".
+  3. Tap "Make first" on the second photo: expect the cards to swap and a success card.
+  4. Tap "Remove" on the third photo, confirm the dialog: expect the card to disappear, the numbering to close up, and a success card.
+  5. Type a credit on a photo card and tap away (or press Enter): expect "Credit saved".
+  6. Change a text field (e.g. notes) and tap Save: expect the button to read "Saving…", then the page to stay on the edit page with a green "<Name> saved" card.
+  7. Go back to the list with "← Places": expect the row's 56px thumbnail to be the photo you made first, with a small count badge showing the number of photos.
+  8. Error path: turn on airplane mode and tap "Add photo" with any file. Expect the placeholder to show "Upload failed" in red with "Try again" and "Discard", plus a red card "Connection dropped. Try again." Turn airplane mode off and tap "Try again": expect it to succeed.
+  9. Open the 1.0.0 app: the place should show your first photo in the list row and at the top of the detail screen.
+- Known things to look at while testing (from earlier iterations): on a phone-height viewport the bottom notice stack overlaps the sticky Save bar of the place form for the 4 s a success card is up (1.2 learnings, line 59 of this file). Clearing a text field to blank does not persist (blank → unchanged in `PlaceModel.update`). Leaving a tab open across a redeploy should show the "The admin was updated since you opened this page. Reload to continue." card and turn Save into "Reload first" (4.1).
+- When done: tick 5.1 in `plan.md`. Anything that did not behave as written goes in this file and as a `fix(admin)` task under a new "## Phase 6" in `plan.md`, with the exact words you expected to see on screen.
+- No code changed this iteration. Git tree was clean at start; the 4.1 progress commit `1d70ddd` is local and will ride along on the next push.
+---
