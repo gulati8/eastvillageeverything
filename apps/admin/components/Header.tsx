@@ -4,7 +4,7 @@ import { logoutAction } from '../lib/actions/login';
 export function Header() {
   return (
     <header className="border-b border-hairline bg-paper">
-      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-6">
+      <div className="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 md:gap-6">
         <Link href="/places" className="text-2xl">
           <span className="font-display italic">EVE</span>{' '}
           <span className="ui font-bold uppercase tracking-wider text-sm">Admin</span>

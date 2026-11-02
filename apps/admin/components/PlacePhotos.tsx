@@ -159,7 +159,7 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
           const photo = result.photo;
           setPhotos((list) => (list.some((p) => p.id === photo.id) ? list : [...list, photo]));
           dropUpload(id);
-          notify({ kind: 'success', title: `Photo ${photo.position + 1} saved to ${placeName}` });
+          notify({ kind: 'success', title: `Photo saved to ${placeName}` });
         } else {
           patchUpload(id, { status: 'failed' });
           notify(describeFailure(result.failure, pathname));
@@ -218,12 +218,14 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
     }
   };
 
-  const onMakeFirst = (photo: PlacePhotoResponse) => {
+  // "Featured" is the user's word for the position-0 photo: the one the app
+  // and the admin list show. Only one photo can hold it.
+  const onFeature = (photo: PlacePhotoResponse) => {
     if (!photo.id) return;
     void runAction(
       photo.id,
       () => makeFirstPlacePhoto(photo.id!),
-      { kind: 'success', title: 'Made first', detail: `It is now the list thumbnail for ${placeName}.` },
+      { kind: 'success', title: 'Featured', detail: `The app shows this photo for ${placeName}.` },
       'Order not saved',
     );
   };
@@ -253,13 +255,43 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
 
   const showGoogle = photos.length === 0 && googleFallback !== null;
   const showEmptyHint = photos.length === 0 && googleFallback === null && uploads.length === 0;
+  // Photo cards plus the Google card (never both at once); the add card and
+  // in-flight uploads do not count.
+  const cardCount = photos.length + (showGoogle ? 1 : 0);
+  const hint = showGoogle
+    ? 'No photos yet'
+    : cardCount >= 2
+      ? `${cardCount} photos · swipe for more`
+      : 'Saved the moment you pick them';
+  const openPicker = () => fileRef.current?.click();
 
   return (
     <section aria-label="Photos" className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 className="text-2xl">Photos</h2>
-        <span className="ui text-xs uppercase text-ink3">Saved the moment you pick them</span>
+        <span className="ui text-xs uppercase text-ink3">{hint}</span>
       </div>
+
+      {/* The primary way in. The add card at the end of the strip is a second
+          entry point, but on a phone it sits off-screen to the right. */}
+      <button
+        type="button"
+        onClick={openPicker}
+        className="ui mb-3 w-full rounded-input bg-ink px-4 py-3 text-sm uppercase text-paper hover:opacity-90"
+      >
+        Add photo
+      </button>
+      <input
+        ref={fileRef}
+        type="file"
+        accept={ACCEPT}
+        multiple
+        hidden
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) enqueue(e.target.files);
+          e.target.value = '';
+        }}
+      />
 
       <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
         {showGoogle && googleFallback && (
@@ -283,7 +315,7 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photo.thumb_url ?? photo.url} alt="" className="aspect-[4/3] w-full object-cover" />
               <div className="space-y-2 p-3">
-                <Badge>{index === 0 ? '1 · list thumbnail' : String(index + 1)}</Badge>
+                {index === 0 && <Badge>Featured</Badge>}
                 <label className="block">
                   <span className="ui text-xs uppercase text-ink3">Credit</span>
                   <input
@@ -306,10 +338,10 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
                     <button
                       type="button"
                       disabled={busy}
-                      onClick={() => onMakeFirst(photo)}
+                      onClick={() => onFeature(photo)}
                       className="ui rounded-input border border-hairline bg-paper px-3 py-2 text-xs uppercase hover:border-accent disabled:opacity-60"
                     >
-                      Make first
+                      Feature
                     </button>
                   ) : (
                     <span />
@@ -383,7 +415,7 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
         <Card dashed>
           <button
             type="button"
-            onClick={() => fileRef.current?.click()}
+            onClick={openPicker}
             className="ui grid aspect-[4/3] w-full place-items-center bg-paper text-sm uppercase text-ink hover:text-accent"
           >
             <span className="grid place-items-center gap-1">
@@ -398,17 +430,6 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
                 : 'Pick one or several from the camera or library. Each one saves as soon as it finishes.'}
             </p>
           </div>
-          <input
-            ref={fileRef}
-            type="file"
-            accept={ACCEPT}
-            multiple
-            hidden
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) enqueue(e.target.files);
-              e.target.value = '';
-            }}
-          />
         </Card>
       </div>
     </section>
@@ -419,7 +440,7 @@ function Card({ children, dashed = false, uploadId }: { children: React.ReactNod
   return (
     <div
       data-upload-id={uploadId}
-      className={`w-full shrink-0 snap-start overflow-hidden rounded-card border bg-paper md:w-[18rem] ${dashed ? 'border-2 border-dashed border-hairline' : 'border-hairline'}`}
+      className={`w-[86%] shrink-0 snap-start overflow-hidden rounded-card border bg-paper md:w-[18rem] ${dashed ? 'border-2 border-dashed border-hairline' : 'border-hairline'}`}
     >
       {children}
     </div>
