@@ -27,3 +27,17 @@ h1, h2, h3 {
   font-family: theme('fontFamily.ui');
   letter-spacing: 0.04em;
 }
+
+/* Feedback overlay cards slide up from the bottom edge; reduced motion just appears. */
+@keyframes notice-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.notice-card {
+  animation: notice-in 180ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .notice-card {
+    animation: none;
+  }
+}

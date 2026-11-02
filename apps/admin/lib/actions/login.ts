@@ -8,6 +8,7 @@ import { UserModel } from '@eve/db';
 import { redis } from '../redis';
 import { destroySession, SESSION_COOKIE } from '../auth';
 import { assertSameOriginAction, sanitizeAdminNextPath } from '../security';
+import { setFlash } from '../flash';
 
 const SECRET = process.env.SESSION_SECRET ?? '';
 const SESSION_TTL_SECONDS = 24 * 60 * 60;
@@ -62,5 +63,6 @@ export async function logoutAction(): Promise<void> {
   const raw = cookieStore.get(SESSION_COOKIE)?.value;
   await destroySession(raw);
   cookieStore.delete(SESSION_COOKIE);
+  await setFlash('success', 'Signed out');
   redirect('/login');
 }

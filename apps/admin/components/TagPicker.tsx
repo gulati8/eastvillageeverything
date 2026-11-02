@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { SortableList } from './SortableList';
+import { useNotices } from './Notices';
 import { createTagInline } from '../lib/actions/tags';
 
 interface Tag { id: string; value: string; display: string; }
@@ -17,6 +18,7 @@ export function TagPicker({ name, allTags, initial }: Props) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const { notify } = useNotices();
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inlineCreateAvailable = true;
 
@@ -82,11 +84,18 @@ export function TagPicker({ name, allTags, initial }: Props) {
                 onClick={() => {
                   const display = query.trim();
                   startTransition(async () => {
-                    const created = await createTagInline(display);
-                    if (created) {
-                      setSelected((prev) => [...prev, created]);
+                    try {
+                      const result = await createTagInline(display);
+                      if (!result.ok) {
+                        notify({ kind: 'error', title: 'Tag not created', detail: result.error });
+                        return;
+                      }
+                      setSelected((prev) => [...prev, result.tag]);
                       setQuery('');
                       setOpen(false);
+                      notify({ kind: 'success', title: `Tag “${result.tag.display}” created`, detail: 'Save the place to keep it selected.' });
+                    } catch (e) {
+                      notify({ kind: 'error', title: 'Tag not created', detail: e instanceof Error ? e.message : 'Try again.' });
                     }
                   });
                 }}

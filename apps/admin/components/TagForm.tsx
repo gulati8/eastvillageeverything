@@ -1,3 +1,5 @@
+import { ReturnTo } from './ReturnTo';
+
 interface Props {
   action: (fd: FormData) => void;
   defaultValues?: { display: string; value: string };
@@ -6,6 +8,7 @@ interface Props {
 export function TagForm({ action, defaultValues = { display: '', value: '' } }: Props) {
   return (
     <form action={action} className="space-y-4">
+      <ReturnTo />
       <label className="block">
         <span className="ui text-xs uppercase text-ink3">Display name</span>
         <input
@@ -17,7 +20,7 @@ export function TagForm({ action, defaultValues = { display: '', value: '' } }: 
         <span className="ui text-xs uppercase text-ink3">Slug</span>
         <input
           name="value" required defaultValue={defaultValues.value}
-          pattern="[a-z0-9-]+"
+          pattern="[a-z0-9\-]+"
           placeholder="e.g., happy-hour"
           className="w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent"
         />

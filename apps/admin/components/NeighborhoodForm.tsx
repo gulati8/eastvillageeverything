@@ -1,3 +1,5 @@
+import { ReturnTo } from './ReturnTo';
+
 interface Props {
   action: (fd: FormData) => void;
   defaultValues?: { display: string; value: string; is_default: boolean };
@@ -6,6 +8,7 @@ interface Props {
 export function NeighborhoodForm({ action, defaultValues = { display: '', value: '', is_default: false } }: Props) {
   return (
     <form action={action} className="space-y-4">
+      <ReturnTo />
       <label className="block">
         <span className="ui text-xs uppercase text-ink3">Display name</span>
         <input

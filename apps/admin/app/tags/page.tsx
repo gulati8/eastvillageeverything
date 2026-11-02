@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { SortableList } from '../../components/SortableList';
+import { useNotices } from '../../components/Notices';
 import { reorderTags } from '../../lib/actions/tags';
 
 interface Tag { id: string; value: string; display: string; sort_order: number; }
@@ -12,6 +13,7 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 export default function TagsPage() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [pending, startTransition] = useTransition();
+  const { notify } = useNotices();
 
   useEffect(() => {
     fetch(`${basePath}/api/admin/tags`, { credentials: 'same-origin' })
@@ -20,8 +22,22 @@ export default function TagsPage() {
   }, []);
 
   const onReorder = (next: Tag[]) => {
+    const previous = tags;
     setTags(next);
-    startTransition(() => { void reorderTags(next.map((t) => t.id)); });
+    startTransition(async () => {
+      try {
+        const result = await reorderTags(next.map((t) => t.id));
+        if (result.ok) {
+          notify({ kind: 'success', title: 'Order saved' });
+        } else {
+          setTags(previous);
+          notify({ kind: 'error', title: 'Order not saved', detail: result.error });
+        }
+      } catch (e) {
+        setTags(previous);
+        notify({ kind: 'error', title: 'Order not saved', detail: e instanceof Error ? e.message : 'Try again.' });
+      }
+    });
   };
 
   return (

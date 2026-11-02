@@ -11,6 +11,31 @@ function assertGuarded(source, functionName, guardName) {
   assert.match(source, pattern, `${functionName} must call ${guardName} before doing work`);
 }
 
+/**
+ * Splits a source file into its `export async function` blocks. Helpers that
+ * sit between two exports are folded into the preceding block, which is fine
+ * for a "contains" check.
+ */
+function exportedFunctionBlocks(source) {
+  return source
+    .split(/(?=^export async function )/m)
+    .slice(1)
+    .map((block) => ({ name: block.match(/^export async function (\w+)/)[1], block }));
+}
+
+describe('admin feedback', () => {
+  it('every exported action that redirects also sets a flash notice', () => {
+    for (const file of ['./actions/places.ts', './actions/tags.ts', './actions/neighborhoods.ts']) {
+      const blocks = exportedFunctionBlocks(src(file));
+      assert.ok(blocks.length > 0, `${file} must export actions`);
+      for (const { name, block } of blocks) {
+        if (!/\bredirect\(/.test(block)) continue;
+        assert.match(block, /\bsetFlash\(/, `${name} in ${file} redirects without calling setFlash`);
+      }
+    }
+  });
+});
+
 describe('admin security guards', () => {
   it('guards every mutating place action', () => {
     const places = src('./actions/places.ts');

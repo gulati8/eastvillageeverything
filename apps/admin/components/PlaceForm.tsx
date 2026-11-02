@@ -3,6 +3,7 @@
 import { PhotoUpload } from './PhotoUpload';
 import { TagPicker } from './TagPicker';
 import { NeighborhoodPicker } from './NeighborhoodPicker';
+import { ReturnTo } from './ReturnTo';
 
 interface Tag { id: string; value: string; display: string; }
 interface Neighborhood { id: string; value: string; display: string; }
@@ -43,6 +44,7 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
 
   return (
     <form action={action} className="space-y-5">
+      <ReturnTo />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
         <div className="space-y-5">
           <section className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { ReturnTo } from './ReturnTo';
 
 interface Props {
   action: (formData: FormData) => void;
@@ -14,6 +15,7 @@ export function DeleteButton({ action, id, label = 'Delete', confirmText = 'Dele
   return (
     <form ref={formRef} action={action} className="inline">
       <input type="hidden" name="id" value={id} />
+      <ReturnTo />
       <button
         type="button"
         onClick={() => { if (confirm(confirmText)) formRef.current?.requestSubmit(); }}

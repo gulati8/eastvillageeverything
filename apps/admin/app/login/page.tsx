@@ -1,5 +1,6 @@
 import { loginAction } from '../../lib/actions/login';
 import { sanitizeAdminNextPath } from '../../lib/security';
+import { RaiseNotice } from '../../components/RaiseNotice';
 
 interface Props {
   searchParams: Promise<{ next?: string; error?: string }>;
@@ -14,7 +15,10 @@ export default async function LoginPage({ searchParams }: Props) {
         <h1 className="text-3xl">EVE Admin</h1>
         <p className="ui text-ink3 text-sm">Sign in to continue.</p>
         {sp.error && (
-          <p className="ui text-sm" style={{ color: '#C44' }}>{sp.error}</p>
+          <>
+            <p className="ui text-sm" style={{ color: '#C44' }}>{sp.error}</p>
+            <RaiseNotice kind="error" title="Sign-in failed" detail={sp.error} />
+          </>
         )}
         <input type="hidden" name="next" value={next} />
         <label className="block">

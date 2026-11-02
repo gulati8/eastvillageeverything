@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useNotices } from './Notices';
 import { createNeighborhoodInline } from '../lib/actions/neighborhoods';
 
 interface Neighborhood { id: string; value: string; display: string; }
@@ -17,6 +18,7 @@ export function NeighborhoodPicker({ name, options, initialId }: Props) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const { notify } = useNotices();
   const inlineCreateAvailable = true;
 
   const filtered = list.filter((n) => n.display.toLowerCase().includes(query.toLowerCase()));
@@ -64,12 +66,20 @@ export function NeighborhoodPicker({ name, options, initialId }: Props) {
               onClick={() => {
                 const display = query.trim();
                 startTransition(async () => {
-                  const created = await createNeighborhoodInline(display);
-                  if (created) {
+                  try {
+                    const result = await createNeighborhoodInline(display);
+                    if (!result.ok) {
+                      notify({ kind: 'error', title: 'Neighborhood not created', detail: result.error });
+                      return;
+                    }
+                    const created = result.neighborhood;
                     setList((prev) => [...prev, created]);
                     setSelectedId(created.id);
                     setQuery('');
                     setOpen(false);
+                    notify({ kind: 'success', title: `Neighborhood “${created.display}” created`, detail: 'Save the place to keep it selected.' });
+                  } catch (e) {
+                    notify({ kind: 'error', title: 'Neighborhood not created', detail: e instanceof Error ? e.message : 'Try again.' });
                   }
                 });
               }}
