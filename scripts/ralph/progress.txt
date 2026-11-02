@@ -178,3 +178,7 @@ Previous plan and log: scripts/ralph/archive/launch-plan.md, launch-progress.txt
 ## 2026-11-02 - 5.1 phone test, first finding (human)
 - On an iPhone, the edit pages for Upstate (one uploaded photo) and Verlaines (Google fallback only) show one photo card and no "Add photo" control. Screenshots were reviewed in chat. Cause: the add card is the last card of the horizontally scrolling strip and phone cards are full width, so it is off-screen with no cue to swipe. Logged as 6.1; 5.1 now also waits on 6.1. Steps 1 to 9 of 5.1 could not be run.
 ---
+
+## 2026-11-02 - 5.1 phone test, second finding (human)
+- The badge "1 · list thumbnail" means nothing to the user. Decision: the concept is "featured". First photo's badge reads "Featured", other cards carry no badge or number, the "Make first" button becomes "Feature". Folded into 6.1 (d).
+---
