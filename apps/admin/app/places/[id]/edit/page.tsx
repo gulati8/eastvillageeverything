@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PlaceForm } from '../../../../components/PlaceForm';
 import { PrevNextNav } from '../../../../components/PrevNextNav';
@@ -57,6 +58,7 @@ export default async function EditPlacePage({
 
   return (
     <div className="space-y-4">
+      <Link href="/places" className="ui inline-block text-sm text-ink3 hover:text-ink">← Places</Link>
       <PrevNextNav
         prevHref={prev ? `/places/${prev.id}/edit` : null}
         nextHref={next ? `/places/${next.id}/edit` : null}

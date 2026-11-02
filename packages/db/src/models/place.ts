@@ -217,7 +217,9 @@ export class PlaceModel {
    * Create a new place
    */
   static async create(data: PlaceInput): Promise<Place> {
-    return withTransaction(async (client: PoolClient) => {
+    // The transaction returns only the id: `findById` reads through the pool,
+    // which cannot see the uncommitted row, so the full read happens after commit.
+    const id = await withTransaction(async (client: PoolClient) => {
       let neighborhoodId = data.neighborhood_id;
       if (!neighborhoodId) {
         const defaultRow = await client.query<{ id: string }>(
@@ -270,9 +272,9 @@ export class PlaceModel {
         await PlaceModel.setTags(client, place.id, data.tags);
       }
 
-      // Return the full place with tags
-      return (await PlaceModel.findById(place.id))!;
+      return place.id as string;
     });
+    return (await PlaceModel.findById(id))!;
   }
 
   /**

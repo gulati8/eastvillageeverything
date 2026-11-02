@@ -57,10 +57,11 @@ export async function createPlace(formData: FormData) {
     redirect(returnTo);
   }
   const tags = await tagValuesForIds(readTagIds(formData));
-  await PlaceModel.create({ ...f, tags });
+  const place = await PlaceModel.create({ ...f, tags });
   revalidatePath('/places');
-  await setFlash('success', `${f.name} created`);
-  redirect('/places');
+  // Land on the new place's edit page so photos can be added next.
+  await setFlash('success', `${f.name} created`, 'Add photos below.');
+  redirect(`/places/${place.id}/edit`);
 }
 
 export async function updatePlace(id: string, formData: FormData) {
@@ -76,7 +77,8 @@ export async function updatePlace(id: string, formData: FormData) {
   revalidatePath('/places');
   revalidatePath(`/places/${id}/edit`);
   await setFlash('success', `${f.name} saved`);
-  redirect('/places');
+  // Stay on the page being edited rather than bouncing to the list.
+  redirect(`/places/${id}/edit`);
 }
 
 export async function deletePlace(formData: FormData) {

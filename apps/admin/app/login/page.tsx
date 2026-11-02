@@ -1,6 +1,7 @@
 import { loginAction } from '../../lib/actions/login';
 import { sanitizeAdminNextPath } from '../../lib/security';
 import { RaiseNotice } from '../../components/RaiseNotice';
+import { SubmitButton } from '../../components/SubmitButton';
 
 interface Props {
   searchParams: Promise<{ next?: string; error?: string }>;
@@ -41,9 +42,9 @@ export default async function LoginPage({ searchParams }: Props) {
             className="w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent"
           />
         </label>
-        <button type="submit" className="w-full ui font-bold uppercase tracking-wider p-3 rounded-input bg-ink text-paper">
+        <SubmitButton pendingLabel="Signing in…" className="w-full ui font-bold uppercase tracking-wider p-3 rounded-input bg-ink text-paper disabled:opacity-80">
           Sign in
-        </button>
+        </SubmitButton>
       </form>
     </main>
   );

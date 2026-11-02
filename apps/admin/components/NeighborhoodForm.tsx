@@ -1,4 +1,5 @@
 import { ReturnTo } from './ReturnTo';
+import { SubmitButton } from './SubmitButton';
 
 interface Props {
   action: (fd: FormData) => void;
@@ -28,7 +29,9 @@ export function NeighborhoodForm({ action, defaultValues = { display: '', value:
         <span className="ui text-sm">Set as default neighborhood</span>
       </label>
       <div className="pt-2 border-t border-hairline">
-        <button type="submit" className="ui text-sm uppercase bg-ink text-paper px-4 py-2 rounded-input">Save</button>
+        <SubmitButton pendingLabel="Saving…" className="ui text-sm uppercase bg-ink text-paper px-4 py-2 rounded-input disabled:opacity-80">
+          Save
+        </SubmitButton>
       </div>
     </form>
   );

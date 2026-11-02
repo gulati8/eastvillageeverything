@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { ReturnTo } from './ReturnTo';
+import { SubmitButton } from './SubmitButton';
 
 interface Props {
   action: (formData: FormData) => void;
@@ -16,14 +17,15 @@ export function DeleteButton({ action, id, label = 'Delete', confirmText = 'Dele
     <form ref={formRef} action={action} className="inline">
       <input type="hidden" name="id" value={id} />
       <ReturnTo />
-      <button
+      <SubmitButton
         type="button"
+        pendingLabel="Deleting…"
         onClick={() => { if (confirm(confirmText)) formRef.current?.requestSubmit(); }}
-        className="ui text-sm uppercase"
+        className="ui text-sm uppercase disabled:opacity-80"
         style={{ color: '#C44' }}
       >
         {label}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

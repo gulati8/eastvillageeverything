@@ -4,6 +4,7 @@ import { PhotoUpload } from './PhotoUpload';
 import { TagPicker } from './TagPicker';
 import { NeighborhoodPicker } from './NeighborhoodPicker';
 import { ReturnTo } from './ReturnTo';
+import { SubmitButton } from './SubmitButton';
 
 interface Tag { id: string; value: string; display: string; }
 interface Neighborhood { id: string; value: string; display: string; }
@@ -84,8 +85,7 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
           <section className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
             <SectionHeader
               title="Photo"
-              description="Nicholas adds images from camera, photo library, or file upload. No pasted image URLs."
-              badge="Crop/resize planned"
+              description="Pick an image from the camera or photo library. Each upload also saves a list thumbnail and a detail hero."
             />
             <div className="grid gap-4 md:grid-cols-[minmax(0,18rem)_1fr]">
               <PhotoUpload
@@ -101,12 +101,6 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
               />
               <div className="space-y-3">
                 <Field label="Photo credit" name="photo_credit" defaultValue={v.photo_credit ?? ''} />
-                <div className="rounded-input border border-hairline bg-paper p-3">
-                  <p className="ui text-xs uppercase text-ink3">Tracked next</p>
-                  <p className="mt-1 text-sm text-ink2">
-                    Automatic resize, crop presets, and focal-point adjustment will be added after the safe upload-only flow is in place.
-                  </p>
-                </div>
               </div>
             </div>
           </section>
@@ -115,7 +109,6 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
             <SectionHeader
               title="Editorial for mobile"
               description="Optional enriched copy. The app and old web must still work when these are blank."
-              badge="AI planned"
             />
             <div className="space-y-3">
               <TextAreaWithGenerate label="Pitch" name="pitch" defaultValue={v.pitch ?? ''} rows={2} hint="2 sentences. Friend voice." />
@@ -151,25 +144,20 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
       </div>
 
       <div className="sticky bottom-0 -mx-4 flex items-center gap-3 border-t border-hairline bg-paper/95 px-4 py-3 md:static md:mx-0 md:bg-transparent md:px-0 md:pt-4">
-        <button type="submit" className="ui text-sm uppercase bg-ink text-paper px-4 py-2 rounded-input">Save</button>
+        <SubmitButton pendingLabel="Saving…" className="ui text-sm uppercase bg-ink text-paper px-4 py-2 rounded-input disabled:opacity-80">
+          Save
+        </SubmitButton>
         <span className="ui text-xs uppercase text-ink3">Safe for old web and mobile fallbacks</span>
       </div>
     </form>
   );
 }
 
-function SectionHeader({ title, description, badge }: { title: string; description: string; badge?: string }) {
+function SectionHeader({ title, description }: { title: string; description: string }) {
   return (
-    <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-      <div>
-        <h2 className="text-2xl">{title}</h2>
-        <p className="mt-1 text-sm text-ink2">{description}</p>
-      </div>
-      {badge && (
-        <span className="ui w-fit rounded-chip bg-paper px-2 py-1 text-xs uppercase text-accent">
-          {badge}
-        </span>
-      )}
+    <div className="mb-4">
+      <h2 className="text-2xl">{title}</h2>
+      <p className="mt-1 text-sm text-ink2">{description}</p>
     </div>
   );
 }
