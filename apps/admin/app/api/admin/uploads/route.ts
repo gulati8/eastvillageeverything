@@ -4,8 +4,8 @@ import { randomUUID } from 'node:crypto';
 import sharp from 'sharp';
 import { putObject } from '@eve/storage';
 import { PlaceModel, PlacePhotoModel } from '@eve/db';
-import type { PlacePhotoResponse } from '@eve/shared-types';
 import { adminErrorResponse, requireAdminRequest } from '../../../../lib/security';
+import { toPlacePhotoResponse } from '../../../../lib/photos';
 
 export const runtime = 'nodejs';
 
@@ -39,7 +39,7 @@ async function makeVariant(src: Buffer, width: number, quality: number): Promise
  * With an optional `place_id` the same request also attaches the upload to
  * that place as its next photo (`PlacePhotoModel.add`, which mirrors the first
  * photo into `places.photo_*`) and the response gains `photo` and `place_id`.
- * Without `place_id` the response is the bare URL set (the tag form uses it).
+ * Without `place_id` the response is the bare URL set.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -138,15 +138,7 @@ export async function POST(req: NextRequest) {
       thumb_url: urls.thumb_url,
       hero_url: urls.hero_url,
     });
-    const photo: PlacePhotoResponse = {
-      id: row.id,
-      url: row.url,
-      thumb_url: row.thumb_url,
-      hero_url: row.hero_url,
-      credit: row.credit,
-      position: row.position,
-      attribution: null,
-    };
+    const photo = toPlacePhotoResponse(row);
     revalidatePath('/places');
     revalidatePath(`/places/${placeId}/edit`);
     return NextResponse.json({ ...urls, photo, place_id: placeId });

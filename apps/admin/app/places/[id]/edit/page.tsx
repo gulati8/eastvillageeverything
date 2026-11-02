@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation';
 import { PlaceForm } from '../../../../components/PlaceForm';
 import { PrevNextNav } from '../../../../components/PrevNextNav';
 import { DeleteButton } from '../../../../components/DeleteButton';
+import { PlacePhotos } from '../../../../components/PlacePhotos';
 import { PlaceModel, TagModel, NeighborhoodModel } from '@eve/db';
 import { updatePlace, deletePlace } from '../../../../lib/actions/places';
+import { googlePhotoUrl, toPlacePhotoResponse } from '../../../../lib/photos';
 
 export default async function EditPlacePage({
   params,
@@ -36,6 +38,11 @@ export default async function EditPlacePage({
 
   const update = updatePlace.bind(null, place.id);
 
+  const photos = (place.photos ?? []).map(toPlacePhotoResponse);
+  const googleFallback = place.google_photo_name
+    ? { url: googlePhotoUrl(place.id, 'hero'), attribution: place.google_photo_attribution ?? null }
+    : null;
+
   const defaultValues = {
     name: place.name,
     address: place.address ?? '',
@@ -44,9 +51,6 @@ export default async function EditPlacePage({
     url: place.url ?? '',
     neighborhood_id: place.neighborhood_id,
     photo_url: place.photo_url ?? '',
-    photo_thumb_url: place.photo_thumb_url ?? '',
-    photo_hero_url: place.photo_hero_url ?? '',
-    photo_credit: place.photo_credit ?? '',
     specials: place.specials ?? '',
     notes: place.notes ?? '',
     pitch: place.pitch ?? '',
@@ -68,6 +72,7 @@ export default async function EditPlacePage({
         <h1 className="text-3xl">{place.name}</h1>
         <DeleteButton action={deletePlace} id={place.id} confirmText="Delete this place? This cannot be undone." />
       </div>
+      <PlacePhotos placeId={place.id} photos={photos} placeName={place.name} googleFallback={googleFallback} />
       <PlaceForm
         action={update}
         defaultValues={defaultValues}

@@ -17,6 +17,10 @@ export default async function NewPlacePage({
   return (
     <div className="space-y-4">
       <h1 className="text-3xl">New place</h1>
+      <section aria-label="Photos" className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
+        <h2 className="text-2xl">Photos</h2>
+        <p className="mt-1 text-sm text-ink2">Save the place first, then add photos here.</p>
+      </section>
       <PlaceForm
         action={createPlace}
         allTags={tags.map((t) => ({ id: t.id, value: t.value, display: t.display }))}

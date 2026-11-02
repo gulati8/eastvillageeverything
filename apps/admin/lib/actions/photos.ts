@@ -2,23 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 import { PlacePhotoModel } from '@eve/db';
-import type { PlacePhoto, PlacePhotoResponse } from '@eve/shared-types';
+import type { PlacePhotoResponse } from '@eve/shared-types';
 import { requireAdminMutation } from '../security';
+import { toPlacePhotoResponse } from '../photos';
 import type { ActionResult } from './tags';
 
 export type PhotosResult = ActionResult<{ photos: PlacePhotoResponse[] }>;
-
-function toResponse(row: PlacePhoto): PlacePhotoResponse {
-  return {
-    id: row.id,
-    url: row.url,
-    thumb_url: row.thumb_url,
-    hero_url: row.hero_url,
-    credit: row.credit,
-    position: row.position,
-    attribution: null,
-  };
-}
 
 function errorMessage(e: unknown): string {
   return e instanceof Error && e.message ? e.message : 'Something went wrong. Try again.';
@@ -26,7 +15,7 @@ function errorMessage(e: unknown): string {
 
 /** The place's fresh ordered list after a write, with the list and edit pages revalidated. */
 async function freshList(placeId: string): Promise<PhotosResult> {
-  const photos = (await PlacePhotoModel.listForPlace(placeId)).map(toResponse);
+  const photos = (await PlacePhotoModel.listForPlace(placeId)).map(toPlacePhotoResponse);
   revalidatePath('/places');
   revalidatePath(`/places/${placeId}/edit`);
   return { ok: true, photos };

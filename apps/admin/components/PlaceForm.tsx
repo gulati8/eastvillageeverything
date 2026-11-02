@@ -1,6 +1,5 @@
 'use client';
 
-import { PhotoUpload } from './PhotoUpload';
 import { TagPicker } from './TagPicker';
 import { NeighborhoodPicker } from './NeighborhoodPicker';
 import { ReturnTo } from './ReturnTo';
@@ -13,7 +12,8 @@ interface Props {
   action: (formData: FormData) => void;
   defaultValues?: Partial<{
     name: string; address: string; cross_street: string; phone: string; url: string;
-    neighborhood_id: string; photo_url: string; photo_thumb_url: string; photo_hero_url: string; photo_credit: string;
+    /** Mirrored first photo; the readiness row reads it. Photos themselves live in `PlacePhotos`. */
+    neighborhood_id: string; photo_url: string;
     specials: string; notes: string;
     pitch: string; perfect: string; insider: string; vibe: string; crowd: string;
   }>;
@@ -79,29 +79,6 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
             <div className="space-y-3">
               <TextArea label="Specials" name="specials" defaultValue={v.specials ?? ''} rows={3} />
               <TextArea label="Notes" name="notes" defaultValue={v.notes ?? ''} rows={3} />
-            </div>
-          </section>
-
-          <section className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
-            <SectionHeader
-              title="Photo"
-              description="Pick an image from the camera or photo library. Each upload also saves a list thumbnail and a detail hero."
-            />
-            <div className="grid gap-4 md:grid-cols-[minmax(0,18rem)_1fr]">
-              <PhotoUpload
-                name="photo_url"
-                prefix="place"
-                initialUrl={v.photo_url ?? null}
-                variants={{
-                  thumb: { name: 'photo_thumb_url', initialUrl: v.photo_thumb_url ?? null },
-                  hero: { name: 'photo_hero_url', initialUrl: v.photo_hero_url ?? null },
-                }}
-                label="Place image"
-                help="Each upload also saves a 400px list thumbnail and a 1200px detail hero."
-              />
-              <div className="space-y-3">
-                <Field label="Photo credit" name="photo_credit" defaultValue={v.photo_credit ?? ''} />
-              </div>
             </div>
           </section>
 
