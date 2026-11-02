@@ -21,6 +21,7 @@
  *   - setCredit: writes the trimmed credit (blank -> null), mirrors
  *   - mirrorFirst: the UPDATE copies the position-0 row (or nulls) into places
  *   - listForPlace: ordered by position
+ *   - countsByPlace: one GROUP BY query, returned as a Map keyed by place id
  * Needs a live DB (not covered here): the deferred constraint actually
  * tolerating the mid-transaction swap; verified by hand in progress.txt (2.1).
  */
@@ -117,6 +118,20 @@ describe('PlacePhotoModel.listForPlace', () => {
     assert.equal(calls.length, 1);
     assert.match(calls[0].sql, /FROM place_photos WHERE place_id = \$1 ORDER BY position ASC/);
     assert.deepEqual(calls[0].params, [PLACE]);
+    assert.equal(transactions, 0, 'a read needs no transaction');
+  });
+});
+
+describe('PlacePhotoModel.countsByPlace', () => {
+  test('groups place_photos by place_id in one query and returns a Map', async () => {
+    script.push(rows({ place_id: PLACE, count: 3 }, { place_id: 'other', count: 1 }));
+    const counts = await PlacePhotoModel.countsByPlace();
+    assert.equal(calls.length, 1, 'one query for every place');
+    assert.match(calls[0].sql, /SELECT place_id, COUNT\(\*\)::int AS count FROM place_photos GROUP BY place_id/);
+    assert.deepEqual(calls[0].params, []);
+    assert.equal(counts.get(PLACE), 3);
+    assert.equal(counts.get('other'), 1);
+    assert.equal(counts.get('missing'), undefined, 'places with no photos are absent');
     assert.equal(transactions, 0, 'a read needs no transaction');
   });
 });

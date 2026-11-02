@@ -45,6 +45,17 @@ export class PlacePhotoModel {
     return result.rows;
   }
 
+  /**
+   * Photo count per place in one query, keyed by place id. Places with no
+   * photos are absent, so callers read `counts.get(id) ?? 0`.
+   */
+  static async countsByPlace(): Promise<Map<string, number>> {
+    const result = await query<{ place_id: string; count: number }>(
+      `SELECT place_id, COUNT(*)::int AS count FROM place_photos GROUP BY place_id`
+    );
+    return new Map(result.rows.map((row) => [row.place_id, row.count]));
+  }
+
   /** Append a photo at `max(position) + 1` (0 for the first). Throws when the place does not exist. */
   static async add(placeId: string, data: PlacePhotoInput): Promise<PlacePhoto> {
     const url = httpUrl(data.url);
