@@ -174,3 +174,7 @@ Previous plan and log: scripts/ralph/archive/launch-plan.md, launch-progress.txt
 - When done: tick 5.1 in `plan.md`. Anything that did not behave as written goes in this file and as a `fix(admin)` task under a new "## Phase 6" in `plan.md`, with the exact words you expected to see on screen.
 - No code changed this iteration. Git tree was clean at start; the 4.1 progress commit `1d70ddd` is local and will ride along on the next push.
 ---
+
+## 2026-11-02 - 5.1 phone test, first finding (human)
+- On an iPhone, the edit pages for Upstate (one uploaded photo) and Verlaines (Google fallback only) show one photo card and no "Add photo" control. Screenshots were reviewed in chat. Cause: the add card is the last card of the horizontally scrolling strip and phone cards are full width, so it is off-screen with no cue to swipe. Logged as 6.1; 5.1 now also waits on 6.1. Steps 1 to 9 of 5.1 could not be run.
+---
