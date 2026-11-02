@@ -20,6 +20,24 @@ describe('autoDismissMs', () => {
     assert.equal(autoDismissMs('info'), AUTO_DISMISS_MS);
     assert.equal(autoDismissMs('error'), null);
   });
+
+  it('keeps a sticky success or info notice until dismissed', () => {
+    assert.equal(autoDismissMs('info', true), null);
+    assert.equal(autoDismissMs('success', true), null);
+    assert.equal(autoDismissMs('info', false), AUTO_DISMISS_MS);
+  });
+});
+
+describe('reduceNotices sticky', () => {
+  it('gives a sticky info notice no expiry and tick never drops it', () => {
+    let s = add([], 'a', 'info', T0, { sticky: true });
+    assert.equal(s[0].expiresAt, null);
+    s = reduceNotices(s, { type: 'tick', now: T0 + AUTO_DISMISS_MS * 10 });
+    assert.deepEqual(s.map((n) => n.id), ['a']);
+    assert.equal(nextExpiry(s), null);
+    s = reduceNotices(s, { type: 'dismiss', id: 'a' });
+    assert.deepEqual(s, []);
+  });
 });
 
 describe('reduceNotices add', () => {

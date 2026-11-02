@@ -2,6 +2,8 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
+import { useStale } from './VersionWatch';
+import { STALE_BUTTON_LABEL } from '../lib/stale';
 
 interface Props {
   children: ReactNode;
@@ -19,20 +21,28 @@ interface Props {
  * server action runs it is disabled, shows `pendingLabel`, and carries a busy
  * outline so it reads as in progress on a phone with no hover state.
  * Must be rendered inside the form it reports on (`useFormStatus`).
+ *
+ * When `VersionWatch` has seen a redeploy under this tab the button is
+ * disabled with "Reload first": the action would fail with
+ * "Failed to find Server Action" and nothing would be saved.
  */
 export function SubmitButton({ children, pendingLabel, className = '', type = 'submit', onClick, style }: Props) {
   const { pending } = useFormStatus();
+  const stale = useStale();
+  const disabled = pending || stale;
+  const label = pending ? pendingLabel : stale ? STALE_BUTTON_LABEL : children;
   return (
     <button
       type={type}
       onClick={onClick}
-      disabled={pending}
+      disabled={disabled}
       aria-busy={pending || undefined}
-      aria-disabled={pending || undefined}
+      aria-disabled={disabled || undefined}
+      title={stale && !pending ? 'The admin was updated. Reload the page to continue.' : undefined}
       style={style}
-      className={`${className} ${pending ? 'cursor-progress opacity-80 outline outline-2 outline-offset-2 outline-accent' : ''}`.trim()}
+      className={`${className} ${pending ? 'cursor-progress opacity-80 outline outline-2 outline-offset-2 outline-accent' : ''} ${stale && !pending ? 'cursor-not-allowed opacity-60' : ''}`.trim()}
     >
-      {pending ? pendingLabel : children}
+      {label}
     </button>
   );
 }

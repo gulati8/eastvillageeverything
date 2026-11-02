@@ -4,8 +4,9 @@
  * value and schedules a single timer from `nextExpiry()`.
  *
  * Success and info notices expire `AUTO_DISMISS_MS` after they are added;
- * error notices stay until dismissed. A paused notice (hovered, touched)
- * keeps its remaining time and resumes from there.
+ * error notices and notices added with `sticky: true` stay until dismissed.
+ * A paused notice (hovered, touched) keeps its remaining time and resumes
+ * from there.
  */
 
 export type NoticeKind = 'success' | 'error' | 'info';
@@ -19,6 +20,8 @@ export interface NoticeInput {
   title: string;
   detail?: string;
   action?: NoticeAction;
+  /** Stay until dismissed even for success/info (an out-of-date page, say). */
+  sticky?: boolean;
 }
 
 export interface Notice extends NoticeInput {
@@ -38,14 +41,14 @@ export type NoticeEvent =
 
 export const AUTO_DISMISS_MS = 4000;
 
-export function autoDismissMs(kind: NoticeKind): number | null {
-  return kind === 'error' ? null : AUTO_DISMISS_MS;
+export function autoDismissMs(kind: NoticeKind, sticky = false): number | null {
+  return kind === 'error' || sticky ? null : AUTO_DISMISS_MS;
 }
 
 export function reduceNotices(state: Notice[], event: NoticeEvent): Notice[] {
   switch (event.type) {
     case 'add': {
-      const ttl = autoDismissMs(event.input.kind);
+      const ttl = autoDismissMs(event.input.kind, event.input.sticky);
       const notice: Notice = {
         ...event.input,
         id: event.id,

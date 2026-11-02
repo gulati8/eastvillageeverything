@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import { Header } from '../components/Header';
 import { NoticesProvider } from '../components/Notices';
 import { FlashNotice } from '../components/FlashNotice';
+import { VersionWatch } from '../components/VersionWatch';
 
 export const metadata = { title: 'EVE Admin' };
 
@@ -14,9 +15,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="en">
       <body>
         <NoticesProvider>
-          {userId ? <Header /> : null}
-          <main className="max-w-5xl mx-auto px-4 py-6">{children}</main>
-          <FlashNotice />
+          <VersionWatch>
+            {userId ? <Header /> : null}
+            <main className="max-w-5xl mx-auto px-4 py-6">{children}</main>
+            <FlashNotice />
+          </VersionWatch>
         </NoticesProvider>
       </body>
     </html>

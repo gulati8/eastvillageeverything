@@ -75,7 +75,9 @@ describe('admin security guards', () => {
   it('guards admin API routes explicitly', () => {
     const tagsRoute = src('../app/api/admin/tags/route.ts');
     const uploadsRoute = src('../app/api/admin/uploads/route.ts');
+    const versionRoute = src('../app/api/admin/version/route.ts');
     assert.match(tagsRoute, /requireAdminRequest\(req\)/, 'tags API must require an admin session');
+    assert.match(versionRoute, /requireAdminRequest\(req\)/, 'version API must require an admin session');
     assert.match(uploadsRoute, /requireAdminRequest\(req, \{ mutation: true \}\)/, 'upload API must require admin session and origin check');
   });
 
