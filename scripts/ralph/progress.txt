@@ -45,3 +45,7 @@ Older: scripts/ralph/archive/launch-plan.md, launch-progress.txt
   {"fields":{"pitch":null,"perfect":null,"insider":null,"vibe":"dim · moody · polished","crowd":"cocktail devotees, date-night pairs and visitors in the know"},"searches":1,"warnings":[]}
 - Learnings: the web search results dominate the input (30k+ tokens per click). `Anthropic.Message.content` pushes straight into a `MessageParam` as the assistant turn (no narrowing needed), which is how both the pause resume and the fix-up request continue the conversation. Node 26 runs `editorial.test.mjs` against the `.ts` source directly, same as the other admin tests.
 ---
+## 2026-11-03 - 3.2 deploy result
+- Pushed 23b3539. Build and Deploy run 41588894194 passed (build-and-push and deploy jobs both success) and CI run 41588894220 passed. `eve-admin` restarted on `ghcr.io/gulati8/eve-admin:latest` (Up 55 s at check time) and sees `ANTHROPIC_API_KEY` in its environment.
+- Prod checks: `curl -s -o /dev/null -w '%{http_code}' -X POST https://eastvillageeverything.nyc/admin/api/admin/generate` prints 401; `ssh ec2-user@100.29.233.41 'grep -c "^ANTHROPIC_API_KEY=sk" /srv/eve/.env'` prints 1; `/admin/login` still 200. The prod route is live for 3.3.
+---
