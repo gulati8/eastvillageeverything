@@ -1,16 +1,35 @@
 'use client';
 
+import { useRef, useState, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { TagPicker } from './TagPicker';
 import { NeighborhoodPicker } from './NeighborhoodPicker';
 import { ReturnTo } from './ReturnTo';
 import { SubmitButton } from './SubmitButton';
 import { CollapsibleSection } from './CollapsibleSection';
+import { useNotices } from './Notices';
+import { EDITORIAL_FIELDS, type EditorialField, type EditorialFields } from '../lib/editorial';
+
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
+/** Text fields the generate route reads from the page's unsaved state. */
+const GENERATE_FORM_KEYS = ['name', 'address', 'cross_street', 'url', 'specials', 'notes', ...EDITORIAL_FIELDS] as const;
+
+const EDITORIAL_LABELS: Record<EditorialField, string> = {
+  pitch: 'Pitch',
+  perfect: 'Perfect when…',
+  insider: 'Insider tip',
+  vibe: 'Vibe',
+  crowd: 'Crowd',
+};
 
 interface Tag { id: string; value: string; display: string; }
 interface Neighborhood { id: string; value: string; display: string; }
 
 interface Props {
   action: (formData: FormData) => void;
+  /** Set on the edit page. Without it (a new place) Generate is unavailable: the route needs a saved row. */
+  placeId?: string;
   defaultValues?: Partial<{
     name: string; address: string; cross_street: string; phone: string; url: string;
     /** Mirrored first photo; the readiness row reads it. Photos themselves live in `PlacePhotos`. */
@@ -24,7 +43,61 @@ interface Props {
   showEditorial?: boolean;
 }
 
-export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, neighborhoods }: Props) {
+type EditorialState = Record<EditorialField, string>;
+
+type GenerateOutcome =
+  | { ok: true; fields: EditorialFields; warnings: string[] }
+  | { ok: false; kind: 'signed-out' }
+  | { ok: false; kind: 'server'; message: string }
+  | { ok: false; kind: 'network' };
+
+/**
+ * Posts to the generate route with the page's unsaved text. Nothing is
+ * written server-side; the caller decides what to keep and Save persists it.
+ */
+async function postGenerate(placeId: string, fields: EditorialField[], form: HTMLFormElement): Promise<GenerateOutcome> {
+  const data = new FormData(form);
+  const snapshot: Record<string, string> = {};
+  for (const key of GENERATE_FORM_KEYS) {
+    const value = data.get(key);
+    if (typeof value === 'string') snapshot[key] = value;
+  }
+  let res: Response;
+  try {
+    res = await fetch(`${basePath}/api/admin/generate`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ place_id: placeId, fields, form: snapshot }),
+    });
+  } catch {
+    return { ok: false, kind: 'network' };
+  }
+  if (res.status === 401) return { ok: false, kind: 'signed-out' };
+  let body: unknown = null;
+  try {
+    body = await res.json();
+  } catch {
+    return { ok: false, kind: 'network' };
+  }
+  const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : null;
+  if (res.ok) {
+    const returned = record?.fields;
+    if (!returned || typeof returned !== 'object') return { ok: false, kind: 'network' };
+    const out = {} as EditorialFields;
+    for (const key of EDITORIAL_FIELDS) {
+      const value = (returned as Record<string, unknown>)[key];
+      out[key] = typeof value === 'string' ? value : null;
+    }
+    const warnings = Array.isArray(record?.warnings) ? record.warnings.filter((w): w is string => typeof w === 'string') : [];
+    return { ok: true, fields: out, warnings };
+  }
+  const message = typeof record?.error === 'string' ? record.error : null;
+  if (message) return { ok: false, kind: 'server', message };
+  return { ok: false, kind: 'network' };
+}
+
+export function PlaceForm({ action, placeId, defaultValues = {}, allTags, selectedTags, neighborhoods }: Props) {
   const v = defaultValues;
   const defaultNeighborhood =
     v.neighborhood_id ||
@@ -36,16 +109,89 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
   const hasContact = Boolean(v.phone?.trim() || v.url?.trim());
   const hasPhoto = Boolean(v.photo_url?.trim());
   const hasTags = selectedTags.length > 0;
-  const hasEditorial = Boolean(
-    v.pitch?.trim() ||
-    v.perfect?.trim() ||
-    v.insider?.trim() ||
-    v.vibe?.trim() ||
-    v.crowd?.trim(),
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const { notify } = useNotices();
+  const pathname = usePathname();
+  const [editorial, setEditorial] = useState<EditorialState>({
+    pitch: v.pitch ?? '',
+    perfect: v.perfect ?? '',
+    insider: v.insider ?? '',
+    vibe: v.vibe ?? '',
+    crowd: v.crowd ?? '',
+  });
+  /** The fields a request is writing right now; null when idle. */
+  const [writing, setWriting] = useState<EditorialField[] | null>(null);
+  const generating = writing !== null;
+
+  const hasEditorial = EDITORIAL_FIELDS.some((f) => editorial[f].trim());
+  const setField = (field: EditorialField, value: string) => setEditorial((s) => ({ ...s, [field]: value }));
+
+  const generate = async (fields: EditorialField[]) => {
+    if (!placeId || generating || !formRef.current) return;
+    setWriting(fields);
+    try {
+      const result = await postGenerate(placeId, fields, formRef.current);
+      if (!result.ok) {
+        if (result.kind === 'signed-out') {
+          notify({
+            kind: 'error',
+            title: 'You were signed out. Sign in again.',
+            action: { label: 'Sign in', href: `/login?next=${encodeURIComponent(pathname)}` },
+          });
+        } else if (result.kind === 'server') {
+          notify({ kind: 'error', title: result.message });
+        } else {
+          notify({ kind: 'error', title: 'Connection dropped. Try again.' });
+        }
+        return;
+      }
+      const filled = fields.filter((f) => result.fields[f] !== null);
+      const empty = fields.filter((f) => result.fields[f] === null);
+      if (filled.length > 0) {
+        setEditorial((s) => {
+          const next = { ...s };
+          for (const f of filled) next[f] = result.fields[f] ?? '';
+          return next;
+        });
+        notify({ kind: 'success', title: 'Editorial drafted', detail: `${filled.length} field(s) filled. Review, then Save.` });
+      }
+      if (empty.length > 0) {
+        notify({ kind: 'info', title: `Nothing found for ${empty.map((f) => EDITORIAL_LABELS[f]).join(', ')}.` });
+      }
+      if (result.warnings.length > 0) {
+        notify({ kind: 'info', title: 'Check the wording', detail: result.warnings[0] });
+      }
+    } finally {
+      setWriting(null);
+    }
+  };
+
+  const onGenerateBlank = () => {
+    const blank = EDITORIAL_FIELDS.filter((f) => !editorial[f].trim());
+    if (blank.length === 0) {
+      notify({ kind: 'info', title: 'Nothing to fill. Every editorial field has text; use Redo on one to rewrite it.' });
+      return;
+    }
+    void generate(blank);
+  };
+
+  const editorialField = (field: EditorialField, hint: string, rows?: number) => (
+    <EditorialInput
+      key={field}
+      field={field}
+      label={EDITORIAL_LABELS[field]}
+      value={editorial[field]}
+      onChange={(value) => setField(field, value)}
+      hint={hint}
+      rows={rows}
+      busy={writing?.includes(field) ?? false}
+      redo={placeId ? { onClick: () => void generate([field]), disabled: generating } : null}
+    />
   );
 
   return (
-    <form action={action} className="space-y-5">
+    <form ref={formRef} action={action} className="space-y-5">
       <ReturnTo />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
         <div className="space-y-5">
@@ -86,11 +232,27 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
             description="Optional enriched copy. The app and old web must still work when these are blank."
           >
             <div className="space-y-3">
-              <TextAreaWithGenerate label="Pitch" name="pitch" defaultValue={v.pitch ?? ''} rows={2} hint="2 sentences. Friend voice." />
-              <FieldWithGenerate label="Perfect when…" name="perfect" defaultValue={v.perfect ?? ''} hint="finishes 'Perfect when…'" />
-              <TextAreaWithGenerate label="Insider tip" name="insider" defaultValue={v.insider ?? ''} rows={2} hint="One sentence." />
-              <FieldWithGenerate label="Vibe" name="vibe" defaultValue={v.vibe ?? ''} hint="3 words separated by ' · '" />
-              <FieldWithGenerate label="Crowd" name="crowd" defaultValue={v.crowd ?? ''} hint="Who's there." />
+              {placeId ? (
+                <div>
+                  <button
+                    type="button"
+                    onClick={onGenerateBlank}
+                    disabled={generating}
+                    aria-busy={generating || undefined}
+                    className="ui w-full rounded-input bg-ink px-4 py-3 text-sm uppercase text-paper hover:opacity-90 disabled:cursor-progress disabled:opacity-70"
+                  >
+                    {generating ? 'Writing…' : 'Generate editorial'}
+                  </button>
+                  <p className="ui mt-1 text-xs text-ink3">Fills the blank fields below. Nothing is saved until you press Save.</p>
+                </div>
+              ) : (
+                <p className="text-sm text-ink2">Save the place first, then generate editorial here.</p>
+              )}
+              {editorialField('pitch', '2 sentences. Friend voice.', 2)}
+              {editorialField('perfect', "finishes 'Perfect when…'")}
+              {editorialField('insider', 'One sentence.', 2)}
+              {editorialField('vibe', "3 words separated by ' · '")}
+              {editorialField('crowd', "Who's there.")}
             </div>
           </CollapsibleSection>
         </div>
@@ -117,7 +279,7 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
       </div>
 
       <div className="sticky bottom-0 -mx-4 flex items-center gap-3 border-t border-hairline bg-paper/95 px-4 py-3 md:static md:mx-0 md:bg-transparent md:px-0 md:pt-4">
-        <SubmitButton pendingLabel="Saving…" className="ui text-sm uppercase bg-ink text-paper px-4 py-2 rounded-input disabled:opacity-80">
+        <SubmitButton pendingLabel="Saving…" busy={generating} className="ui text-sm uppercase bg-ink text-paper px-4 py-2 rounded-input disabled:opacity-80">
           Save
         </SubmitButton>
         <span className="ui text-xs uppercase text-ink3">Safe for old web and mobile fallbacks</span>
@@ -141,27 +303,15 @@ function ReadinessRow({ label, good, detail, optional = false }: { label: string
   );
 }
 
+const INPUT_CLASS = 'w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent';
+
 function Field({ label, name, defaultValue, required, hint }: { label: string; name: string; defaultValue: string; required?: boolean; hint?: string }) {
   return (
     <label className="block">
       <span className="ui text-xs uppercase text-ink3">{label}</span>
-      <input
-        name={name}
-        defaultValue={defaultValue}
-        required={required}
-        className="w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent"
-      />
+      <input name={name} defaultValue={defaultValue} required={required} className={INPUT_CLASS} />
       {hint && <span className="ui text-xs text-ink3 block mt-1">{hint}</span>}
     </label>
-  );
-}
-
-function FieldWithGenerate(props: { label: string; name: string; defaultValue: string; hint?: string }) {
-  return (
-    <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-      <Field {...props} />
-      <GenerateButton />
-    </div>
   );
 }
 
@@ -169,35 +319,62 @@ function TextArea({ label, name, defaultValue, rows, hint }: { label: string; na
   return (
     <label className="block">
       <span className="ui text-xs uppercase text-ink3">{label}</span>
-      <textarea
-        name={name}
-        defaultValue={defaultValue}
-        rows={rows}
-        className="w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent"
-      />
+      <textarea name={name} defaultValue={defaultValue} rows={rows} className={INPUT_CLASS} />
       {hint && <span className="ui text-xs text-ink3 block mt-1">{hint}</span>}
     </label>
   );
 }
 
-function TextAreaWithGenerate(props: { label: string; name: string; defaultValue: string; rows: number; hint?: string }) {
-  return (
-    <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-      <TextArea {...props} />
-      <GenerateButton />
-    </div>
-  );
+interface EditorialInputProps {
+  field: EditorialField;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  hint: string;
+  /** A textarea when set, an input otherwise. */
+  rows?: number;
+  /** A request is writing this field: dimmed, read-only, `aria-busy`. */
+  busy: boolean;
+  /** The per-field "Redo" button; null on a new place, where there is nothing to generate from. */
+  redo: { onClick: () => void; disabled: boolean } | null;
 }
 
-function GenerateButton() {
+/**
+ * One controlled editorial field with its label row. The `name` is unchanged
+ * so Save submits exactly what the page shows, generated or typed.
+ */
+function EditorialInput({ field, label, value, onChange, hint, rows, busy, redo }: EditorialInputProps) {
+  const id = `editorial-${field}`;
+  const className = `${INPUT_CLASS} read-only:cursor-progress ${busy ? 'opacity-50' : ''}`.trim();
+  const shared = {
+    id,
+    name: field,
+    value,
+    readOnly: busy,
+    'aria-busy': busy || undefined,
+    onChange: (e: { currentTarget: { value: string } }) => onChange(e.currentTarget.value),
+  };
+  let control: ReactNode;
+  if (rows !== undefined) control = <textarea {...shared} rows={rows} className={className} />;
+  else control = <input {...shared} className={className} />;
   return (
-    <button
-      type="button"
-      disabled
-      title="Planned next phase: generate editable draft text with an LLM."
-      className="ui h-10 rounded-input border border-hairline bg-paper px-3 text-xs uppercase text-ink3 opacity-70"
-    >
-      Generate AI text
-    </button>
+    <div>
+      <div className="flex items-baseline justify-between gap-3">
+        <label htmlFor={id} className="ui text-xs uppercase text-ink3">{label}</label>
+        {redo && (
+          <button
+            type="button"
+            onClick={redo.onClick}
+            disabled={redo.disabled}
+            aria-label={`Regenerate ${label}`}
+            className="ui text-xs uppercase text-ink3 hover:text-ink disabled:cursor-progress disabled:opacity-60"
+          >
+            Redo
+          </button>
+        )}
+      </div>
+      {control}
+      <span className="ui text-xs text-ink3 block mt-1">{hint}</span>
+    </div>
   );
 }

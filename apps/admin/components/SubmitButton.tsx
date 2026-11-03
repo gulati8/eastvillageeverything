@@ -14,6 +14,8 @@ interface Props {
   type?: 'submit' | 'button';
   onClick?: () => void;
   style?: CSSProperties;
+  /** Disabled while the caller runs its own request (Generate editorial, say), with the label unchanged. */
+  busy?: boolean;
 }
 
 /**
@@ -26,10 +28,10 @@ interface Props {
  * disabled with "Reload first": the action would fail with
  * "Failed to find Server Action" and nothing would be saved.
  */
-export function SubmitButton({ children, pendingLabel, className = '', type = 'submit', onClick, style }: Props) {
+export function SubmitButton({ children, pendingLabel, className = '', type = 'submit', onClick, style, busy = false }: Props) {
   const { pending } = useFormStatus();
   const stale = useStale();
-  const disabled = pending || stale;
+  const disabled = pending || stale || busy;
   const label = pending ? pendingLabel : stale ? STALE_BUTTON_LABEL : children;
   return (
     <button
@@ -40,7 +42,7 @@ export function SubmitButton({ children, pendingLabel, className = '', type = 's
       aria-disabled={disabled || undefined}
       title={stale && !pending ? 'The admin was updated. Reload the page to continue.' : undefined}
       style={style}
-      className={`${className} ${pending ? 'cursor-progress opacity-80 outline outline-2 outline-offset-2 outline-accent' : ''} ${stale && !pending ? 'cursor-not-allowed opacity-60' : ''}`.trim()}
+      className={`${className} ${pending ? 'cursor-progress opacity-80 outline outline-2 outline-offset-2 outline-accent' : ''} ${stale && !pending ? 'cursor-not-allowed opacity-60' : ''} ${busy && !pending && !stale ? 'opacity-60' : ''}`.trim()}
     >
       {label}
     </button>

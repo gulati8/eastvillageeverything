@@ -75,6 +75,7 @@ export default async function EditPlacePage({
       <PlacePhotos placeId={place.id} photos={photos} placeName={place.name} googleFallback={googleFallback} />
       <PlaceForm
         action={update}
+        placeId={place.id}
         defaultValues={defaultValues}
         allTags={tags.map((t) => ({ id: t.id, value: t.value, display: t.display }))}
         selectedTags={selectedTags.map((t) => ({ id: t.id, value: t.value, display: t.display }))}
