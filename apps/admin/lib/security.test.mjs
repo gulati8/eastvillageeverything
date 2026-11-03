@@ -76,9 +76,11 @@ describe('admin security guards', () => {
     const tagsRoute = src('../app/api/admin/tags/route.ts');
     const uploadsRoute = src('../app/api/admin/uploads/route.ts');
     const versionRoute = src('../app/api/admin/version/route.ts');
+    const generateRoute = src('../app/api/admin/generate/route.ts');
     assert.match(tagsRoute, /requireAdminRequest\(req\)/, 'tags API must require an admin session');
     assert.match(versionRoute, /requireAdminRequest\(req\)/, 'version API must require an admin session');
     assert.match(uploadsRoute, /requireAdminRequest\(req, \{ mutation: true \}\)/, 'upload API must require admin session and origin check');
+    assert.match(generateRoute, /export async function POST[^]*?{\n\s*try {\n\s*await requireAdminRequest\(req, \{ mutation: true \}\)/, 'generate API must require admin session and origin check before doing work');
   });
 
   it('answers signed-out API calls with JSON 401, not a login redirect', () => {
