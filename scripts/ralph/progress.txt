@@ -212,3 +212,7 @@ Previous plan and log: scripts/ralph/archive/launch-plan.md, launch-progress.txt
 - When done: tick 5.1 in `plan.md`. Anything that did not behave as written goes in this file and as a `fix(admin)` task under "## Phase 6" in `plan.md`, with the exact words you expected to see on screen; 5.1's `Blocked by` list then gains that task id.
 - No code changed this iteration. The `d634427` chore commit is local and rides along on the next push.
 ---
+
+## 2026-11-02 - 5.1 (human)
+- Phone test done against prod after 6.1: adding a photo saves and shows feedback. The user considered that sufficient and did not run the remaining steps (Feature, Remove, credit, airplane mode, app check). 5.1 ticked; every task in plan.md is now ticked. Deferred items (mobile photo swiping, retiring the mirrored legacy columns) remain at the bottom of plan.md for a future plan.
+---

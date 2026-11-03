@@ -60,7 +60,7 @@ task may revisit:
 
 ## Phase 5: human test
 
-- [ ] **5.1 [HUMAN] Phone test at a real place.** Blocked by: 1.2, 2.2, 3.2, 3.3, 4.1, 6.1. On your phone, open `https://eastvillageeverything.nyc/admin`, open a place, add two photos from the camera roll and one from the camera. For each: progress shows, then a "saved" card. Tap "Make first" on the second photo, remove the third, type a credit and tap away, change a text field and tap Save. Every one of those should produce a card, and the list page should show the new first photo as the row thumbnail. Then force the error paths: put the phone in airplane mode and add a photo (expect a red card with Try again), and open the app (1.0.0) to confirm the place shows your first photo in the list and the detail.
+- [x] **5.1 [HUMAN] Phone test at a real place.** Blocked by: 1.2, 2.2, 3.2, 3.3, 4.1, 6.1. On your phone, open `https://eastvillageeverything.nyc/admin`, open a place, add two photos from the camera roll and one from the camera. For each: progress shows, then a "saved" card. Tap "Make first" on the second photo, remove the third, type a credit and tap away, change a text field and tap Save. Every one of those should produce a card, and the list page should show the new first photo as the row thumbnail. Then force the error paths: put the phone in airplane mode and add a photo (expect a red card with Try again), and open the app (1.0.0) to confirm the place shows your first photo in the list and the detail.
   Done when: everything above behaves as written. Anything that does not goes in `progress.txt` as a `fix(admin)` task under a new Phase 6 in this file, with the exact words you expected to see.
 
 ## Phase 6: fixes from the phone test
