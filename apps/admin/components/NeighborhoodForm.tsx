@@ -1,29 +1,28 @@
+'use client';
+
+import { useState } from 'react';
 import { ReturnTo } from './ReturnTo';
+import { SlugLine } from './SlugLine';
 import { SubmitButton } from './SubmitButton';
 
 interface Props {
   action: (fd: FormData) => void;
-  defaultValues?: { display: string; value: string; is_default: boolean };
+  defaultValues?: { display: string; is_default: boolean };
 }
 
-export function NeighborhoodForm({ action, defaultValues = { display: '', value: '', is_default: false } }: Props) {
+export function NeighborhoodForm({ action, defaultValues = { display: '', is_default: false } }: Props) {
+  const [display, setDisplay] = useState(defaultValues.display);
   return (
     <form action={action} className="space-y-4">
       <ReturnTo />
       <label className="block">
         <span className="ui text-xs uppercase text-ink3">Display name</span>
         <input
-          name="display" required defaultValue={defaultValues.display}
+          name="display" required value={display} onChange={(e) => setDisplay(e.target.value)}
           className="w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent"
         />
       </label>
-      <label className="block">
-        <span className="ui text-xs uppercase text-ink3">Slug</span>
-        <input
-          name="value" defaultValue={defaultValues.value} placeholder="auto-generated"
-          className="w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent"
-        />
-      </label>
+      <SlugLine display={display} />
       <label className="flex items-center gap-2">
         <input type="checkbox" name="is_default" defaultChecked={defaultValues.is_default} />
         <span className="ui text-sm">Set as default neighborhood</span>

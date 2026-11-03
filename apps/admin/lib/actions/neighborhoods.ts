@@ -5,19 +5,21 @@ import { redirect } from 'next/navigation';
 import { NeighborhoodModel } from '@eve/db';
 import { requireAdminMutation, sanitizeAdminNextPath } from '../security';
 import { setFlash } from '../flash';
+import { slugify, suffixSlug } from '../slug';
 import type { ActionResult } from './tags';
 
-function slugify(s: string): string {
-  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
-}
-
-async function uniqueSlug(base: string): Promise<string> {
+/**
+ * First of `base`, `base-2`, `base-3`… that no other neighborhood holds. A
+ * row whose id is `excludeId` does not count, so a neighborhood keeps its
+ * slug on an unchanged save and takes the plain slug back on rename.
+ */
+async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
   let candidate = base;
-  let i = 2;
-  while (await NeighborhoodModel.findByValue(candidate)) {
-    candidate = `${base}-${i++}`;
+  for (let i = 2; ; i++) {
+    const existing = await NeighborhoodModel.findByValue(candidate);
+    if (!existing || existing.id === excludeId) return candidate;
+    candidate = suffixSlug(base, i);
   }
-  return candidate;
 }
 
 function errorMessage(e: unknown): string {
@@ -28,13 +30,12 @@ export async function createNeighborhood(formData: FormData) {
   await requireAdminMutation();
   const returnTo = sanitizeAdminNextPath(formData.get('return_to'), '/neighborhoods/new');
   const display = String(formData.get('display') ?? '').trim();
-  const valueRaw = String(formData.get('value') ?? '').trim();
   const isDefault = formData.get('is_default') === 'on';
   if (!display) {
     await setFlash('error', 'Give the neighborhood a display name before saving.');
     redirect(returnTo);
   }
-  const value = await uniqueSlug(valueRaw ? slugify(valueRaw) : slugify(display));
+  const value = await uniqueSlug(slugify(display));
   await NeighborhoodModel.create({ value, display, is_default: isDefault });
   revalidatePath('/neighborhoods');
   await setFlash('success', `${display} created`);
@@ -45,22 +46,12 @@ export async function updateNeighborhood(id: string, formData: FormData) {
   await requireAdminMutation();
   const returnTo = sanitizeAdminNextPath(formData.get('return_to'), `/neighborhoods/${id}/edit`);
   const display = String(formData.get('display') ?? '').trim();
-  const valueRaw = String(formData.get('value') ?? '').trim();
   const isDefault = formData.get('is_default') === 'on';
   if (!display) {
     await setFlash('error', 'Give the neighborhood a display name before saving.');
     redirect(returnTo);
   }
-  const value = slugify(valueRaw || display);
-  if (!value) {
-    await setFlash('error', 'Fix the slug: it needs at least one letter or number.');
-    redirect(returnTo);
-  }
-  const existing = await NeighborhoodModel.findByValue(value);
-  if (existing && existing.id !== id) {
-    await setFlash('error', `A neighborhood with the slug “${value}” already exists. Choose another slug.`);
-    redirect(returnTo);
-  }
+  const value = await uniqueSlug(slugify(display), id);
   await NeighborhoodModel.update(id, { display, value, is_default: isDefault });
   revalidatePath('/neighborhoods');
   await setFlash('success', `${display} saved`);

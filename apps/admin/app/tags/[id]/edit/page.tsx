@@ -15,7 +15,7 @@ export default async function EditTagPage({ params }: { params: Promise<{ id: st
         <h1 className="text-3xl">{tag.display}</h1>
         <DeleteButton action={deleteTag} id={tag.id} confirmText="Delete this tag? Places tagged with it lose the tag." />
       </div>
-      <TagForm action={update} defaultValues={{ display: tag.display, value: tag.value }} />
+      <TagForm action={update} defaultValues={{ display: tag.display }} />
     </div>
   );
 }
