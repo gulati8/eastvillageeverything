@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 're
 import { usePathname } from 'next/navigation';
 import type { PlacePhotoResponse } from '@eve/shared-types';
 import { useNotices } from './Notices';
+import { CollapsibleSection } from './CollapsibleSection';
 import type { NoticeInput } from '../lib/notices';
 import { makeFirstPlacePhoto, removePlacePhoto, setPlacePhotoCredit } from '../lib/actions/photos';
 
@@ -266,12 +267,12 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
   const openPicker = () => fileRef.current?.click();
 
   return (
-    <section aria-label="Photos" className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
-      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="text-2xl">Photos</h2>
-        <span className="ui text-xs uppercase text-ink3">{hint}</span>
-      </div>
-
+    <CollapsibleSection
+      title="Photos"
+      aria-label="Photos"
+      defaultOpen
+      summaryExtra={<span className="ui text-xs uppercase text-ink3">{hint}</span>}
+    >
       {/* The primary way in. The add card at the end of the strip is a second
           entry point, but on a phone it sits off-screen to the right. */}
       <button
@@ -432,7 +433,7 @@ export function PlacePhotos({ placeId, photos: initialPhotos, placeName, googleF
           </div>
         </Card>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }
 

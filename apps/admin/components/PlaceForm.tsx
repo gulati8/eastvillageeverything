@@ -4,6 +4,7 @@ import { TagPicker } from './TagPicker';
 import { NeighborhoodPicker } from './NeighborhoodPicker';
 import { ReturnTo } from './ReturnTo';
 import { SubmitButton } from './SubmitButton';
+import { CollapsibleSection } from './CollapsibleSection';
 
 interface Tag { id: string; value: string; display: string; }
 interface Neighborhood { id: string; value: string; display: string; }
@@ -48,11 +49,11 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
       <ReturnTo />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
         <div className="space-y-5">
-          <section className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
-            <SectionHeader
-              title="Basics"
-              description="Required data stays compatible with the old web directory and the mobile app."
-            />
+          <CollapsibleSection
+            title="Basics"
+            description="Required data stays compatible with the old web directory and the mobile app."
+            defaultOpen
+          >
             <div className="grid gap-3 md:grid-cols-2">
               <Field label="Name" name="name" defaultValue={v.name ?? ''} required />
               <NeighborhoodPicker name="neighborhood_id" options={neighborhoods} initialId={defaultNeighborhood} />
@@ -61,32 +62,29 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
               <Field label="Phone" name="phone" defaultValue={v.phone ?? ''} />
               <Field label="Website" name="url" defaultValue={v.url ?? ''} />
             </div>
-          </section>
+          </CollapsibleSection>
 
-          <section className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
-            <SectionHeader
-              title="Tags in mobile order"
-              description="The first tag is the headline category the mobile experience uses most prominently."
-            />
+          <CollapsibleSection
+            title="Tags in mobile order"
+            description="The first tag is the headline category the mobile experience uses most prominently."
+          >
             <TagPicker name="tag_ids" allTags={allTags} initial={selectedTags} />
-          </section>
+          </CollapsibleSection>
 
-          <section className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
-            <SectionHeader
-              title="Current web fields"
-              description="These continue to feed the existing eastvillageeverything.nyc web experience."
-            />
+          <CollapsibleSection
+            title="Current web fields"
+            description="These continue to feed the existing eastvillageeverything.nyc web experience."
+          >
             <div className="space-y-3">
               <TextArea label="Specials" name="specials" defaultValue={v.specials ?? ''} rows={3} />
               <TextArea label="Notes" name="notes" defaultValue={v.notes ?? ''} rows={3} />
             </div>
-          </section>
+          </CollapsibleSection>
 
-          <section className="rounded-card border border-hairline bg-paper2 p-4 md:p-5">
-            <SectionHeader
-              title="Editorial for mobile"
-              description="Optional enriched copy. The app and old web must still work when these are blank."
-            />
+          <CollapsibleSection
+            title="Editorial for mobile"
+            description="Optional enriched copy. The app and old web must still work when these are blank."
+          >
             <div className="space-y-3">
               <TextAreaWithGenerate label="Pitch" name="pitch" defaultValue={v.pitch ?? ''} rows={2} hint="2 sentences. Friend voice." />
               <FieldWithGenerate label="Perfect when…" name="perfect" defaultValue={v.perfect ?? ''} hint="finishes 'Perfect when…'" />
@@ -94,13 +92,12 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
               <FieldWithGenerate label="Vibe" name="vibe" defaultValue={v.vibe ?? ''} hint="3 words separated by ' · '" />
               <FieldWithGenerate label="Crowd" name="crowd" defaultValue={v.crowd ?? ''} hint="Who's there." />
             </div>
-          </section>
+          </CollapsibleSection>
         </div>
 
         <aside className="space-y-3 lg:sticky lg:top-5">
-          <section className="rounded-card border border-hairline bg-paper2 p-4">
-            <div className="ui text-xs uppercase text-ink3">Readiness</div>
-            <div className="mt-3 space-y-2">
+          <CollapsibleSection title="Readiness">
+            <div className="space-y-2">
               <ReadinessRow label="Old web safe" good={hasName} detail={hasName ? 'Name present' : 'Needs name'} />
               <ReadinessRow label="Mobile safe" good={hasName} detail={hasName ? 'Fallbacks available' : 'Needs name'} />
               <ReadinessRow label="Address" good={hasAddress} detail={hasAddress ? 'Good' : 'Optional but useful'} optional />
@@ -109,14 +106,13 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
               <ReadinessRow label="Tags ordered" good={hasTags} detail={hasTags ? `${selectedTags.length} selected` : 'Optional'} optional />
               <ReadinessRow label="Editorial" good={hasEditorial} detail={hasEditorial ? 'Draft present' : 'Optional'} optional />
             </div>
-          </section>
+          </CollapsibleSection>
 
-          <section className="rounded-card border border-hairline bg-paper2 p-4">
-            <div className="ui text-xs uppercase text-ink3">Guardrails</div>
-            <p className="mt-2 text-sm text-ink2">
+          <CollapsibleSection title="Guardrails">
+            <p className="text-sm text-ink2">
               New enriched fields are optional. Blank values must not break the public web directory or the mobile app.
             </p>
-          </section>
+          </CollapsibleSection>
         </aside>
       </div>
 
@@ -127,15 +123,6 @@ export function PlaceForm({ action, defaultValues = {}, allTags, selectedTags, n
         <span className="ui text-xs uppercase text-ink3">Safe for old web and mobile fallbacks</span>
       </div>
     </form>
-  );
-}
-
-function SectionHeader({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="mb-4">
-      <h2 className="text-2xl">{title}</h2>
-      <p className="mt-1 text-sm text-ink2">{description}</p>
-    </div>
   );
 }
 
