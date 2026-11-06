@@ -1,56 +1,74 @@
 #!/usr/bin/env node
-// Generates the fastlane deliver inputs for the iOS App Store listing:
-//   apps/mobile/fastlane/metadata/      from docs/app-store/listing.md
-//   apps/mobile/fastlane/screenshots/   from docs/app-store/screenshots/<size>/*.png
-// listing.md is the source of truth; edit it, rerun this, then run fastlane deliver
-// (see apps/mobile/fastlane/Deliverfile). Usage: node scripts/app-store-metadata.mjs
-import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+// Generates the fastlane inputs for both store listings:
+//   iOS (fastlane deliver, see apps/mobile/fastlane/Deliverfile)
+//     apps/mobile/fastlane/metadata/{en-US,*.txt}   from docs/app-store/listing.md
+//     apps/mobile/fastlane/screenshots/en-US/       from docs/app-store/screenshots/<size>/*.png
+//   Android (fastlane supply, run by task 2.6 in scripts/ralph/plan.md)
+//     apps/mobile/fastlane/metadata/android/en-US/{title,short_description,full_description}.txt
+//                                                    from docs/app-store/play-listing.md
+//     apps/mobile/fastlane/metadata/android/en-US/images/{icon.png,featureGraphic.png,phoneScreenshots/}
+//                                                    from docs/app-store/android/
+// The two listing files are the source of truth; edit them, rerun this, then run fastlane.
+// Usage: node scripts/app-store-metadata.mjs
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const listingPath = join(root, 'docs/app-store/listing.md');
+const playListingPath = join(root, 'docs/app-store/play-listing.md');
 const shotsSrc = join(root, 'docs/app-store/screenshots');
+const playSrc = join(root, 'docs/app-store/android');
 const fastlaneDir = join(root, 'apps/mobile/fastlane');
 const metaDir = join(fastlaneDir, 'metadata');
 const localeDir = join(metaDir, 'en-US');
 const reviewDir = join(metaDir, 'review_information');
 const shotsDir = join(fastlaneDir, 'screenshots/en-US');
-
-const md = readFileSync(listingPath, 'utf8');
+const playDir = join(metaDir, 'android/en-US');
+const playImagesDir = join(playDir, 'images');
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/** Body of the first `## <heading>...` section (heading match is a prefix). */
-function section(heading) {
-  const re = new RegExp(`^## ${escapeRe(heading)}[^\\n]*\\n([\\s\\S]*?)(?=^## |$(?![\\s\\S]))`, 'm');
-  const m = md.match(re);
-  if (!m) throw new Error(`listing.md: missing section "## ${heading}"`);
-  return m[1];
+/** Readers for one listing markdown file (`name` is only for error messages). */
+function listing(path, name) {
+  const md = readFileSync(path, 'utf8');
+
+  /** Body of the first `## <heading>...` section (heading match is a prefix). */
+  function section(heading) {
+    const re = new RegExp(`^## ${escapeRe(heading)}[^\\n]*\\n([\\s\\S]*?)(?=^## |$(?![\\s\\S]))`, 'm');
+    const m = md.match(re);
+    if (!m) throw new Error(`${name}: missing section "## ${heading}"`);
+    return m[1];
+  }
+
+  /** Contents of the first fenced code block under a section. */
+  function fenced(heading) {
+    const m = section(heading).match(/^```\n([\s\S]*?)\n```/m);
+    if (!m) throw new Error(`${name}: no fenced block under "## ${heading}"`);
+    return m[1];
+  }
+
+  /** Backticked value from a `| Field | \`value\` |` table row under a section. */
+  function tableValue(heading, field) {
+    const re = new RegExp(`^\\| ${escapeRe(field)} \\| \`([^\`]+)\` \\|`, 'm');
+    const m = section(heading).match(re);
+    if (!m) throw new Error(`${name}: no table row "${field}" under "## ${heading}"`);
+    return m[1];
+  }
+
+  /** Value of a `- Label: value` bullet under a section. */
+  function bullet(heading, label) {
+    const re = new RegExp(`^- ${escapeRe(label)}: (.+)$`, 'm');
+    const m = section(heading).match(re);
+    if (!m) throw new Error(`${name}: no bullet "${label}" under "## ${heading}"`);
+    return m[1].trim();
+  }
+
+  return { section, fenced, tableValue, bullet };
 }
 
-/** Contents of the first fenced code block under a section. */
-function fenced(heading) {
-  const m = section(heading).match(/^```\n([\s\S]*?)\n```/m);
-  if (!m) throw new Error(`listing.md: no fenced block under "## ${heading}"`);
-  return m[1];
-}
-
-/** Backticked value from a `| Field | \`value\` |` table row under a section. */
-function tableValue(heading, field) {
-  const re = new RegExp(`^\\| ${escapeRe(field)} \\| \`([^\`]+)\` \\|`, 'm');
-  const m = section(heading).match(re);
-  if (!m) throw new Error(`listing.md: no table row "${field}" under "## ${heading}"`);
-  return m[1];
-}
-
-/** Value of a `- Label: value` bullet under a section. */
-function bullet(heading, label) {
-  const re = new RegExp(`^- ${escapeRe(label)}: (.+)$`, 'm');
-  const m = section(heading).match(re);
-  if (!m) throw new Error(`listing.md: no bullet "${label}" under "## ${heading}"`);
-  return m[1].trim();
-}
+const { section, fenced, tableValue, bullet } = listing(listingPath, 'listing.md');
+const play = listing(playListingPath, 'play-listing.md');
 
 // App Store Connect category codes (spaceship app_category.rb). Add as needed.
 const CATEGORY_CODES = {
@@ -99,7 +117,28 @@ const review = phone
     }
   : null;
 
+// Google Play (fastlane supply) character limits.
+const PLAY_LIMITS = { title: 30, short_description: 80, full_description: 4000 };
+const playLocale = {
+  title: play.fenced('Name'),
+  short_description: play.fenced('Short description'),
+  full_description: play.fenced('Full description'),
+};
+// supply's image names are fixed; the phone screenshots keep their docs filenames (01-list.png ...).
+const PLAY_IMAGES = { 'icon-512.png': 'icon.png', 'feature-graphic.png': 'featureGraphic.png' };
+const playShots = readdirSync(playSrc).filter((f) => /^\d\d-.*\.png$/.test(f)).sort();
+
 const problems = [];
+for (const [key, limit] of Object.entries(PLAY_LIMITS)) {
+  if (playLocale[key].length > limit) problems.push(`play ${key}: ${playLocale[key].length} chars, limit ${limit}`);
+}
+for (const key of ['title', 'short_description']) {
+  if (/\n/.test(playLocale[key])) problems.push(`play ${key}: must be a single line`);
+}
+for (const file of Object.keys(PLAY_IMAGES)) {
+  if (!existsSync(join(playSrc, file))) problems.push(`play images: docs/app-store/android/${file} is missing (run node scripts/play-store-assets.mjs)`);
+}
+if (playShots.length === 0) problems.push('play images: no NN-name.png phone screenshots in docs/app-store/android/');
 for (const [key, limit] of Object.entries(LIMITS)) {
   if (locale[key].length > limit) problems.push(`${key}: ${locale[key].length} chars, limit ${limit}`);
 }
@@ -108,7 +147,7 @@ for (const key of ['name', 'subtitle', 'keywords', 'privacy_url', 'support_url',
   if (/\n/.test(locale[key])) problems.push(`${key}: must be a single line`);
 }
 if (problems.length) {
-  console.error('listing.md fails App Store Connect limits:\n  ' + problems.join('\n  '));
+  console.error('listing.md / play-listing.md fail the store limits:\n  ' + problems.join('\n  '));
   process.exit(1);
 }
 
@@ -116,6 +155,7 @@ rmSync(metaDir, { recursive: true, force: true });
 rmSync(shotsDir, { recursive: true, force: true });
 mkdirSync(localeDir, { recursive: true });
 mkdirSync(shotsDir, { recursive: true });
+mkdirSync(join(playImagesDir, 'phoneScreenshots'), { recursive: true });
 
 for (const [key, value] of Object.entries(locale)) writeFileSync(join(localeDir, `${key}.txt`), value + '\n');
 for (const [key, value] of Object.entries(nonLocalised)) writeFileSync(join(metaDir, `${key}.txt`), value + '\n');
@@ -140,3 +180,12 @@ else console.log('  review information: skipped (no Phone row in listing.md; ent
 for (const [key, limit] of Object.entries(LIMITS)) console.log(`  ${key}: ${locale[key].length}/${limit}`);
 console.log(`  categories: ${nonLocalised.primary_category}, ${nonLocalised.secondary_category}`);
 console.log(`copied ${shotCount} screenshots to ${shotsDir}`);
+
+// Android: metadata/android/en-US/{title,short_description,full_description}.txt and images/.
+for (const [key, value] of Object.entries(playLocale)) writeFileSync(join(playDir, `${key}.txt`), value + '\n');
+for (const [src, dest] of Object.entries(PLAY_IMAGES)) copyFileSync(join(playSrc, src), join(playImagesDir, dest));
+for (const file of playShots) copyFileSync(join(playSrc, file), join(playImagesDir, 'phoneScreenshots', file));
+
+console.log(`wrote ${Object.keys(playLocale).length} en-US files to ${playDir}`);
+for (const [key, limit] of Object.entries(PLAY_LIMITS)) console.log(`  ${key}: ${playLocale[key].length}/${limit}`);
+console.log(`copied ${Object.keys(PLAY_IMAGES).length} graphics and ${playShots.length} phone screenshots to ${playImagesDir}`);
