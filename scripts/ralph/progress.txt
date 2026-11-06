@@ -79,3 +79,9 @@ Older: scripts/ralph/archive/admin-photos-plan.md, admin-photos-progress.txt; la
 - Files: `docs/app-store/play-listing.md` (new), `docs/app-store/android/*` (new, 7 PNGs), `scripts/play-store-assets.mjs` (new), `scripts/app-store-metadata.mjs`, `apps/mobile/fastlane/.gitignore`, `apps/mobile/fastlane/metadata/android/en-US/*.txt` (new), `src/views/public/privacy.ejs`, `src/views/public/support.ejs`, `scripts/ralph/plan.md`, `scripts/ralph/progress.txt`.
 - Validation: `node scripts/app-store-metadata.mjs` exit 0 (iOS output unchanged per `git status`; Android title 23/30, short 77/80, full 1847/4000); `wc -c` on the three Android files: 24, 78, 1848 (each includes the trailing newline); sharp: `icon-512.png` 512x512 alpha false 3 channels, `feature-graphic.png` 1024x500 alpha false; the five screenshots 1080x2400 alpha false; `grep -n -i 'iphone\|ios' src/views/public/privacy.ejs src/views/public/support.ejs` prints nothing. Pre-push and deploy results are in the follow-up entry below.
 ---
+## 2026-11-06 - 2.5 deploy result
+- Pre-push: `npm run build:packages && npx tsc --noEmit && (cd apps/mobile && npm test)`: build OK, root tsc OK, 22 suites / 221 passed / 1 skipped (exit 0).
+- Pushed `7864142` to main. CI run 42173701973 and Build and Deploy run 42173702107 both completed with success (`gh run watch --exit-status` exit 0 for each).
+- Done when: `curl -s https://eastvillageeverything.nyc/privacy | grep -c iPhone` printed 0 on the first try (support page also 0); the privacy page now contains "the OS version"; `GET /` is 200.
+- Next: 2.6 is blocked by 2.4 `[HUMAN]` (Play Console account verification, app creation, service account key at `apps/mobile/google-play-key.json`). 3.1 (photo gallery) has no blockers and is the next agent task.
+---
