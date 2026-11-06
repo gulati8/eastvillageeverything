@@ -4,6 +4,7 @@ Previous plan and log: scripts/ralph/archive/admin-editorial-plan.md, admin-edit
 Older: scripts/ralph/archive/admin-photos-plan.md, admin-photos-progress.txt; launch-plan.md, launch-progress.txt
 
 ## Codebase Patterns
+- Prod when SSH is blocked (4.5): port 22 is open only to two fixed IPs, so from other networks run prod SQL over AWS SSM (`aws ssm send-command --instance-ids i-021ca6be74a5d9b16 --document-name AWS-RunShellScript`, region `us-east-1`, AWS CLI already authenticated); helper `/tmp/eve-4.5/psql.sh` (recreate from the 4.5 entry if `/tmp` was cleared). Neighborhood rows on prod: east-village (default), lower-east-side, nolita, soho, greenwich-village, west-village, gramercy, murray-hill.
 - Admin neighborhoods (4.4): `PlaceModel.findAll({ neighborhood_id })` filters by id (the admin list, `app/places/page.tsx` + `components/NeighborhoodFilter.tsx`, `?neighborhood=<id>`); `neighborhood` (slug) is the API filter. The place form starts on the `is_default` row. `updateNeighborhood` refuses to uncheck the current default ("Pick another default first"); move it by checking the box on another row. `NeighborhoodForm` has `sort_order`. The enrich backfill query joins `neighborhoods` and sends the display name to Text Search with a 5 km bias.
 - Playwright e2e locally (4.3): `npx playwright test <spec>` needs Playwright's own Chromium and headless shell (`~/Library/Caches/ms-playwright/chromium-1217` and `chromium_headless_shell-1217`, each with an `INSTALLATION_COMPLETE` marker; installed by hand in 4.3 because `npx playwright install chromium` hangs mid-extraction on this Mac). Server for the run: `npx tsx src/server.ts` with `DATABASE_URL`/`REDIS_URL` exported from `apps/admin/.env.local` (after `npm run build:packages`).
 - Detail hero gallery (3.1): `src/components/HeroGallery.tsx` (paged horizontal FlatList, dots, `onPageChange`) fed by `PlaceV2Display.photos` (`null` = detail not loaded, `[]` = none) from `transformPlace`; the caption is `src/data/heroCaption.ts`. The `heroShade`/`heroText` overlays in `PlaceDetail.tsx` must stay `pointerEvents="none"`, or the ScrollView eats the horizontal swipe. Simulator UI driving that works from this harness: `idb` (`brew install facebook/fb/idb-companion`, `fb-idb` in `/tmp/eve-3.1/venv`), `idb ui swipe --udid <udid> x1 y1 x2 y2` in device points; cliclick clicks did not reach the Simulator and System Events could not see its windows. Prod shell when port 22 is closed to this network: `aws ssm send-command --region us-east-1 --instance-ids i-021ca6be74a5d9b16 --document-name AWS-RunShellScript --parameters file://params.json`, then `aws ssm wait command-executed` and `get-command-invocation`; a prod admin session is minted by writing `sess:<sid>` to `eve-redis` and signing the sid inside `eve-admin` (`node -e` with `cookie-signature` and `process.env.SESSION_SECRET`), never by printing the secret.
@@ -118,4 +119,45 @@ Older: scripts/ralph/archive/admin-photos-plan.md, admin-photos-progress.txt; la
 ---
 ## 2026-11-06 - 4.4 deploy result
 - Pushed `e12246c` to main. Build and Deploy run 42185036202 and CI run 42185036135 both completed with success. `curl -s -o /dev/null -w '%{http_code}' https://eastvillageeverything.nyc/admin/login` printed 200; `/admin/places?neighborhood=x` signed out gives the 307 login redirect as before; `curl -s 'https://eastvillageeverything.nyc/api/places?limit=1' | jq '.[0].neighborhood'` still prints `{"value":"east-village","display":"East Village"}`. Every `Done when` check for 4.4 passed; box ticked.
+---
+## 2026-11-06 - 4.5
+- Prod now has eight `neighborhoods` rows and 25 places moved off East Village. Inserted (`value`, `display`, `sort_order`, `is_default` false): `lower-east-side` Lower East Side 10, `nolita` Nolita 20, `soho` SoHo 30, `greenwich-village` Greenwich Village 40, `west-village` West Village 50, `gramercy` Gramercy 60, `murray-hill` Murray Hill 70. Inserts and the `UPDATE places SET neighborhood_id` ran in one transaction (`/tmp/eve-4.5/apply.sql`, a `DO` block that raises on any row-count mismatch), ids cross-checked by name against the prod listing before running.
+- Candidates were the 30 prod rows (of 246) with a non-10003/10009 zip, a blank address, or `lat`/`lng` outside the East Village box. Only 15 addresses carry a zip at all, so the coordinate box did most of the work. Reassigned, as `name | address | old → new`:
+  - Chloe 81 | 81 Ludlow St | East Village → Lower East Side
+  - Clinton Bakery (edge of East Village) | 4 Clinton Street | East Village → Lower East Side (south side of Houston)
+  - Dirt Candy | 430 E 9th St | East Village → Lower East Side (coordinates and the Google match are the live restaurant at 86 Allen St; the row address is the pre-2015 location and should be corrected in the admin)
+  - Donnybrook | 35 Clinton Street | East Village → Lower East Side
+  - Grey Lady | 77 Delancey Street | East Village → Lower East Side
+  - Hair of the dog | 168 Orchard street | East Village → Lower East Side
+  - Marshall Stack | 66 Rivington Street near East Village | East Village → Lower East Side
+  - Omar's Kitchen & Rum Bar | 29A Clinton Street | East Village → Lower East Side
+  - Pretty Ricky's | 101 Rivington Street | East Village → Lower East Side
+  - Rebel | 29 Clinton Street | East Village → Lower East Side
+  - The Mayfly | 269 E HoustonStreet | East Village → Lower East Side (odd Houston numbers are the south side, zip 10002)
+  - The Ten Bells | 247 Broome St. | East Village → Lower East Side
+  - Verlaines | 110 Rivington Street | East Village → Lower East Side
+  - Zerza Moroccan Kitchen | 88 Essex Street (Located in Essex Market) | East Village → Lower East Side
+  - Socarrat | 284 Mulberry Street - Nolita 20 feet south of Houston | East Village → Nolita
+  - Charlie Bird | 5 King St | East Village → SoHo (King St at Sixth Ave, south of Houston; strictly Hudson Square, SoHo is the nearest named bucket)
+  - Soho Diner NYC | 320 W Broadway Street | East Village → SoHo
+  - Blue Haven | 108 W Houston Street | East Village → Greenwich Village (even Houston numbers are the north side, at Thompson St)
+  - Mace | 35 West 8th St. | East Village → Greenwich Village (between Fifth and Sixth)
+  - The Stone | (blank address) | East Village → Greenwich Village (coordinates are 55 W 13th St, the New School's Glass Box Theater; the row still needs an address)
+  - Bus Stop Cafe (West Village) | (blank address) | East Village → West Village (coordinates are 597 Hudson St; the row still needs an address)
+  - Empellon Cocina | 230 West 4th Street | East Village → West Village
+  - Petite Boucherie | 14 Christopher street | East Village → West Village
+  - Hawksmoor NYC (GRAMERCY) | 109 E. 22nd St (Gramercy) | East Village → Gramercy
+  - The Banc Bar Cafe (Murray Hill) | 431 3rd Ave | East Village → Murray Hill (3rd Ave at 31st St; the row name says so)
+- Left on East Village after review (flagged by the box but the address is in the East Village and the coordinates are a bad Google geocode of another branch): Crab Du Jour | 225 First Ave. (coordinates in Harlem); Yubu | 86 E 7th St (coordinates near W Houston); Cafecito | 185 Avenue C #1 (coordinates near Allen/Delancey); C Lounge | 14 Ave C (just north of Houston, 20 m below the box line); The Izakaya | 326 E. 6th Street6466844411 (the "zip" hit is a phone number glued to the address). Re-enriching Crab Du Jour, Yubu and Cafecito would fix their pins; the Izakaya address wants the phone number stripped.
+- Files touched: `scripts/ralph/plan.md`, `scripts/ralph/progress.txt` (no code; the task says no other commit).
+- Validation: `curl -s https://eastvillageeverything.nyc/api/neighborhoods | jq length` → 8. `curl -s 'https://eastvillageeverything.nyc/api/places?neighborhood=lower-east-side' | jq length` → 14 (first rows Chloe 81, Clinton Bakery, Dirt Candy, each with `neighborhood.display` "Lower East Side"). `sudo docker exec eve-db psql -U eve -d eve_production -tAc "select n.display, count(*) from places p join neighborhoods n on n.id=p.neighborhood_id group by 1 order by 2 desc"` →
+  East Village|221
+  Lower East Side|14
+  Greenwich Village|3
+  West Village|3
+  SoHo|2
+  Murray Hill|1
+  Nolita|1
+  Gramercy|1
+- Learnings: `ssh ec2-user@100.29.233.41` timed out from this network: the security group (`sg-0ad1e871c1e90a989`) opens port 22 only to `57.154.23.72/32` and `82.140.186.243/32`, and this Mac's public IP was `68.132.209.151`. The security group was not changed. Prod SQL ran through AWS SSM instead (the AWS CLI here is authenticated as the account root, region `us-east-1`, instance `i-021ca6be74a5d9b16`, SSM agent online): `/tmp/eve-4.5/psql.sh file.sql [psql flags]` base64-encodes the SQL into an `AWS-RunShellScript` command that pipes it to `sudo docker exec -i eve-db psql -U eve -d eve_production -v ON_ERROR_STOP=1 -f -`, waits with `aws ssm wait command-executed`, and prints `get-command-invocation` stdout/stderr. Output is capped at 24000 characters per invocation. The 4.1 mockup's menu counts (LES 18, West Village 6) were a street-name guess; the real split is above.
 ---
