@@ -1,10 +1,13 @@
 /**
  * Resolve the API base URL from the EAS-injected EXPO_PUBLIC_API_BASE_URL.
  * T1.12 wires per-profile values in eas.json. Default fallback for local dev:
- * auto-detected from the Metro bundler's debuggerHost (Expo Go), or
- * http://localhost:3000 for simulators.
+ * auto-detected from the Metro bundler's debuggerHost (Expo Go), or the
+ * local server on the host machine for simulators: http://localhost:3000 on
+ * the iOS Simulator, http://10.0.2.2:3000 on the Android emulator (its
+ * loopback is the emulator itself; 10.0.2.2 is the host).
  */
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 export function getApiBaseUrl(): string {
   const fromEnv = process.env.EXPO_PUBLIC_API_BASE_URL;
@@ -18,8 +21,9 @@ export function getApiBaseUrl(): string {
       const ip = debuggerHost.split(':')[0];
       return `http://${ip}:3000`;
     }
-    // Fallback for simulators where localhost works
-    return 'http://localhost:3000';
+    // Fallback for simulators: the Android emulator reaches the host at
+    // 10.0.2.2; the iOS Simulator shares the host's localhost.
+    return Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
   }
 
   throw new Error(

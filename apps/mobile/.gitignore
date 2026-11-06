@@ -15,3 +15,6 @@ npm-debug.*
 
 expo-env.d.ts
 # @end expo-cli
+# Android store credentials (2.2): the Play service account key and the local upload keystore config
+google-play-key.json
+credentials.json

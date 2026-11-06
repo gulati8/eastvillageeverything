@@ -20,7 +20,11 @@
         "EXPO_PUBLIC_SENTRY_DSN": "https://287901cf680df0593157c65337e56667@o4511324193161216.ingest.us.sentry.io/4511324209217536",
         "EXPO_PUBLIC_SENTRY_ENVIRONMENT": "preview",
         "SENTRY_ORG": "gulati-labs",
-        "SENTRY_PROJECT": "east-village-everything"
+        "SENTRY_PROJECT": "east-village-everything",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "production": {
@@ -39,6 +43,11 @@
         "appleId": "gulati8@gmail.com",
         "ascAppId": "6765464747",
         "appleTeamId": "F5M5TS7B4Q"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./google-play-key.json",
+        "track": "internal",
+        "releaseStatus": "draft"
       }
     }
   }

@@ -20,6 +20,8 @@ interface FilterSheetProps {
   onToggle: (sectionKey: string, chipValue: string) => void;
   onClear: () => void;
   onDone: () => void;
+  /** Sheet index changes (-1 is closed); lets the screen know when it is open. */
+  onChange?: (index: number) => void;
 }
 
 const SNAP_POINTS = ['76%'];
@@ -33,6 +35,7 @@ export function FilterSheet({
   onToggle,
   onClear,
   onDone,
+  onChange,
 }: FilterSheetProps) {
   const { colors, typography } = useTheme();
 
@@ -74,6 +77,7 @@ export function FilterSheet({
       index={-1}
       snapPoints={SNAP_POINTS}
       enablePanDownToClose
+      onChange={onChange}
       handleComponent={renderHandle}
       backgroundStyle={[
         styles.sheetBackground,

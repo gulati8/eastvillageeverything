@@ -6,8 +6,9 @@ const STORAGE_KEY = 'eve.device_id';
 // invoked without an explicit keychainService. Under the new architecture
 // that exception is rethrown out of ObjCTurboModule::performVoidMethodInvocation
 // and aborts the process on launch. Pinning the service to the bundle id
-// keeps every call inside a single named keychain partition. iOS-only;
-// ignored on Android. See facebook/react-native#54859.
+// keeps every call inside a single named keychain partition. On Android the
+// same option is not ignored: it is the alias of the Keystore key that
+// SecureStore encrypts the entry with. See facebook/react-native#54859.
 const SECURE_STORE_OPTIONS: SecureStore.SecureStoreOptions = {
   keychainService: 'com.eastvillageeverything.app',
 };

@@ -3,6 +3,7 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { useEffect, useMemo } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { createQueryClient } from '../src/state/queryClient';
 import { createPersister, getCacheBuster } from '../src/state/persister';
 import { initSentry, Sentry } from '../src/observability/sentry';
@@ -34,6 +35,8 @@ function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* The app is hard-wired dark (ThemeProvider), so the status bar icons are always light. */}
+      <StatusBar style="light" />
       <ThemeProvider>
         <PersistQueryClientProvider
           client={queryClient}

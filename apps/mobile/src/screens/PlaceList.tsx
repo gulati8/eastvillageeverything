@@ -1,7 +1,8 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import {
   ActionSheetIOS,
   Alert,
+  BackHandler,
   FlatList,
   Platform,
   Pressable,
@@ -70,6 +71,7 @@ export function PlaceList() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const listRef = useRef<FlatList<PlaceV2Display>>(null);
   const [activeTab, setActiveTab] = React.useState<TabKey>('home');
+  const [sheetOpen, setSheetOpen] = React.useState(false);
   const { savedPlaceKeys, toggleSavedPlace } = useSavedPlaces();
 
   // Data fetch — no tag param, all filtering is client-side
@@ -150,16 +152,13 @@ export function PlaceList() {
         },
       );
     } else {
+      // Android's Alert shows at most three buttons; SORT_OPTIONS plus Cancel
+      // is five, so only the one working sort is offered until the others ship.
       Alert.alert(
         'Sort by',
-        undefined,
+        'A–Z is the only sort for now.',
         [
-          ...SORT_OPTIONS.map((o) => ({
-            text: o.label,
-            onPress: () => {
-              if (o.mode != null) setSortMode(o.mode);
-            },
-          })),
+          { text: 'A–Z', onPress: () => setSortMode('az') },
           { text: 'Cancel', style: 'cancel' as const },
         ],
       );
@@ -175,6 +174,21 @@ export function PlaceList() {
     bottomSheetRef.current?.close();
     listRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
+
+  const handleSheetChange = useCallback((index: number) => {
+    setSheetOpen(index >= 0);
+  }, []);
+
+  // Android hardware back: while the filter sheet is open it closes the sheet
+  // instead of leaving the screen. When the sheet is closed, default behaviour.
+  useEffect(() => {
+    if (!sheetOpen) return undefined;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      bottomSheetRef.current?.close();
+      return true;
+    });
+    return () => subscription.remove();
+  }, [sheetOpen]);
 
   // Rail chip toggle — sectionKey is now carried on each chip from useFilterState.railChips.
   const handleRailChipToggle = useCallback(
@@ -356,6 +370,7 @@ export function PlaceList() {
         onToggle={toggleFilter}
         onClear={clearFilters}
         onDone={handleSheetDone}
+        onChange={handleSheetChange}
       />
 
       {/* 6. TabBar */}

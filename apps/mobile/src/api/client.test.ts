@@ -1,6 +1,9 @@
 import { apiGet, placesApi, tagsApi } from './client';
 import { ApiError, NetworkError, TimeoutError } from './errors';
 
+// config.ts reads Platform.OS for the dev fallback URL; the Node env has no react-native.
+jest.mock('react-native', () => ({ Platform: { OS: 'ios' } }));
+
 describe('apiGet', () => {
   beforeEach(() => {
     (globalThis as any).fetch = jest.fn();
