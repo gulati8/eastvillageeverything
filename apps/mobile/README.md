@@ -120,6 +120,69 @@ Internal testers live in the `Team (Expo)` group in App Store Connect. The `subm
 
 See [Expo EAS docs](https://docs.expo.dev/build/introduction/).
 
+## Android
+
+Android store builds run on EAS's servers (`eas build --platform android`, no
+`--local`). The JDK and SDK below exist only so the Android emulator can run
+the APK for smoke tests and the device pass; nothing in the release pipeline
+needs them.
+
+### Install (Homebrew, one time)
+
+```bash
+brew install openjdk@17                      # JDK 17, keg-only, no sudo
+brew install --cask android-commandlinetools # sdkmanager, avdmanager
+```
+
+The plan called for `brew install --cask temurin@17`, but that cask runs a
+system `.pkg` installer under `sudo`; the `openjdk@17` formula is the same
+JDK 17 and installs into Homebrew's prefix without a password. Nothing here
+edits your shell rc files. Export these in every shell that runs Android
+tools (or prefix each command with them):
+
+```bash
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+export ANDROID_HOME=/opt/homebrew/share/android-commandlinetools
+export PATH="$JAVA_HOME/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+```
+
+`/usr/libexec/java_home -v 17` only finds this JDK after the optional symlink
+Homebrew prints in its caveats (`sudo ln -sfn /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk`).
+Without it, use the `JAVA_HOME` above.
+
+Then accept the licenses and install the SDK pieces and a Google APIs system
+image (API 37 was the newest `google_apis;arm64-v8a` image on 2026-11-06):
+
+```bash
+yes | sdkmanager --licenses
+sdkmanager --install "platform-tools" "emulator" "platforms;android-36" "build-tools;36.0.0" \
+  "system-images;android-37.0;google_apis;arm64-v8a"
+avdmanager create avd -n eve-pixel -k "system-images;android-37.0;google_apis;arm64-v8a" -d pixel_8 --force
+```
+
+`avdmanager` may print `Could not load devices from .../devices.xml`; the AVD
+is still created (check `emulator -list-avds`). `eve-pixel` is a Pixel 8
+profile, 1080x2400 at 420 dpi, which is also the Play Store screenshot size.
+
+### Run the emulator
+
+```bash
+emulator -avd eve-pixel                                  # with a window
+emulator -avd eve-pixel -no-window -no-audio -no-boot-anim &   # headless, for scripts
+adb wait-for-device shell 'while [ "$(getprop sys.boot_completed)" != "1" ]; do sleep 2; done; echo booted'
+adb install -r build-1.apk
+adb shell am start -n com.eastvillageeverything.app/.MainActivity
+adb exec-out screencap -p > shot.png
+adb emu kill
+```
+
+A cold headless boot takes about 25 s on an Apple Silicon Mac. Inside the
+emulator, the Mac's `localhost` is `10.0.2.2`, so a local API is
+`http://10.0.2.2:3000` (set `EXPO_PUBLIC_API_BASE_URL` to that). The
+emulator installs APKs
+only, so use the `preview` profile (`buildType: apk`) for emulator builds;
+`production` builds an app bundle for Play.
+
 ## State management
 
 TanStack Query (`@tanstack/react-query`) with an AsyncStorage persistor. On cold
