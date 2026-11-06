@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { PlaceModel, TagModel } from '@eve/db';
 import { requireAdminMutation, sanitizeAdminNextPath } from '../security';
 import { setFlash } from '../flash';
+import { readPlaceForm } from '../placeForm';
 
 function readTagIds(formData: FormData): string[] {
   const raw = String(formData.get('tag_ids') ?? '[]');
@@ -24,30 +25,10 @@ async function tagValuesForIds(ids: string[]): Promise<string[]> {
     .filter((v): v is string => Boolean(v));
 }
 
-function readForm(formData: FormData) {
-  return {
-    name: String(formData.get('name') ?? '').trim(),
-    address: String(formData.get('address') ?? '').trim() || undefined,
-    cross_street: String(formData.get('cross_street') ?? '').trim() || undefined,
-    phone: String(formData.get('phone') ?? '').trim() || undefined,
-    url: String(formData.get('url') ?? '').trim() || undefined,
-    neighborhood_id: String(formData.get('neighborhood_id') ?? '').trim() || undefined,
-    // Photos are not read here: `place_photos` is written by `PlacePhotoModel`
-    // and mirrored into `places.photo_*`; Save covers the text fields only.
-    specials: String(formData.get('specials') ?? '') || undefined,
-    notes: String(formData.get('notes') ?? '') || undefined,
-    pitch: String(formData.get('pitch') ?? '') || undefined,
-    perfect: String(formData.get('perfect') ?? '') || undefined,
-    insider: String(formData.get('insider') ?? '') || undefined,
-    vibe: String(formData.get('vibe') ?? '') || undefined,
-    crowd: String(formData.get('crowd') ?? '') || undefined,
-  };
-}
-
 export async function createPlace(formData: FormData) {
   await requireAdminMutation();
   const returnTo = sanitizeAdminNextPath(formData.get('return_to'), '/places/new');
-  const f = readForm(formData);
+  const f = readPlaceForm(formData);
   if (!f.name) {
     await setFlash('error', 'Give the place a name before saving.');
     redirect(returnTo);
@@ -63,7 +44,7 @@ export async function createPlace(formData: FormData) {
 export async function updatePlace(id: string, formData: FormData) {
   await requireAdminMutation();
   const returnTo = sanitizeAdminNextPath(formData.get('return_to'), `/places/${id}/edit`);
-  const f = readForm(formData);
+  const f = readPlaceForm(formData);
   if (!f.name) {
     await setFlash('error', 'Give the place a name before saving.');
     redirect(returnTo);
