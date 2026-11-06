@@ -54,3 +54,7 @@ Older: scripts/ralph/archive/admin-photos-plan.md, admin-photos-progress.txt; la
 - Validation: `cd apps/mobile && npx tsc --noEmit`: pass. `npm test`: 22 suites, 221 passed, 1 skipped. `npx expo-doctor`: 18/18 checks passed. sharp check: `adaptive-icon.png` 1024x1024, alpha, opaque bbox x 173..851, y 170..853 (within 170..854); `splash-icon.png` 1024x1024, alpha, bbox x 4..1020, y 0..1023. `npx expo config --type public`: `versionCode: 1`, the `expo-splash-screen` plugin entry with the four options, `userInterfaceStyle: 'dark'`, no `splash` key. Pre-push: `npm run build:packages && npx tsc --noEmit && (cd apps/mobile && npm test)`: build OK, root tsc OK, 22 suites / 221 passed / 1 skipped. Deploy: pushed to main; the workflow result is logged in the follow-up entry below.
 - Learnings: the Read tool renders transparent PNG pixels as black, so check alpha with sharp, not by eye. `BottomSheet`'s `onChange` fires with -1 on close, which is the only signal `PlaceList` has for the sheet's state since it is ref-controlled. `places.test.ts` mocks `./client` so it never reaches `config.ts`; only `client.test.ts` did.
 ---
+## 2026-11-06 - 2.2 deploy result
+- Pushed `a4b4f12` to main. CI run 42169594615 and Build and Deploy run 42169594745 both completed with success (`gh run watch --exit-status` exit 0 for each).
+- Validation: `curl -s -o /dev/null -w '%{http_code}' https://eastvillageeverything.nyc/` printed 200; `GET /api/places` returned 246 places. Nothing server-side changed in this task; the push lands the Android config on main for the 2.3 build.
+---
