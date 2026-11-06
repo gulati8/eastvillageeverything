@@ -15,6 +15,16 @@ export interface HoursSummary {
   label: string | null;
 }
 
+/** One page of the detail hero gallery (from PlaceDetailResponse.photos). */
+export interface PlacePhotoDisplay {
+  /** Upload id, or 'google' for the single Google Places entry. */
+  key: string;
+  /** hero_url, falling back to the original url. */
+  url: string;
+  /** Upload credit or Google author; null when neither is set. */
+  caption: string | null;
+}
+
 export interface PlaceV2Display {
   key: string;         // UUID from API (PlaceResponse.key)
   name: string;
@@ -32,6 +42,12 @@ export interface PlaceV2Display {
   photoCredit: string | null;
   /** Google photo author shown as "Photo: <name>" under the detail hero; null for admin uploads. */
   photoAttribution: string | null;
+  /**
+   * Every photo for the detail hero gallery. `null` when the response carried
+   * no `photos` field (a list row, or a detail seeded from one and not yet
+   * refetched); `[]` when the place has none.
+   */
+  photos: PlacePhotoDisplay[] | null;
   specials: string | null;
   notes: string | null;
   pitch: string | null;

@@ -14,7 +14,8 @@ import { usePlace } from '../api/places';
 import { ApiError } from '../api/errors';
 import { formatPhone } from '../format/phone';
 import { transformPlace } from '../data/transformPlace';
-import { PhotoFallback } from '../components/PhotoFallback';
+import { heroCaption } from '../data/heroCaption';
+import { HeroGallery } from '../components/HeroGallery';
 import { PhotoAttribution } from '../components/PhotoAttribution';
 import { EditorialCopy } from '../components/EditorialCopy';
 import { DetailSaveButton } from '../components/DetailSaveButton';
@@ -66,6 +67,7 @@ export function PlaceDetail({ id }: { id: string }) {
   const { colors, typography, radii } = useTheme();
   const insets = useSafeAreaInsets();
   const { savedPlaceKeys, toggleSavedPlace } = useSavedPlaces();
+  const [heroIndex, setHeroIndex] = React.useState(0);
 
   const backScrim = 'rgba(22,17,12,0.72)';
 
@@ -107,6 +109,7 @@ export function PlaceDetail({ id }: { id: string }) {
   const specials = place.specials?.trim() || null;
   const notes = place.notes?.trim() || null;
   const hoursLabel = place.hours?.label ?? null;
+  const caption = heroCaption(place.photos, heroIndex, place.photoAttribution, place.photoCredit);
 
   function openMaps() {
     const queryText = place.street
@@ -141,17 +144,14 @@ export function PlaceDetail({ id }: { id: string }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.hero}>
-          <PhotoFallback
-            photo={place.photoHero}
-            id={place.key}
-            name={place.name}
-            width="100%"
+          <HeroGallery
+            photos={place.photos}
+            fallback={{ photo: place.photoHero, id: place.key, name: place.name }}
             height={300}
-            borderRadius={0}
-            showInitials={false}
+            onPageChange={setHeroIndex}
           />
-          <View style={styles.heroShade} />
-          <View style={styles.heroText}>
+          <View style={styles.heroShade} pointerEvents="none" />
+          <View style={styles.heroText} pointerEvents="none">
             <Text style={[styles.heroTitle, { color: colors.ink, fontFamily: typography.ui700.fontFamily }]} numberOfLines={3}>
               {place.name}
             </Text>
@@ -163,7 +163,7 @@ export function PlaceDetail({ id }: { id: string }) {
           </View>
         </View>
 
-        <PhotoAttribution attribution={place.photoAttribution} style={styles.photoAttribution} />
+        <PhotoAttribution attribution={caption} style={styles.photoAttribution} />
 
         <View style={styles.contentArea}>
           <EditorialCopy

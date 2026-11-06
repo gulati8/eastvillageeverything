@@ -1,6 +1,6 @@
-import type { HoursJson, PlaceDetailResponse, PlaceResponse } from '@eve/shared-types';
+import type { HoursJson, PlaceDetailResponse, PlacePhotoResponse, PlaceResponse } from '@eve/shared-types';
 import { getETWeekday } from '../signals/hours';
-import type { HoursSummary, PlaceV2Display } from './placeV2Display';
+import type { HoursSummary, PlacePhotoDisplay, PlaceV2Display } from './placeV2Display';
 
 function normalizeString(v: string | null | undefined): string | null {
   const trimmed = v?.trim();
@@ -33,6 +33,21 @@ export function todayHoursLabel(hoursJson: HoursJson | null, now: Date = new Dat
   if (!Array.isArray(weekdayDescriptions) || weekdayDescriptions.length === 0) return null;
   const mondayFirstIndex = (getETWeekday(now) + 6) % 7;
   return weekdayDescriptions[mondayFirstIndex] ?? null;
+}
+
+/**
+ * Gallery pages from the detail response's `photos`: uploads carry an `id`
+ * and `credit`, the single Google entry has `id: null` and `attribution`.
+ * Absent (list row, or a detail seeded from one) maps to `null`, which the
+ * hero reads as "not loaded yet" and keeps showing the list photo.
+ */
+function photoPages(photos: PlacePhotoResponse[] | undefined): PlacePhotoDisplay[] | null {
+  if (!Array.isArray(photos)) return null;
+  return photos.map((photo) => ({
+    key: photo.id ?? 'google',
+    url: photo.hero_url ?? photo.url,
+    caption: photo.credit ?? photo.attribution ?? null,
+  }));
 }
 
 function summarizeHours(p: PlaceResponse): HoursSummary | null {
@@ -68,6 +83,7 @@ export function transformPlace(p: PlaceResponse | PlaceDetailResponse): PlaceV2D
     photoHero: firstPhoto(p.photo_hero_url, p.photo_url),
     photoCredit: p.photo_credit ?? null,
     photoAttribution: normalizeString('photo_attribution' in p ? p.photo_attribution : null),
+    photos: photoPages('photos' in p ? p.photos : undefined),
     specials: p.specials ?? null,
     notes: p.notes ?? null,
     pitch: p.pitch ?? null,

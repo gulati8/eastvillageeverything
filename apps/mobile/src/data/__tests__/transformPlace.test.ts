@@ -214,6 +214,69 @@ describe('transformPlace', () => {
     });
   });
 
+  describe('photos (detail hero gallery)', () => {
+    const uploads = [
+      {
+        id: 'u1',
+        url: 'https://img/1.png',
+        thumb_url: 'https://img/1.thumb.jpg',
+        hero_url: 'https://img/1.hero.jpg',
+        credit: 'Amit',
+        position: 0,
+        attribution: null,
+      },
+      {
+        id: 'u2',
+        url: 'https://img/2.png',
+        thumb_url: null,
+        hero_url: null,
+        credit: null,
+        position: 1,
+        attribution: null,
+      },
+    ];
+    const google = {
+      id: null,
+      url: 'https://img/g.jpg',
+      thumb_url: null,
+      hero_url: null,
+      credit: null,
+      position: 0,
+      attribution: 'Jane Doe',
+    };
+
+    it('maps uploads: key from id, hero_url falling back to url, caption from credit', () => {
+      const detail: PlaceDetailResponse = { ...makePlaceResponse(), photos: uploads };
+      expect(transformPlace(detail).photos).toEqual([
+        { key: 'u1', url: 'https://img/1.hero.jpg', caption: 'Amit' },
+        { key: 'u2', url: 'https://img/2.png', caption: null },
+      ]);
+    });
+
+    it('maps the Google entry: key "google", caption from attribution', () => {
+      const detail: PlaceDetailResponse = { ...makePlaceResponse(), photos: [google] };
+      expect(transformPlace(detail).photos).toEqual([
+        { key: 'google', url: 'https://img/g.jpg', caption: 'Jane Doe' },
+      ]);
+    });
+
+    it('keeps the server order when uploads and a Google entry are both present', () => {
+      const detail: PlaceDetailResponse = { ...makePlaceResponse(), photos: [...uploads, google] };
+      expect(transformPlace(detail).photos?.map((p) => p.key)).toEqual(['u1', 'u2', 'google']);
+    });
+
+    it('is [] for a detail with no photos', () => {
+      const detail: PlaceDetailResponse = { ...makePlaceResponse(), photos: [] };
+      expect(transformPlace(detail).photos).toEqual([]);
+    });
+
+    it('is null when photos is absent (list row, or a detail seeded from one)', () => {
+      expect(transformPlace(makePlaceResponse()).photos).toBeNull();
+      const detail: PlaceDetailResponse = { ...makePlaceResponse(), photo_attribution: 'Jane Doe' };
+      expect(transformPlace(detail).photos).toBeNull();
+    });
+  });
+
   describe('robustness', () => {
     it('does not throw when all nullable fields are null', () => {
       const input = makePlaceResponse({
