@@ -200,11 +200,12 @@ describe('T2 — PlaceModel.findAll SQL shape (source-level)', () => {
     src = readFileSync(PLACE_MODEL_PATH, 'utf8');
   });
 
-  // T2-AC1: no q → no WHERE, GROUP BY p.id
-  test('T2-AC1: when no q, GROUP BY p.id is used (not GROUP BY p.id, n.display)', () => {
-    // The source should have the conditional: hasQ → GROUP BY p.id, n.display else GROUP BY p.id
-    assert.match(src, /GROUP BY p\.id, n\.display/, 'GROUP BY with n.display branch must exist for q path');
-    assert.match(src, /GROUP BY p\.id[^,]/, 'GROUP BY p.id (without n.display) must exist for no-q path');
+  // T2-AC1: the neighborhood join is unconditional (every row carries
+  // neighborhood_value/neighborhood_display), so GROUP BY always lists the
+  // two joined columns; no q adds no WHERE.
+  test('T2-AC1: GROUP BY always lists p.id with the joined neighborhood columns', () => {
+    assert.match(src, /GROUP BY p\.id, n\.value, n\.display/, 'GROUP BY p.id, n.value, n.display must exist');
+    assert.doesNotMatch(src, /GROUP BY p\.id`/, 'the old no-join GROUP BY p.id branch must be gone');
   });
 
   // T2-AC2: empty/whitespace q handled by trim check
@@ -247,14 +248,18 @@ describe('T2 — PlaceModel.findAll SQL shape (source-level)', () => {
     assert.match(src, /n\.display ILIKE/, 'n.display ILIKE branch not found');
   });
 
-  // T2-AC6: LEFT JOIN neighborhoods added only when q is present
-  test('T2-AC6: LEFT JOIN neighborhoods is added conditionally (inside hasQ block)', () => {
-    // The join must be inside the `if (hasQ)` block — verified by it appearing after `if (hasQ)`
+  // T2-AC6: LEFT JOIN neighborhoods is always present (it feeds the
+  // neighborhood_value/neighborhood_display columns and the `neighborhood`
+  // filter), declared in the FROM clause before the `if (hasQ)` block.
+  test('T2-AC6: LEFT JOIN neighborhoods is unconditional (before the hasQ block)', () => {
     const hasQIdx = src.indexOf('if (hasQ)');
     const joinIdx = src.indexOf('LEFT JOIN neighborhoods n ON');
     assert.ok(hasQIdx >= 0, 'if (hasQ) block not found');
     assert.ok(joinIdx >= 0, 'LEFT JOIN neighborhoods not found');
-    assert.ok(joinIdx > hasQIdx, 'LEFT JOIN neighborhoods must appear after the if (hasQ) check');
+    assert.ok(joinIdx < hasQIdx, 'LEFT JOIN neighborhoods must appear before the if (hasQ) check');
+    assert.match(src, /n\.value AS neighborhood_value, n\.display AS neighborhood_display/,
+      'neighborhood_value/neighborhood_display columns must be selected');
+    assert.match(src, /n\.value = \$\$\{params\.length\}/, 'neighborhood filter on n.value not found');
   });
 
   // T2-AC7: conditions array — tag and q AND-compose

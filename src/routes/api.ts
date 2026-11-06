@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import { PlaceModel, TagModel, NeighborhoodModel } from '@eve/db';
-import type { Place, PlacePhotoResponse, PlacesListResponse, PlaceDetailResponse, TagsFlatResponse, TagsStructuredResponse, TagSummary, NeighborhoodSummary } from '@eve/shared-types';
+import type { Place, PlaceResponse, PlacePhotoResponse, PlacesListResponse, PlaceDetailResponse, TagsFlatResponse, TagsStructuredResponse, TagSummary, NeighborhoodSummary } from '@eve/shared-types';
 import { redisClient } from '../redis.js';
 
 const router = Router();
@@ -121,8 +121,15 @@ function sendPhoto(res: Response, body: Buffer, contentType: string): void {
  * These endpoints are consumed by the public website
  */
 
-// GET /api/places - List all places, optionally filtered by tag
+/** The place's neighborhood as the API serialises it, or null when the join found none. */
+function neighborhoodOf(place: Place): PlaceResponse['neighborhood'] {
+  if (!place.neighborhood_value || !place.neighborhood_display) return null;
+  return { value: place.neighborhood_value, display: place.neighborhood_display };
+}
+
+// GET /api/places - List all places, optionally filtered by neighborhood and/or tag
 router.get('/places', async (req: Request, res: Response) => {
+  const neighborhood = typeof req.query.neighborhood === 'string' ? req.query.neighborhood : undefined;
   const tag = typeof req.query.tag === 'string' ? req.query.tag : undefined;
   const limitRaw = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : NaN;
   const offsetRaw = typeof req.query.offset === 'string' ? parseInt(req.query.offset, 10) : NaN;
@@ -130,7 +137,7 @@ router.get('/places', async (req: Request, res: Response) => {
   const offset = Number.isFinite(offsetRaw) ? offsetRaw : undefined;
 
   try {
-    const places = await PlaceModel.findAll({ tag, limit, offset });
+    const places = await PlaceModel.findAll({ neighborhood, tag, limit, offset });
     // The list shape has no attribution field; only the three URLs are spread in.
     const listPhotoFields = (place: Place, r: Request) => {
       const { photo_attribution: _attribution, ...urls } = photoFields(place, r);
@@ -161,6 +168,7 @@ router.get('/places', async (req: Request, res: Response) => {
       hours_json: place.hours_json ?? null,
       cross_street: place.cross_street ?? null,
       neighborhood_id: place.neighborhood_id,
+      neighborhood: neighborhoodOf(place),
     }));
 
     res.json(response);
@@ -200,6 +208,7 @@ router.get('/places/:id', async (req: Request, res: Response) => {
       price_tier: place.price_tier ?? null,
       cross_street: place.cross_street ?? null,
       neighborhood_id: place.neighborhood_id,
+      neighborhood: neighborhoodOf(place),
       ...photoFields(place, req),
       photo_credit: place.photo_credit ?? null,
       photos: photoList(place, req),

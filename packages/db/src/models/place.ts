@@ -51,10 +51,15 @@ function validateUrl(url: string | undefined): string | null {
 
 export class PlaceModel {
   /**
-   * Find all places, optionally filtered by tag and/or free-text query.
+   * Find all places, optionally filtered by neighborhood, tag and/or free-text
+   * query. Every row carries its neighborhood's slug and display name
+   * (`neighborhood_value`, `neighborhood_display`) from an always-present
+   * LEFT JOIN to `neighborhoods`.
    *
-   * When `q` is provided and non-empty after trim, the query adds a LEFT JOIN
-   * to `neighborhoods` and an OR'd condition group that covers:
+   * `neighborhood` filters on `neighborhoods.value` (the slug).
+   *
+   * When `q` is provided and non-empty after trim, the query adds an OR'd
+   * condition group that covers:
    *   (a) The GIN-indexed expression on the places row itself — name, address,
    *       cross_street, categories, notes. The COALESCE expression here MUST
    *       remain byte-identical to the index DDL in
@@ -64,9 +69,9 @@ export class PlaceModel {
    *       expression, as including it there would break the index alignment).
    *   (c) Tag value/display via subquery on place_tags + tags.
    *
-   * `tag` and `q` are AND-composed via a conditions array.
+   * `neighborhood`, `tag` and `q` are AND-composed via a conditions array.
    */
-  static async findAll(options?: { tag?: string; q?: string; limit?: number; offset?: number }): Promise<Place[]> {
+  static async findAll(options?: { neighborhood?: string; tag?: string; q?: string; limit?: number; offset?: number }): Promise<Place[]> {
     const trimmedQ = options?.q?.trim() ?? '';
     const hasQ = trimmedQ.length > 0;
 
@@ -80,6 +85,7 @@ export class PlaceModel {
         p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit,
         p.photo_thumb_url, p.photo_hero_url,
         p.neighborhood_id,
+        n.value AS neighborhood_value, n.display AS neighborhood_display,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         p.google_photo_name, p.google_photo_attribution,
         COALESCE(
@@ -87,12 +93,18 @@ export class PlaceModel {
           ARRAY[]::varchar[]
         ) as tags
       FROM places p
+      LEFT JOIN neighborhoods n ON n.id = p.neighborhood_id
       LEFT JOIN place_tags pt ON p.id = pt.place_id
       LEFT JOIN tags t ON pt.tag_id = t.id
     `;
 
     const params: string[] = [];
     const conditions: string[] = [];
+
+    if (options?.neighborhood) {
+      params.push(options.neighborhood);
+      conditions.push(`n.value = $${params.length}`);
+    }
 
     if (options?.tag) {
       params.push(options.tag);
@@ -104,9 +116,8 @@ export class PlaceModel {
     }
 
     if (hasQ) {
-      // Add the neighborhoods join for the n.display OR-branch (branch b).
-      sql += `
-      LEFT JOIN neighborhoods n ON p.neighborhood_id = n.id`;
+      // The n.display OR-branch (branch b) reads the always-present
+      // neighborhoods join declared in the FROM clause above.
 
       // Escape LIKE metacharacters so user-supplied text is treated as literals.
       // Parameterisation stops SQL injection but ILIKE/LIKE still interpret '%'
@@ -154,16 +165,10 @@ export class PlaceModel {
       WHERE ${conditions.join(' AND ')}`;
     }
 
-    // Add n.display to GROUP BY only when the neighborhood join is present.
-    if (hasQ) {
-      sql += `
-      GROUP BY p.id, n.display`;
-    } else {
-      sql += `
-      GROUP BY p.id`;
-    }
-
+    // The neighborhood columns come from the joined table, so they are not
+    // functionally dependent on p.id and must be listed in GROUP BY.
     sql += `
+      GROUP BY p.id, n.value, n.display
       ORDER BY p.name ASC
     `;
 
@@ -196,6 +201,7 @@ export class PlaceModel {
         p.crowd_level, p.price_tier, p.cross_street, p.photo_url, p.photo_credit,
         p.photo_thumb_url, p.photo_hero_url,
         p.neighborhood_id,
+        n.value AS neighborhood_value, n.display AS neighborhood_display,
         p.google_place_id, p.hours_json, p.google_price_level, p.enrichment_status, p.enriched_at,
         p.google_photo_name, p.google_photo_attribution,
         COALESCE(
@@ -203,10 +209,11 @@ export class PlaceModel {
           ARRAY[]::varchar[]
         ) as tags
       FROM places p
+      LEFT JOIN neighborhoods n ON n.id = p.neighborhood_id
       LEFT JOIN place_tags pt ON p.id = pt.place_id
       LEFT JOIN tags t ON pt.tag_id = t.id
       WHERE p.id = $1
-      GROUP BY p.id
+      GROUP BY p.id, n.value, n.display
     `;
 
     const result = await query<Place>(sql, [id]);

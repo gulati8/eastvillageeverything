@@ -28,6 +28,10 @@ export interface Place {
   notes: string | null;
   tags: string[];
   neighborhood_id: string;
+  /** Slug of the place's neighborhood (`neighborhoods.value`), joined by `PlaceModel.findAll`/`findById`. */
+  neighborhood_value?: string;
+  /** Display name of the place's neighborhood (`neighborhoods.display`), joined alongside `neighborhood_value`. */
+  neighborhood_display?: string;
   lat?: number | null;
   lng?: number | null;
   created_at: Date;
@@ -102,6 +106,12 @@ export interface PlaceResponse {
   notes: string | null;
   tags: string[];
   neighborhood_id?: string;
+  /**
+   * The place's neighborhood: `value` is the slug (`GET /api/places?neighborhood=<value>`),
+   * `display` the name to show. The API always sets it; optional in the type so
+   * older cached rows and test fixtures without it still type-check.
+   */
+  neighborhood?: { value: string; display: string } | null;
   lat?: number | null;
   lng?: number | null;
   created_at: string;

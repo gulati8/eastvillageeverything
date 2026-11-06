@@ -33,17 +33,18 @@ Retry-After: <seconds>
 
 ## GET /api/places
 
-Returns a paginated list of places, optionally filtered by tag.
+Returns a list of places, optionally filtered by neighborhood and/or tag, and optionally paginated.
 
 **Query parameters**
 
 | Param | Type | Required | Default | Notes |
 |-------|------|----------|---------|-------|
+| `neighborhood` | string | no | — | Returns only places in the neighborhood with this `value` slug (see `GET /api/neighborhoods`). An unknown slug returns `[]` with 200. |
 | `tag` | string | no | — | Returns only places that have this tag value |
-| `limit` | integer | no | 100 | Page size, clamped to `[1, 200]` |
-| `offset` | integer | no | 0 | Number of rows to skip, clamped to `>= 0` |
+| `limit` | integer | no | none | Page size, clamped to `[1, 200]`. When omitted, the whole list is returned (no limit). |
+| `offset` | integer | no | 0 | Number of rows to skip, clamped to `>= 0`. Only applied together with `limit`. |
 
-Non-numeric `limit` / `offset` values are silently ignored and the defaults are used.
+`neighborhood` and `tag` combine with AND. Non-numeric `limit` / `offset` values are silently ignored, as if omitted.
 
 **Response 200**
 
@@ -73,13 +74,16 @@ Array of place objects. The list response includes a subset of fields suitable f
     "photo_thumb_url": "string | null",
     "photo_hero_url": "string | null",
     "hours_json": "object | null",
-    "cross_street": "string | null"
+    "cross_street": "string | null",
+    "neighborhood_id": "uuid",
+    "neighborhood": { "value": "string", "display": "string" }
   }
 ]
 ```
 
 Notes:
 - `key` is the place UUID (not `id`).
+- `neighborhood` is the place's neighborhood: `value` is the slug accepted by `?neighborhood=`, `display` is the name to show (for example `{ "value": "east-village", "display": "East Village" }`). Every place has one; `neighborhood_id` is the same neighborhood's UUID.
 - `phone` is stored as digits only; format for display on the client.
 - `specials`, `categories`, `notes` store plain text with `\n` newlines. Render with `white-space: pre-wrap`.
 - `lat` and `lng` are nullable. Currently always `null`; Phase 2 will populate via geocoding.
@@ -119,6 +123,8 @@ Returns a single place by UUID.
   "crowd_level": "string | null",
   "price_tier": "string | null",
   "cross_street": "string | null",
+  "neighborhood_id": "uuid",
+  "neighborhood": { "value": "string", "display": "string" },
   "photo_url": "string | null",
   "photo_thumb_url": "string | null",
   "photo_hero_url": "string | null",
@@ -213,3 +219,27 @@ Returns tags.
 Nesting is capped at 2 levels — parents never have parents themselves. (Server-side enforcement via `TagModel.assertCanBeParent`.)
 
 An empty tag table returns `{ "parents": [], "standalone": [] }`.
+
+---
+
+## GET /api/neighborhoods
+
+Returns every neighborhood, in `sort_order`. Use `value` for the `?neighborhood=` filter on `GET /api/places`; places carry the same `value` and `display` in their `neighborhood` field.
+
+**Response 200**
+
+```json
+[
+  {
+    "id": "uuid",
+    "value": "string",
+    "display": "string",
+    "is_default": "boolean",
+    "order": "string"
+  }
+]
+```
+
+- `value` is the slug (for example `east-village`), derived from `display` on every save in the admin, so it changes when a neighborhood is renamed.
+- `is_default` is `true` for exactly one neighborhood: the one a place gets when created without one.
+- `order` is a string representation of the `sort_order` integer, as with tags.
