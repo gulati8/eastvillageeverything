@@ -94,6 +94,8 @@ interface BackfillPlace {
   id: string;
   name: string;
   address: string;
+  /** Display name of the place's neighborhood (joined from `neighborhoods`), for the Text Search query. */
+  neighborhood: string;
 }
 
 interface RefreshPlace {
@@ -127,12 +129,25 @@ function sleep(ms: number): Promise<void> {
 // ---------------------------------------------------------------------------
 
 /**
- * Resolve a Google place_id for a given place name + address using Text Search.
- * Returns the bare place_id string (e.g. "ChIJ...") or null on failure.
+ * Centre of the location bias for Text Search: the East Village. The radius
+ * is wide enough to take in the neighborhoods the guide now covers, from the
+ * Lower East Side to the West Village; the query text carries the place's own
+ * neighborhood, which is what actually disambiguates.
+ */
+const SEARCH_BIAS = {
+  center: { latitude: 40.7264, longitude: -73.9818 },
+  radius: 5000.0,
+};
+
+/**
+ * Resolve a Google place_id for a given place name + address + neighborhood
+ * using Text Search. Returns the bare place_id string (e.g. "ChIJ...") or
+ * null on failure.
  */
 async function resolveGooglePlaceId(
   name: string,
-  address: string
+  address: string,
+  neighborhood: string
 ): Promise<string | null> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10_000);
@@ -149,13 +164,8 @@ async function resolveGooglePlaceId(
           'X-Goog-FieldMask': 'places.id',
         },
         body: JSON.stringify({
-          textQuery: `${name}, ${address}, East Village, New York, NY`,
-          locationBias: {
-            circle: {
-              center: { latitude: 40.7264, longitude: -73.9818 },
-              radius: 1000.0,
-            },
-          },
+          textQuery: `${name}, ${address}, ${neighborhood}, New York, NY`,
+          locationBias: { circle: SEARCH_BIAS },
         }),
       }
     );
@@ -383,10 +393,11 @@ async function runBackfill(): Promise<{
   skipped: number;
 }> {
   const result = await pool.query<BackfillPlace>(
-    `SELECT id, name, address
-     FROM places
-     WHERE address IS NOT NULL AND google_place_id IS NULL
-     ORDER BY name
+    `SELECT p.id, p.name, p.address, n.display AS neighborhood
+     FROM places p
+     JOIN neighborhoods n ON n.id = p.neighborhood_id
+     WHERE p.address IS NOT NULL AND p.google_place_id IS NULL
+     ORDER BY p.name
      ${limit !== null ? `LIMIT ${limit}` : ''}`
   );
 
@@ -401,7 +412,7 @@ async function runBackfill(): Promise<{
     console.log(`Processing: "${place.name}"`);
 
     // Step 1: Resolve Google place_id via Text Search
-    const googlePlaceId = await resolveGooglePlaceId(place.name, place.address);
+    const googlePlaceId = await resolveGooglePlaceId(place.name, place.address, place.neighborhood);
     await sleep(100);
 
     if (!googlePlaceId) {

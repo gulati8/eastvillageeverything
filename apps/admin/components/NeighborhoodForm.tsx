@@ -7,10 +7,10 @@ import { SubmitButton } from './SubmitButton';
 
 interface Props {
   action: (fd: FormData) => void;
-  defaultValues?: { display: string; is_default: boolean };
+  defaultValues?: { display: string; sort_order: number; is_default: boolean };
 }
 
-export function NeighborhoodForm({ action, defaultValues = { display: '', is_default: false } }: Props) {
+export function NeighborhoodForm({ action, defaultValues = { display: '', sort_order: 0, is_default: false } }: Props) {
   const [display, setDisplay] = useState(defaultValues.display);
   return (
     <form action={action} className="space-y-4">
@@ -23,6 +23,14 @@ export function NeighborhoodForm({ action, defaultValues = { display: '', is_def
         />
       </label>
       <SlugLine display={display} />
+      <label className="block">
+        <span className="ui text-xs uppercase text-ink3">Sort order</span>
+        <input
+          name="sort_order" type="number" step={1} defaultValue={defaultValues.sort_order}
+          className="w-full mt-1 p-3 rounded-input bg-paper border border-hairline focus:outline-none focus:border-accent"
+        />
+        <span className="ui text-xs text-ink3 block mt-1">Lower numbers come first in the app and the API.</span>
+      </label>
       <label className="flex items-center gap-2">
         <input type="checkbox" name="is_default" defaultChecked={defaultValues.is_default} />
         <span className="ui text-sm">Set as default neighborhood</span>

@@ -79,7 +79,7 @@ export default async function EditPlacePage({
         defaultValues={defaultValues}
         allTags={tags.map((t) => ({ id: t.id, value: t.value, display: t.display }))}
         selectedTags={selectedTags.map((t) => ({ id: t.id, value: t.value, display: t.display }))}
-        neighborhoods={neighborhoods.map((n) => ({ id: n.id, value: n.value, display: n.display }))}
+        neighborhoods={neighborhoods.map((n) => ({ id: n.id, value: n.value, display: n.display, is_default: n.is_default }))}
         showEditorial={showEditorial}
       />
     </div>

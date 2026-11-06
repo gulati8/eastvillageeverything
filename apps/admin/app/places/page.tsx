@@ -1,25 +1,33 @@
 import Link from 'next/link';
 import { PlaceModel, PlacePhotoModel, NeighborhoodModel } from '@eve/db';
 import { SearchInput } from '../../components/SearchInput';
+import { NeighborhoodFilter } from '../../components/NeighborhoodFilter';
 import { DeleteButton } from '../../components/DeleteButton';
 import { deletePlace } from '../../lib/actions/places';
 import { googlePhotoUrl } from '../../lib/photos';
 
+function first(v: string | string[] | undefined): string {
+  return (Array.isArray(v) ? v[0] : v)?.trim() ?? '';
+}
+
 export default async function PlacesPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ q?: string | string[] }>;
+  searchParams?: Promise<{ q?: string | string[]; neighborhood?: string | string[] }>;
 }) {
   const resolvedSearchParams = (await searchParams) ?? {};
-  const rawQ = resolvedSearchParams.q;
-  const q = (Array.isArray(rawQ) ? rawQ[0] : rawQ)?.trim() ?? '';
+  const q = first(resolvedSearchParams.q);
+  const requestedNeighborhood = first(resolvedSearchParams.neighborhood);
 
-  const [places, neighborhoods, photoCounts] = await Promise.all([
-    PlaceModel.findAll({ q: q || undefined }),
-    NeighborhoodModel.findAll(),
+  const neighborhoods = await NeighborhoodModel.findAll();
+  // Only a real row filters; an unknown id (a stale link, a deleted row) shows everything.
+  const neighborhoodId = neighborhoods.some((n) => n.id === requestedNeighborhood) ? requestedNeighborhood : '';
+  const [places, photoCounts] = await Promise.all([
+    PlaceModel.findAll({ q: q || undefined, neighborhood_id: neighborhoodId || undefined }),
     PlacePhotoModel.countsByPlace(),
   ]);
   const nameById = new Map(neighborhoods.map((n) => [n.id, n.display]));
+  const filterName = nameById.get(neighborhoodId);
 
   return (
     <div className="space-y-4">
@@ -27,7 +35,15 @@ export default async function PlacesPage({
         <h1 className="text-3xl">Places</h1>
         <Link href="/places/new" className="ui text-sm uppercase bg-ink text-paper px-4 py-2 rounded-input">+ New</Link>
       </div>
-      <SearchInput initialValue={q} />
+      <div className="flex items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <SearchInput initialValue={q} />
+        </div>
+        <NeighborhoodFilter
+          value={neighborhoodId}
+          options={neighborhoods.map((n) => ({ id: n.id, display: n.display }))}
+        />
+      </div>
       <ul className="divide-y divide-hairline">
         {places.map((p) => {
           // The mirrored first photo wins; the Google proxy stands in until there is one.
@@ -80,8 +96,10 @@ export default async function PlacesPage({
       </ul>
       {places.length === 0 && (
         q
-          ? <p className="ui text-sm text-ink3">No places match &ldquo;{q}&rdquo;.</p>
-          : <p className="ui text-sm text-ink3">No places yet. <Link href="/places/new" className="underline">Add one.</Link></p>
+          ? <p className="ui text-sm text-ink3">No places match &ldquo;{q}&rdquo;{filterName ? ` in ${filterName}` : ''}.</p>
+          : filterName
+            ? <p className="ui text-sm text-ink3">No places in {filterName} yet.</p>
+            : <p className="ui text-sm text-ink3">No places yet. <Link href="/places/new" className="underline">Add one.</Link></p>
       )}
     </div>
   );

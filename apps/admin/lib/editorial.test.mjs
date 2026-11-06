@@ -58,6 +58,15 @@ describe('buildEditorialPrompt', () => {
     }
   });
 
+  it('covers the East Village and nearby neighborhoods, not the East Village alone', () => {
+    const { system } = buildEditorialPrompt({ place, fields: ['pitch'] });
+    assert.ok(system.includes('the East Village and nearby neighborhoods in Manhattan'));
+    assert.doesNotMatch(system, /of the East Village in Manhattan/);
+    // The user message names the place's own neighborhood, so a Lower East Side place is described as one.
+    const { user } = buildEditorialPrompt({ place: { ...place, neighborhood: 'Lower East Side' }, fields: ['pitch'] });
+    assert.match(user, /^Neighborhood: Lower East Side$/m);
+  });
+
   it('puts the place facts, hours and price tier in the user message', () => {
     const { user } = buildEditorialPrompt({ place, fields: [...EDITORIAL_FIELDS] });
     assert.match(user, /^Place: Death & Co$/m);

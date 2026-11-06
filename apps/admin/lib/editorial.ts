@@ -48,7 +48,7 @@ export const EDITORIAL_OUTPUT_SCHEMA = {
   additionalProperties: false,
 } as const;
 
-export const EDITORIAL_SYSTEM_PROMPT = `You write short editorial copy for East Village Everything, a guide to the bars and restaurants of the East Village in Manhattan. Each place has five editorial fields. You will be told which ones to write.
+export const EDITORIAL_SYSTEM_PROMPT = `You write short editorial copy for East Village Everything, a guide to the bars and restaurants of the East Village and nearby neighborhoods in Manhattan. Each place has five editorial fields. You will be told which ones to write.
 
 How to work
 - Search the web for the place by name and address. Prefer write-ups and reviews from the last two years and weigh the newest most. Ground everything in what those sources actually praise or warn about.

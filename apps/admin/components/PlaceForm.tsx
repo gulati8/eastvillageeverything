@@ -24,7 +24,7 @@ const EDITORIAL_LABELS: Record<EditorialField, string> = {
 };
 
 interface Tag { id: string; value: string; display: string; }
-interface Neighborhood { id: string; value: string; display: string; }
+interface Neighborhood { id: string; value: string; display: string; is_default: boolean; }
 
 interface Props {
   action: (formData: FormData) => void;
@@ -99,9 +99,10 @@ async function postGenerate(placeId: string, fields: EditorialField[], form: HTM
 
 export function PlaceForm({ action, placeId, defaultValues = {}, allTags, selectedTags, neighborhoods }: Props) {
   const v = defaultValues;
+  // A new place starts on the default neighborhood (the `is_default` row), whatever it is called.
   const defaultNeighborhood =
     v.neighborhood_id ||
-    neighborhoods.find((n) => n.value === 'east-village')?.id ||
+    neighborhoods.find((n) => n.is_default)?.id ||
     neighborhoods[0]?.id ||
     '';
   const hasName = Boolean(v.name?.trim());

@@ -15,7 +15,7 @@ export default async function EditNeighborhoodPage({ params }: { params: Promise
         <h1 className="text-3xl">{n.display}</h1>
         <DeleteButton action={deleteNeighborhood} id={n.id} confirmText="Delete this neighborhood? Places assigned to it must be reassigned first." />
       </div>
-      <NeighborhoodForm action={update} defaultValues={{ display: n.display, is_default: n.is_default }} />
+      <NeighborhoodForm action={update} defaultValues={{ display: n.display, sort_order: n.sort_order, is_default: n.is_default }} />
     </div>
   );
 }

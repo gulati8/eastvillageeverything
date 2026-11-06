@@ -26,17 +26,26 @@ function errorMessage(e: unknown): string {
   return e instanceof Error && e.message ? e.message : 'Something went wrong. Try again.';
 }
 
+/** The `sort_order` field as an integer; blank or unparseable falls back to `fallback`. */
+function readSortOrder(formData: FormData, fallback: number): number {
+  const raw = String(formData.get('sort_order') ?? '').trim();
+  if (!raw) return fallback;
+  const n = Number(raw);
+  return Number.isFinite(n) ? Math.trunc(n) : fallback;
+}
+
 export async function createNeighborhood(formData: FormData) {
   await requireAdminMutation();
   const returnTo = sanitizeAdminNextPath(formData.get('return_to'), '/neighborhoods/new');
   const display = String(formData.get('display') ?? '').trim();
   const isDefault = formData.get('is_default') === 'on';
+  const sortOrder = readSortOrder(formData, 0);
   if (!display) {
     await setFlash('error', 'Give the neighborhood a display name before saving.');
     redirect(returnTo);
   }
   const value = await uniqueSlug(slugify(display));
-  await NeighborhoodModel.create({ value, display, is_default: isDefault });
+  await NeighborhoodModel.create({ value, display, sort_order: sortOrder, is_default: isDefault });
   revalidatePath('/neighborhoods');
   await setFlash('success', `${display} created`);
   redirect('/neighborhoods');
@@ -51,8 +60,21 @@ export async function updateNeighborhood(id: string, formData: FormData) {
     await setFlash('error', 'Give the neighborhood a display name before saving.');
     redirect(returnTo);
   }
+  const current = await NeighborhoodModel.findById(id);
+  if (!current) {
+    await setFlash('error', 'That neighborhood no longer exists.');
+    redirect('/neighborhoods');
+  }
+  // The table must always have a default: `PlaceModel.create` throws without
+  // one. Unchecking the box on the current default is refused; the way to move
+  // it is to check the box on another neighborhood, which clears this one.
+  if (current.is_default && !isDefault) {
+    await setFlash('error', 'Pick another default first', `${current.display} is the default neighborhood. Set another neighborhood as default and this one will stop being it.`);
+    redirect(returnTo);
+  }
+  const sortOrder = readSortOrder(formData, current.sort_order);
   const value = await uniqueSlug(slugify(display), id);
-  await NeighborhoodModel.update(id, { display, value, is_default: isDefault });
+  await NeighborhoodModel.update(id, { display, value, sort_order: sortOrder, is_default: isDefault });
   revalidatePath('/neighborhoods');
   await setFlash('success', `${display} saved`);
   redirect('/neighborhoods');

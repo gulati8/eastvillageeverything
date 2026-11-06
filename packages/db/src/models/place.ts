@@ -56,7 +56,8 @@ export class PlaceModel {
    * (`neighborhood_value`, `neighborhood_display`) from an always-present
    * LEFT JOIN to `neighborhoods`.
    *
-   * `neighborhood` filters on `neighborhoods.value` (the slug).
+   * `neighborhood` filters on `neighborhoods.value` (the slug);
+   * `neighborhood_id` filters on `places.neighborhood_id` (the admin's list).
    *
    * When `q` is provided and non-empty after trim, the query adds an OR'd
    * condition group that covers:
@@ -69,9 +70,9 @@ export class PlaceModel {
    *       expression, as including it there would break the index alignment).
    *   (c) Tag value/display via subquery on place_tags + tags.
    *
-   * `neighborhood`, `tag` and `q` are AND-composed via a conditions array.
+   * `neighborhood`, `neighborhood_id`, `tag` and `q` are AND-composed via a conditions array.
    */
-  static async findAll(options?: { neighborhood?: string; tag?: string; q?: string; limit?: number; offset?: number }): Promise<Place[]> {
+  static async findAll(options?: { neighborhood?: string; neighborhood_id?: string; tag?: string; q?: string; limit?: number; offset?: number }): Promise<Place[]> {
     const trimmedQ = options?.q?.trim() ?? '';
     const hasQ = trimmedQ.length > 0;
 
@@ -104,6 +105,11 @@ export class PlaceModel {
     if (options?.neighborhood) {
       params.push(options.neighborhood);
       conditions.push(`n.value = $${params.length}`);
+    }
+
+    if (options?.neighborhood_id) {
+      params.push(options.neighborhood_id);
+      conditions.push(`p.neighborhood_id = $${params.length}`);
     }
 
     if (options?.tag) {

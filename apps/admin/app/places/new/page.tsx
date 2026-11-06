@@ -23,7 +23,7 @@ export default async function NewPlacePage({
         action={createPlace}
         allTags={tags.map((t) => ({ id: t.id, value: t.value, display: t.display }))}
         selectedTags={[]}
-        neighborhoods={neighborhoods.map((n) => ({ id: n.id, value: n.value, display: n.display }))}
+        neighborhoods={neighborhoods.map((n) => ({ id: n.id, value: n.value, display: n.display, is_default: n.is_default }))}
         showEditorial={showEditorial}
       />
     </div>
