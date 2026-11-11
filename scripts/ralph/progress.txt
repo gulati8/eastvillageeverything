@@ -169,3 +169,8 @@ Older: scripts/ralph/archive/admin-photos-plan.md, admin-photos-progress.txt; la
 - Files touched: `scripts/ralph/progress.txt` only.
 - Validation: `grep -nE '^\s*- \[ \]' scripts/ralph/plan.md` lists 2.4, 2.6, 2.7, 3.2, 3.3, 4.2, 4.6, 4.7, 4.8; `grep -n '## Decision' scripts/ralph/progress.txt` finds only the 4.1 note that the human will write one.
 ---
+## 2026-11-10 - Direction from the human on the switcher (not the final pick)
+- The human looked at the 4.1 mockups. Option A's masthead is right; B and C are rejected. They liked the neighborhood pill row from C as a control, so the arrow next to the neighborhood title now expands that pill row instead of opening a dropdown. Full wording is in the decision list at the top of `plan.md`.
+- New task 4.1b redraws the mockup with that interaction and three placements of the search box and filter button. 4.2 (the human's pick) now chooses among layouts 1, 2 and 3 and is blocked by 4.1b. 4.6 was reworded to match.
+- No `## Decision` entry exists yet; the human writes it in 4.2.
+---
