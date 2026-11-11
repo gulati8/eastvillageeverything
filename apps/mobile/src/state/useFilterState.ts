@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FilterSection } from '../data/deriveFilterSections';
 import type { PlaceV2Display, SortMode } from '../data/placeV2Display';
+import { ALL_NEIGHBORHOODS, filterByNeighborhood } from '../data/neighborhoods';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -20,6 +21,13 @@ export interface UseFilterStateReturn {
 
   // Derived
   applyFilters: (places: PlaceV2Display[]) => PlaceV2Display[];
+  /**
+   * `allPlaces` narrowed to the selected neighborhood, or whole while a search
+   * is typed (search covers every neighborhood). Counts are taken over this.
+   */
+  scopedPlaces: PlaceV2Display[];
+  /** True when a typed search has widened a single-neighborhood list to every neighborhood. */
+  searchingEverywhere: boolean;
   matchCount: number;
   totalCount: number;
   activeFilterCount: number;
@@ -202,6 +210,7 @@ function applySort(places: PlaceV2Display[], sortMode: SortMode): PlaceV2Display
 export function useFilterState(
   allPlaces: PlaceV2Display[] = [],
   sections: FilterSection[] = [],
+  neighborhood: string = ALL_NEIGHBORHOODS,
 ): UseFilterStateReturn {
   const [activeFilters, setActiveFilters] = useState<Map<string, Set<string>>>(
     () => buildEmptyFilters(sections),
@@ -276,11 +285,18 @@ export function useFilterState(
   // Derived: matchCount and totalCount
   // --------------------------------------------------------------------------
 
-  const totalCount = allPlaces.length;
+  const scopedPlaces = useMemo(
+    () => filterByNeighborhood(allPlaces, neighborhood, searchQuery),
+    [allPlaces, neighborhood, searchQuery],
+  );
+  const searchingEverywhere =
+    neighborhood !== ALL_NEIGHBORHOODS && searchQuery.trim() !== '';
+
+  const totalCount = scopedPlaces.length;
 
   const matchCount = useMemo(
-    () => applyFilters(allPlaces).length,
-    [applyFilters, allPlaces],
+    () => applyFilters(scopedPlaces).length,
+    [applyFilters, scopedPlaces],
   );
 
   // --------------------------------------------------------------------------
@@ -307,7 +323,7 @@ export function useFilterState(
     const counts: Record<string, number> = {};
 
     // Pre-filter by search query — chip counts are marginal over text-filtered results
-    const searchFiltered = applySearch(allPlaces, searchQuery);
+    const searchFiltered = applySearch(scopedPlaces, searchQuery);
 
     for (const section of sections) {
       // Build a hypothetical activeFilters with only this chip active in this section
@@ -321,7 +337,7 @@ export function useFilterState(
     }
 
     return counts;
-  }, [activeFilters, allPlaces, searchQuery, sections]);
+  }, [activeFilters, scopedPlaces, searchQuery, sections]);
 
   // --------------------------------------------------------------------------
   // Derived: railChips
@@ -354,6 +370,8 @@ export function useFilterState(
     setSearchQuery,
     setSortMode,
     applyFilters,
+    scopedPlaces,
+    searchingEverywhere,
     matchCount,
     totalCount,
     activeFilterCount,

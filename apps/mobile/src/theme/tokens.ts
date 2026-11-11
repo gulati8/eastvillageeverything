@@ -1,4 +1,4 @@
-// Design tokens for East Village Everything — generated from design handoff
+// Design tokens for the EVE app — generated from design handoff
 // docs/design_handoff_eve/README.md
 
 export type SignalKind = 'happy' | 'closing' | 'music' | 'walkin' | 'always';

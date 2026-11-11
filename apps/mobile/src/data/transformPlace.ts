@@ -73,6 +73,9 @@ export function transformPlace(p: PlaceResponse | PlaceDetailResponse): PlaceV2D
     name: p.name,
     street: p.address ?? null,
     cross: p.cross_street ?? null,
+    neighborhood: p.neighborhood
+      ? { value: p.neighborhood.value, display: p.neighborhood.display }
+      : null,
     tags,
     phone: p.phone ?? null,
     url: p.url ?? null,

@@ -52,6 +52,18 @@ describe('transformPlace', () => {
       expect(result.street).toBe('507 E 5th St');
     });
 
+    it('maps neighborhood → { value, display }', () => {
+      const result = transformPlace(
+        makePlaceResponse({ neighborhood: { value: 'lower-east-side', display: 'Lower East Side' } }),
+      );
+      expect(result.neighborhood).toEqual({ value: 'lower-east-side', display: 'Lower East Side' });
+    });
+
+    it('maps a missing or null neighborhood → null', () => {
+      expect(transformPlace(makePlaceResponse()).neighborhood).toBeNull();
+      expect(transformPlace(makePlaceResponse({ neighborhood: null })).neighborhood).toBeNull();
+    });
+
     it('ignores legacy categories', () => {
       const result = transformPlace(makePlaceResponse({ categories: 'Dive bar\nIrish pub' }));
       expect(result).not.toHaveProperty('kind');

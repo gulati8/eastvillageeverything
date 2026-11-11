@@ -15,6 +15,7 @@ import { ApiError } from '../api/errors';
 import { formatPhone } from '../format/phone';
 import { transformPlace } from '../data/transformPlace';
 import { heroCaption } from '../data/heroCaption';
+import { mapsQueryText, streetWithNeighborhood } from '../data/neighborhoods';
 import { HeroGallery } from '../components/HeroGallery';
 import { PhotoAttribution } from '../components/PhotoAttribution';
 import { EditorialCopy } from '../components/EditorialCopy';
@@ -109,13 +110,11 @@ export function PlaceDetail({ id }: { id: string }) {
   const specials = place.specials?.trim() || null;
   const notes = place.notes?.trim() || null;
   const hoursLabel = place.hours?.label ?? null;
+  const heroStreetLine = streetWithNeighborhood(place);
   const caption = heroCaption(place.photos, heroIndex, place.photoAttribution, place.photoCredit);
 
   function openMaps() {
-    const queryText = place.street
-      ? `${place.name}, ${place.street}, East Village, New York, NY`
-      : `${place.name}, East Village, New York, NY`;
-    const query = encodeURIComponent(queryText);
+    const query = encodeURIComponent(mapsQueryText(place));
     const url = Platform.OS === 'ios'
       ? `maps://?q=${query}`
       : `https://maps.google.com/?q=${query}`;
@@ -155,9 +154,9 @@ export function PlaceDetail({ id }: { id: string }) {
             <Text style={[styles.heroTitle, { color: colors.ink, fontFamily: typography.ui700.fontFamily }]} numberOfLines={3}>
               {place.name}
             </Text>
-            {place.street ? (
+            {heroStreetLine ? (
               <Text style={[styles.heroMeta, { color: colors.ink2, fontFamily: typography.ui600.fontFamily }]} numberOfLines={2}>
-                {place.street}
+                {heroStreetLine}
               </Text>
             ) : null}
           </View>

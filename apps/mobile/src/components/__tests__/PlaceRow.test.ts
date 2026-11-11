@@ -63,6 +63,7 @@ function basePlace(overrides: Partial<PlaceV2Display> = {}): PlaceV2Display {
     photoCredit: null,
     photoAttribution: null,
     photos: null,
+    neighborhood: null,
     specials: null,
     notes: null,
     pitch: null,
@@ -84,8 +85,8 @@ function basePlace(overrides: Partial<PlaceV2Display> = {}): PlaceV2Display {
   };
 }
 
-function render(place: PlaceV2Display): AnyEl {
-  return PlaceRow({ place, onPress: () => undefined }) as AnyEl;
+function render(place: PlaceV2Display, showNeighborhood?: boolean): AnyEl {
+  return PlaceRow({ place, showNeighborhood, onPress: () => undefined }) as AnyEl;
 }
 
 function childrenOf(el: AnyEl): AnyEl[] {
@@ -131,5 +132,29 @@ describe('PlaceRow italic line', () => {
   it('renders no italic line when there is neither `perfect` nor tags', () => {
     const el = render(basePlace({ perfect: null, tags: [] }));
     expect(findByTestID(el, 'row-italic-line')).toBeNull();
+  });
+});
+
+describe('PlaceRow street line', () => {
+  const les = { value: 'lower-east-side', display: 'Lower East Side' };
+
+  it('shows the street alone by default', () => {
+    const el = render(basePlace({ street: '81 Ludlow St', neighborhood: les }));
+    expect(textOf(findByTestID(el, 'row-street-line')!)).toBe('81 Ludlow St');
+  });
+
+  it('ends with the neighborhood when showNeighborhood is set', () => {
+    const el = render(basePlace({ street: '81 Ludlow St', neighborhood: les }), true);
+    expect(textOf(findByTestID(el, 'row-street-line')!)).toBe('81 Ludlow St · Lower East Side');
+  });
+
+  it('shows the neighborhood alone for a place with no street', () => {
+    const el = render(basePlace({ street: null, neighborhood: les }), true);
+    expect(textOf(findByTestID(el, 'row-street-line')!)).toBe('Lower East Side');
+  });
+
+  it('renders no street line when there is neither', () => {
+    expect(findByTestID(render(basePlace({ street: null }), true), 'row-street-line')).toBeNull();
+    expect(findByTestID(render(basePlace({ street: null })), 'row-street-line')).toBeNull();
   });
 });

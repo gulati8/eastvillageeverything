@@ -3,6 +3,7 @@ import type {
   PlaceDetailResponse,
   TagsFlatResponse,
   TagsStructuredResponse,
+  NeighborhoodSummary,
 } from '@eve/shared-types';
 import { getOrCreateDeviceId } from '../identity/deviceId';
 import { getApiBaseUrl, REQUEST_TIMEOUT_MS } from './config';
@@ -171,4 +172,9 @@ export const tagsApi = {
     apiGet<TagsFlatResponse>('/api/tags'),
   structured: (): Promise<TagsStructuredResponse> =>
     apiGet<TagsStructuredResponse>('/api/tags', { query: { structured: '1' } }),
+};
+
+export const neighborhoodsApi = {
+  list: (): Promise<NeighborhoodSummary[]> =>
+    apiGet<NeighborhoodSummary[]>('/api/neighborhoods'),
 };

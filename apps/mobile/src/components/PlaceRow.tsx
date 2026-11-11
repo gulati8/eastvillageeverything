@@ -10,6 +10,7 @@ import * as Haptics from 'expo-haptics';
 import { useTheme } from '../theme/useTheme';
 import type { PlaceV2Display } from '../data/placeV2Display';
 import { rowItalicLine } from '../data/rowItalicLine';
+import { streetWithNeighborhood } from '../data/neighborhoods';
 import { PhotoFallback } from './PhotoFallback';
 import { SignalPip } from './SignalPip';
 import { BookmarkIcon } from '../icons/BookmarkIcon';
@@ -18,6 +19,8 @@ interface PlaceRowProps {
   place: PlaceV2Display;
   isLast?: boolean;
   isSaved?: boolean;
+  /** End the street line with " · <neighborhood>" (lists that span neighborhoods). */
+  showNeighborhood?: boolean;
   onPress: () => void;
   onSave?: () => void;
 }
@@ -26,11 +29,12 @@ function collapseText(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
 }
 
-export function PlaceRow({ place, isLast = false, isSaved = false, onPress, onSave }: PlaceRowProps) {
+export function PlaceRow({ place, isLast = false, isSaved = false, showNeighborhood = false, onPress, onSave }: PlaceRowProps) {
   const { colors, typography } = useTheme();
 
   const specialsExcerpt = place.specials != null ? collapseText(place.specials) : null;
   const italicLine = rowItalicLine(place);
+  const streetLine = showNeighborhood ? streetWithNeighborhood(place) : place.street;
 
   function handleSave(event: GestureResponderEvent) {
     event.stopPropagation();
@@ -79,15 +83,16 @@ export function PlaceRow({ place, isLast = false, isSaved = false, onPress, onSa
           </Pressable>
         </View>
 
-        {place.street != null && (
+        {streetLine != null && (
           <Text
+            testID="row-street-line"
             style={[
               styles.metaLine,
               { color: colors.ink3, fontFamily: typography.ui600.fontFamily },
             ]}
             numberOfLines={1}
           >
-            {place.street}
+            {streetLine}
           </Text>
         )}
 

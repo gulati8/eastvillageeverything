@@ -14,16 +14,26 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import BottomSheet from '@gorhom/bottom-sheet';
+import { useIsRestoring } from '@tanstack/react-query';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 import { usePlacesList } from '../api/places';
 import { useTagsStructured } from '../api/tags';
+import { useNeighborhoods } from '../api/neighborhoods';
 import { transformPlace } from '../data/transformPlace';
 import { deriveFilterSections, filterSectionsForPlaces } from '../data/deriveFilterSections';
 import { useFilterState } from '../state/useFilterState';
+import { useNeighborhood } from '../state/useNeighborhood';
+import {
+  ALL_NEIGHBORHOODS,
+  neighborhoodPills,
+  neighborhoodTitle,
+} from '../data/neighborhoods';
 import { useSavedPlaces } from '../state/useSavedPlaces';
 import { PlaceRow } from '../components/PlaceRow';
 import { SearchBar } from '../components/SearchBar';
 import { FilterRail } from '../components/FilterRail';
+import { NeighborhoodRail } from '../components/NeighborhoodRail';
 import { FilterSheet } from '../components/FilterSheet';
 import { TabBar, TAB_BAR_CLEARANCE, type TabKey } from '../components/TabBar';
 import { EveListSkeleton } from '../components/EveListSkeleton';
@@ -38,7 +48,8 @@ import type { PlaceV2Display, SortMode } from '../data/placeV2Display';
 
 const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-function getEyebrowText(count: number): string {
+/** Right-hand side of the eyebrow: the day and the time, e.g. "Tue · 6:24pm". */
+function getEyebrowClock(): string {
   const now = new Date();
   const day = DAY_ABBR[now.getDay()];
   const hours = now.getHours();
@@ -47,7 +58,7 @@ function getEyebrowText(count: number): string {
   const displayHour = hours % 12 === 0 ? 12 : hours % 12;
   const displayMinute = minutes.toString().padStart(2, '0');
   const timeStr = `${displayHour}:${displayMinute}${ampm}`;
-  return `${day} · ${timeStr} · East Village`;
+  return `${day} · ${timeStr}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -67,11 +78,12 @@ const SORT_OPTIONS: Array<{ label: string; mode: SortMode | null }> = [
 
 export function PlaceList() {
   const insets = useSafeAreaInsets();
-  const { colors, typography, radii } = useTheme();
+  const { colors, typography } = useTheme();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const listRef = useRef<FlatList<PlaceV2Display>>(null);
   const [activeTab, setActiveTab] = React.useState<TabKey>('home');
   const [sheetOpen, setSheetOpen] = React.useState(false);
+  const [switcherOpen, setSwitcherOpen] = React.useState(false);
   const { savedPlaceKeys, toggleSavedPlace } = useSavedPlaces();
 
   // Data fetch — no tag param, all filtering is client-side
@@ -90,7 +102,30 @@ export function PlaceList() {
     [allPlaces, tagsData],
   );
 
-  // Filter state
+  // Neighborhood: the remembered choice, or the default row. While it cannot
+  // be known yet the list waits. If the neighborhoods are not coming (the
+  // request failed, or the device is offline with nothing cached) the whole
+  // list is shown instead.
+  const isRestoringCache = useIsRestoring();
+  const { data: neighborhoods, fetchStatus: neighborhoodsFetchStatus } = useNeighborhoods();
+  const { selected: resolvedNeighborhood, select: selectNeighborhood } = useNeighborhood(neighborhoods);
+  const neighborhoodsUnavailable =
+    neighborhoods === undefined && !isRestoringCache && neighborhoodsFetchStatus !== 'fetching';
+  const neighborhood =
+    resolvedNeighborhood ?? (neighborhoodsUnavailable ? ALL_NEIGHBORHOODS : null);
+
+  const pills = React.useMemo(
+    () => neighborhoodPills(neighborhoods ?? [], allPlaces, neighborhood),
+    [neighborhoods, allPlaces, neighborhood],
+  );
+  // The Saved tab ignores the neighborhood, so its title is not one and it has
+  // no switcher: a neighborhood's name above another neighborhood's places
+  // would read as wrong.
+  const onSavedTab = activeTab === 'saved';
+  const title = onSavedTab ? 'Saved' : neighborhoodTitle(neighborhood, neighborhoods, allPlaces);
+  const canSwitch = !onSavedTab && title !== null;
+
+  // Filter state. The Saved tab ignores the neighborhood: a saved list is the user's own.
   const {
     activeFilters,
     searchQuery,
@@ -100,18 +135,28 @@ export function PlaceList() {
     setSearchQuery,
     setSortMode,
     applyFilters,
+    scopedPlaces,
+    searchingEverywhere,
     matchCount,
     totalCount,
     activeFilterCount,
     chipCounts,
     railChips,
-  } = useFilterState(allPlaces, filterSections);
+  } = useFilterState(
+    allPlaces,
+    filterSections,
+    onSavedTab ? ALL_NEIGHBORHOODS : neighborhood ?? ALL_NEIGHBORHOODS,
+  );
 
   // Filtered + sorted places for the Home list
   const filteredPlaces = React.useMemo(
-    () => applyFilters(allPlaces),
-    [applyFilters, allPlaces],
+    () => applyFilters(scopedPlaces),
+    [applyFilters, scopedPlaces],
   );
+
+  // Rows name their neighborhood whenever the list spans more than one.
+  const showRowNeighborhood =
+    onSavedTab || neighborhood === ALL_NEIGHBORHOODS || searchingEverywhere;
 
   // Home and Saved share the same row formatting; Saved narrows to saved IDs.
   const displayPlaces = React.useMemo(
@@ -200,7 +245,33 @@ export function PlaceList() {
 
   const handleTabPress = useCallback((tab: TabKey) => {
     setActiveTab(tab);
+    setSwitcherOpen(false);
   }, []);
+
+  // Neighborhood switcher: the title's arrow expands the pill row; a pill
+  // switches and collapses it; the arrow again collapses it unchanged.
+  const handleSwitcherToggle = useCallback(() => {
+    setSwitcherOpen((open) => !open);
+  }, []);
+
+  const handleNeighborhoodSelect = useCallback(
+    (value: string) => {
+      selectNeighborhood(value);
+      setSwitcherOpen(false);
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
+    },
+    [selectNeighborhood],
+  );
+
+  const chevronStyle = useAnimatedStyle(
+    () => ({
+      transform: [
+        { translateY: withTiming(switcherOpen ? 3 : -2, { duration: 200 }) },
+        { rotate: withTiming(switcherOpen ? '-135deg' : '45deg', { duration: 200 }) },
+      ],
+    }),
+    [switcherOpen],
+  );
 
   // ---------------------------------------------------------------------------
   // Render helpers
@@ -214,11 +285,12 @@ export function PlaceList() {
         place={item}
         isLast={index === displayPlaces.length - 1}
         isSaved={savedPlaceKeys.has(item.key)}
+        showNeighborhood={showRowNeighborhood}
         onPress={() => router.push(`/place/${item.key}`)}
         onSave={() => toggleSavedPlace(item.key)}
       />
     ),
-    [displayPlaces.length, savedPlaceKeys, toggleSavedPlace],
+    [displayPlaces.length, savedPlaceKeys, showRowNeighborhood, toggleSavedPlace],
   );
 
   // ---------------------------------------------------------------------------
@@ -226,7 +298,7 @@ export function PlaceList() {
   // ---------------------------------------------------------------------------
 
   const hasData = rawData !== undefined;
-  const isLoadingInitial = isLoading && !hasData;
+  const isLoadingInitial = (isLoading && !hasData) || (hasData && neighborhood === null);
   const isErrorNoData = isError && !hasData;
   const isEmpty = !isLoadingInitial && !isErrorNoData && displayPlaces.length === 0;
   const isSavedTabEmpty = activeTab === 'saved' && savedPlaceKeys.size === 0;
@@ -250,87 +322,79 @@ export function PlaceList() {
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.paper, paddingTop: insets.top }]}>
-      {/* 1. Compact masthead */}
+      {/* 1. Masthead: brand and clock in the eyebrow, the neighborhood as the title */}
       <View style={styles.masthead}>
-        <Text
-          style={[
-            styles.eyebrow,
-            { color: colors.ink3, fontFamily: typography.ui600.fontFamily },
-          ]}
-        >
-          {getEyebrowText(totalCount)}
-        </Text>
-        <Text
-          style={[
-            styles.mastheadTitle,
-            { color: colors.ink, fontFamily: typography.displayItalic.fontFamily },
-          ]}
-        >
-          East Village Everything
-        </Text>
-      </View>
-
-      {/* 2. Search + filter bar */}
-      <View style={styles.searchRow}>
-        <View style={styles.searchBarWrapper}>
-          <SearchBar
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
+        <View style={styles.eyebrowRow}>
+          <Text
+            style={[
+              styles.eyebrow,
+              { color: colors.ink3, fontFamily: typography.ui600.fontFamily },
+            ]}
+          >
+            East Village Everything
+          </Text>
+          <Text
+            style={[
+              styles.eyebrow,
+              { color: colors.ink3, fontFamily: typography.ui600.fontFamily },
+            ]}
+          >
+            {getEyebrowClock()}
+          </Text>
         </View>
-
-        {/* Filter button */}
         <Pressable
-          onPress={handleFilterButtonPress}
-          style={[
-            styles.filterButton,
-            {
-              backgroundColor: colors.paper2,
-              borderColor: colors.line,
-            },
-          ]}
-          accessibilityLabel="Open filters"
-          accessibilityRole="button"
+          onPress={handleSwitcherToggle}
+          disabled={!canSwitch}
+          hitSlop={{ top: 4, bottom: 8, left: 8, right: 16 }}
+          style={styles.titleRow}
+          accessibilityRole={canSwitch ? 'button' : 'header'}
+          accessibilityState={canSwitch ? { expanded: switcherOpen } : undefined}
+          accessibilityLabel={canSwitch ? `${title}. Change neighborhood` : undefined}
         >
-          {/* Three-line filter icon */}
-          <View style={styles.filterIcon}>
-            <View style={[styles.filterLine, { backgroundColor: colors.ink, width: 16 }]} />
-            <View style={[styles.filterLine, { backgroundColor: colors.ink, width: 12 }]} />
-            <View style={[styles.filterLine, { backgroundColor: colors.ink, width: 8 }]} />
-          </View>
-
-          {/* Badge when filters active */}
-          {activeFilterCount > 0 && (
-            <View
-              style={[
-                styles.filterBadge,
-                { backgroundColor: colors.accent },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.filterBadgeText,
-                  { color: '#FFFFFF', fontFamily: typography.ui700.fontFamily },
-                ]}
-              >
-                {activeFilterCount}
-              </Text>
-            </View>
+          <Text
+            style={[
+              styles.mastheadTitle,
+              { color: colors.ink, fontFamily: typography.displayItalic.fontFamily },
+            ]}
+            numberOfLines={1}
+          >
+            {title ?? ' '}
+          </Text>
+          {canSwitch && (
+            <Animated.View
+              style={[styles.chevron, { borderColor: colors.accent }, chevronStyle]}
+            />
           )}
         </Pressable>
       </View>
 
-      {/* 3. FilterRail */}
+      {/* 2. Neighborhood pills, expanded by the title's arrow */}
+      <NeighborhoodRail
+        open={switcherOpen && canSwitch}
+        pills={pills}
+        selected={neighborhood}
+        onSelect={handleNeighborhoodSelect}
+      />
+
+      {/* 3. Search, full width */}
+      <View style={styles.searchRow}>
+        <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
+      </View>
+
+      {/* 4. Tag rail, led by the filter button */}
       <FilterRail
         chips={railChips}
         matchCount={matchCount}
         totalCount={totalCount}
         activeSort={sortMode}
+        activeFilterCount={activeFilterCount}
+        searchingEverywhere={searchingEverywhere}
+        onFilterPress={handleFilterButtonPress}
         onChipToggle={handleRailChipToggle}
         onSortPress={handleSortPress}
       />
 
-      {/* 4. Content area */}
+      {/* 5. Content area */}
       <View style={styles.content}>
         {isLoadingInitial && <EveListSkeleton />}
 
@@ -360,7 +424,7 @@ export function PlaceList() {
         )}
       </View>
 
-      {/* 5. FilterSheet — rendered at bottom, controlled by ref */}
+      {/* 6. FilterSheet — rendered at bottom, controlled by ref */}
       <FilterSheet
         bottomSheetRef={bottomSheetRef}
         sections={filterSections}
@@ -373,7 +437,7 @@ export function PlaceList() {
         onChange={handleSheetChange}
       />
 
-      {/* 6. TabBar */}
+      {/* 7. TabBar */}
       <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
     </View>
   );
@@ -388,62 +452,42 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 0,
   },
+  eyebrowRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   eyebrow: {
     fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.66,
     lineHeight: 16,
-    marginBottom: 4,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
   },
   mastheadTitle: {
+    flexShrink: 1,
     fontSize: 32,
     letterSpacing: -0.64,
     lineHeight: 38,
-    marginBottom: 0,
+  },
+  chevron: {
+    width: 9,
+    height: 9,
+    marginLeft: 14,
+    marginRight: 4,
+    borderRightWidth: 2,
+    borderBottomWidth: 2,
   },
   searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 22,
     paddingTop: 14,
-    paddingBottom: 0,
-    gap: 8,
-  },
-  searchBarWrapper: {
-    flex: 1,
-  },
-  filterButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  filterIcon: {
-    gap: 3,
-    alignItems: 'center',
-  },
-  filterLine: {
-    height: 2,
-    borderRadius: 1,
-  },
-  filterBadge: {
-    position: 'absolute',
-    top: -2,
-    right: -2,
-    minWidth: 16,
-    height: 16,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 3,
-  },
-  filterBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    lineHeight: 14,
   },
   content: {
     flex: 1,

@@ -30,6 +30,8 @@ export interface PlaceV2Display {
   name: string;
   street: string | null;
   cross: string | null;
+  /** The place's neighborhood (slug and display name); null when the response carries none. */
+  neighborhood: { value: string; display: string } | null;
   hours: HoursSummary | null;
   hoursJson: HoursJson | null;
   vibe: string | null;

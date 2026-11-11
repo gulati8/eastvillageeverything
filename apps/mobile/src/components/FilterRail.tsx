@@ -22,6 +22,11 @@ interface FilterRailProps {
   matchCount: number;
   totalCount: number;
   activeSort: SortMode;
+  /** Number of active filters, shown as a badge on the filter button. */
+  activeFilterCount: number;
+  /** True while a typed search is covering every neighborhood. */
+  searchingEverywhere?: boolean;
+  onFilterPress: () => void;
   onChipToggle: (sectionKey: string, value: string) => void;
   onSortPress: () => void;
 }
@@ -38,6 +43,9 @@ export function FilterRail({
   matchCount,
   totalCount,
   activeSort,
+  activeFilterCount,
+  searchingEverywhere = false,
+  onFilterPress,
   onChipToggle,
   onSortPress,
 }: FilterRailProps) {
@@ -51,7 +59,7 @@ export function FilterRail({
 
     const xPos = chipPositions.current[value];
     if (xPos !== undefined && scrollRef.current) {
-      scrollRef.current.scrollTo({ x: Math.max(0, xPos - 22), animated: true });
+      scrollRef.current.scrollTo({ x: Math.max(0, xPos), animated: true });
     }
   }
 
@@ -59,11 +67,43 @@ export function FilterRail({
 
   return (
     <View style={styles.container}>
-      {/* Chip scroll row */}
+      {/* Filter button, pinned at the head of the rail, then the chip scroll row */}
+      <View style={styles.railRow}>
+        <Pressable
+          onPress={onFilterPress}
+          hitSlop={6}
+          style={[
+            styles.filterButton,
+            { backgroundColor: colors.paper2, borderColor: colors.line },
+          ]}
+          accessibilityLabel="Open filters"
+          accessibilityRole="button"
+        >
+          <View style={styles.filterIcon}>
+            <View style={[styles.filterLine, { backgroundColor: colors.ink, width: 14 }]} />
+            <View style={[styles.filterLine, { backgroundColor: colors.ink, width: 10 }]} />
+            <View style={[styles.filterLine, { backgroundColor: colors.ink, width: 6 }]} />
+          </View>
+
+          {activeFilterCount > 0 && (
+            <View style={[styles.filterBadge, { backgroundColor: colors.accent }]}>
+              <Text
+                style={[
+                  styles.filterBadgeText,
+                  { color: '#FFFFFF', fontFamily: typography.ui700.fontFamily },
+                ]}
+              >
+                {activeFilterCount}
+              </Text>
+            </View>
+          )}
+        </Pressable>
+
       <ScrollView
         ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
       >
         {chips.map((chip, index) => {
@@ -111,6 +151,7 @@ export function FilterRail({
           );
         })}
       </ScrollView>
+      </View>
 
       {/* Meta row */}
       <View style={styles.metaRow}>
@@ -124,7 +165,14 @@ export function FilterRail({
             },
           ]}
         >
-          {matchCount !== totalCount ? (
+          {searchingEverywhere ? (
+            <>
+              <Text style={{ color: colors.ink, fontFamily: typography.ui600.fontFamily }}>
+                {matchCount}
+              </Text>
+              {matchCount === 1 ? ' spot · all neighborhoods' : ' spots · all neighborhoods'}
+            </>
+          ) : matchCount !== totalCount ? (
             <>
               <Text style={{ color: colors.ink, fontFamily: typography.ui600.fontFamily }}>
                 {matchCount}
@@ -140,7 +188,7 @@ export function FilterRail({
               <Text style={{ color: colors.ink, fontFamily: typography.ui600.fontFamily }}>
                 {totalCount}
               </Text>
-              {' spots'}
+              {totalCount === 1 ? ' spot' : ' spots'}
             </>
           )}
         </Text>
@@ -169,8 +217,49 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 12,
   },
+  railRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 22,
+  },
+  filterButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 999,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterIcon: {
+    gap: 2.5,
+    alignItems: 'center',
+  },
+  filterLine: {
+    height: 2,
+    borderRadius: 1,
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  filterBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    lineHeight: 14,
+  },
+  scroll: {
+    flex: 1,
+    marginLeft: 8,
+  },
   scrollContent: {
-    paddingHorizontal: 22,
+    paddingRight: 22,
     gap: 8,
     alignItems: 'center',
   },
