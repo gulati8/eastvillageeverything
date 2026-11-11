@@ -10,7 +10,7 @@ under Release notes becomes `changelogs/<versionCode>.txt`, and the
 graphics under `docs/app-store/android/` are copied into `images/`. Keep the
 shape of the fenced blocks. The Data safety, content rating and App content
 answers below are entered in Play Console by hand (task 2.7); `supply` cannot
-set them.
+set them. The console steps, in order, are in `play-release-runbook.md`.
 
 The iOS listing is `listing.md`. The two descriptions say the same things in
 the same voice; the only Android differences are "Maps" for "Apple Maps" and
@@ -102,8 +102,8 @@ exist exactly.
 
 ## Contact and URLs
 
-Store listing > Store settings > Contact details, and the privacy policy
-under Policy > App content.
+Grow users > Store presence > Store settings > Contact details, and the
+privacy policy under Policy and programs > App content.
 
 | Field | Value |
 | --- | --- |
@@ -126,22 +126,24 @@ them to `apps/mobile/fastlane/metadata/android/en-US/images/` as
 | --- | --- | --- | --- |
 | `icon-512.png` | 512 x 512, no alpha | App icon | `apps/mobile/assets/icon.png` resized; Play masks it itself |
 | `feature-graphic.png` | 1024 x 500 | Feature graphic | Dark paper `#16110C`, name in Instrument Serif italic cream `#F5EBDA`, eyebrow in Schibsted Grotesk uppercase `#8B7E69`, rendered by Playwright's Chromium from the app's own font files |
-| `01-list.png` | 1080 x 2400 | Phone screenshot 1 | Home list, no filters |
-| `02-detail.png` | 1080 x 2400 | Phone screenshot 2 | Ace Bar detail |
-| `03-search.png` | 1080 x 2400 | Phone screenshot 3 | Search for "pool" |
-| `04-filters.png` | 1080 x 2400 | Phone screenshot 4 | Filter sheet with Happy Hours and Pool Tables selected |
-| `05-saved.png` | 1080 x 2400 | Phone screenshot 5 | Saved tab with four bookmarked places |
+| `01-list.png` | 1080 x 2400 | Phone screenshot 1 | Home list, East Village, no filters |
+| `02-neighborhoods.png` | 1080 x 2400 | Phone screenshot 2 | The title's arrow tapped: the neighborhood pill row open |
+| `03-detail.png` | 1080 x 2400 | Phone screenshot 3 | 11th Street Bar detail |
+| `04-search.png` | 1080 x 2400 | Phone screenshot 4 | Search for "the": 26 spots across all neighborhoods, each row with its neighborhood |
+| `05-filters.png` | 1080 x 2400 | Phone screenshot 5 | Filter sheet with Happy Hours and Pool Tables selected |
+| `06-saved.png` | 1080 x 2400 | Phone screenshot 6 | Saved tab with four bookmarked places, one on the Lower East Side |
 
 Screenshots were captured from the `eve-pixel` AVD (Pixel 8, 1080 x 2400,
-420 dpi, Android 17) running the EAS `preview` APK against production data,
-driven with `adb shell input`. Play accepts PNG or JPEG, 16:9 to 9:16, each
+420 dpi, Android 17) running the 1.1.0 EAS `preview` APK (`build-2.apk`,
+the same commit as the store bundle) against production data, driven with
+`adb shell input`. Play accepts PNG or JPEG, 16:9 to 9:16, each
 side 320 to 3840 px, so the emulator's raw `screencap` output is uploaded as
 is. The tap coordinates and the exact sequence are in
-`scripts/ralph/progress.txt` (entry 2.5).
+`scripts/ralph/progress.txt` (entry 5.4).
 
 ## App content: Data safety
 
-Policy > App content > Data safety. Answers for every question in the form.
+Policy and programs > App content > Data safety. Answers for every question in the form.
 
 ### Overview
 
@@ -188,7 +190,7 @@ Android permissions beyond `INTERNET`.
 
 ## App content: content rating (IARC questionnaire)
 
-Policy > App content > Content rating. Email `amit@gulatilabs.me`. The app is
+Policy and programs > App content > Content rating. Email `amit@gulatilabs.me`. The app is
 a bar directory, so the one "yes" is the alcohol reference.
 
 | Question | Answer | Why |
