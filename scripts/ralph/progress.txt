@@ -191,3 +191,7 @@ Older: scripts/ralph/archive/admin-photos-plan.md, admin-photos-progress.txt; la
 - Files touched: `scripts/ralph/progress.txt` only.
 - Validation: `grep -nE '^\s*- \[ \]' scripts/ralph/plan.md` lists 2.4, 2.6, 2.7, 3.2, 3.3, 4.2, 4.6, 4.7, 4.8; `ls apps/mobile/google-play-key.json` → No such file; `grep -n '^## Decision' scripts/ralph/progress.txt` → no match.
 ---
+## 2026-11-10 - More direction from the human on the switcher (still not the final pick)
+- The human looked at layouts 1 to 3 and may still pick one. They asked to see two more beside them: the search bar on top, above the neighborhood ("you should be able to search across neighborhoods too"), and the search bar below the tag pills so the two pill rows sit next to each other. New task 4.1c adds them as layouts 4 and 5 without touching 1 to 3. 4.2 now picks among 1 to 5 and is blocked by 4.1c.
+- "Search covers every neighborhood" is now a decision at the top of `plan.md` and applies to whichever layout is picked; 4.6 was reworded to match.
+---
