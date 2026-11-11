@@ -214,3 +214,9 @@ Older: scripts/ralph/archive/admin-photos-plan.md, admin-photos-progress.txt; la
 - Files touched: `scripts/ralph/progress.txt` only.
 - Validation: `plan.md` unticked boxes are 2.4, 2.6, 2.7, 3.2, 3.3, 4.2, 4.6, 4.7, 4.8; `ls apps/mobile/google-play-key.json` → No such file; `grep -n '^## Decision' scripts/ralph/progress.txt` → no match.
 ---
+## Decision
+Neighborhood switcher: layout 3
+- Picked by the human on 2026-11-10, with no changes requested. Layout 3 on `docs/mockups/2026-11-neighborhood-switcher.html` (phones 3a and 3b): the search field alone at full width under the title; a 32 px round filter button is the first item of the tag chip rail; the neighborhood pill row, when the title's arrow is tapped, opens between the title and the search field.
+- Search results across neighborhoods look like phone 4c on the same page (count line "<n> spots · all neighborhoods", each row's address line ending with " · <neighborhood>"); that behaviour is a decision at the top of `plan.md` and applies to layout 3.
+- 4.2 ticked by the planning session on the human's instruction. 4.6 is now available.
+---
