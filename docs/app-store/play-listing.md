@@ -1,11 +1,12 @@
 # Google Play listing: East Village Everything
 
 Source of truth for the Play Console listing of the Android app in
-`apps/mobile/` (package `com.eastvillageeverything.app`, version 1.0.0,
-`versionCode` 1). `node scripts/app-store-metadata.mjs` generates the fastlane
+`apps/mobile/` (package `com.eastvillageeverything.app`, version 1.1.0,
+`versionCode` 2). `node scripts/app-store-metadata.mjs` generates the fastlane
 `supply` tree `apps/mobile/fastlane/metadata/android/en-US/` from this file:
 the fenced blocks under Name, Short description and Full description become
-`title.txt`, `short_description.txt` and `full_description.txt`, and the
+`title.txt`, `short_description.txt` and `full_description.txt`, the block
+under Release notes becomes `changelogs/<versionCode>.txt`, and the
 graphics under `docs/app-store/android/` are copied into `images/`. Keep the
 shape of the fenced blocks. The Data safety, content rating and App content
 answers below are entered in Play Console by hand (task 2.7); `supply` cannot
@@ -35,7 +36,7 @@ East Village Everything
 80 character limit. Shown under the name on the store page and in search.
 
 ```
-Every bar in the East Village: happy hours, trivia, pool tables, late nights.
+East Village bars and nearby neighborhoods: happy hours, trivia, late nights.
 ```
 
 77 of 80 characters.
@@ -50,7 +51,7 @@ plain text.
 East Village Everything is a guide to the bars and late-night spots of the East Village, Manhattan. Nearly 250 places in one list, with the details that matter when you're already out: where the happy hour is still going, who has a pool table or a dart board, where there's trivia tonight, and what's open late.
 
 BROWSE AND SEARCH
-Scroll the whole neighborhood or search by name. Each place shows its address, hours, phone number, website and tags, plus the current specials and our notes on what it's good for.
+Pick a neighborhood, or search across all of them by name. Each place shows its address, hours, phone number, website and tags, plus the current specials and our notes on what it's good for. Open a place and swipe through its photos.
 
 FILTER BY WHAT YOU'RE IN THE MOOD FOR
 Tap tags to narrow the list: Happy Hours, Late Night Eats, Live Music, Trivia Night, Pool Tables, Darts, Skeeball, Ping Pong, Karaoke, Dancing, Sports Bars, Wine Bar, BYOB, Brunch and more. Combine them. Sort A to Z or by what's closing soonest.
@@ -70,13 +71,25 @@ Phone numbers dial. Websites open in your browser. Tap the address for direction
 NO ACCOUNT, NO TRACKING
 There is nothing to sign up for. The app does not ask for your location, does not show ads and does not use third-party analytics. Details in the privacy policy at https://eastvillageeverything.nyc/privacy.
 
-East Village Everything is made in the East Village and covers the East Village only. If your favorite spot is missing or something is wrong, tell us at https://eastvillageeverything.nyc/support.
+East Village Everything is made in the East Village and covers it best, with a growing list of places in the neighborhoods next door: the Lower East Side, Nolita, SoHo, Greenwich Village and the West Village. If your favorite spot is missing or something is wrong, tell us at https://eastvillageeverything.nyc/support.
 ```
 
-About 1,900 of 4000 characters. The facts it relies on are listed under
+About 2,100 of 4000 characters. The facts it relies on are listed under
 "## Description" in `listing.md`; the Android build is the same JavaScript,
 so they hold here too. On Android the address opens a `geo:` search, which
 lands in whatever maps app the phone has (Google Maps on most), hence "Maps".
+
+## Release notes
+
+500 character limit. Written to `changelogs/<versionCode>.txt`, where the
+version code is `android.versionCode` in `apps/mobile/app.json` (2 for
+1.1.0, the first version uploaded to Play).
+
+```
+Pick a neighborhood: tap the title to move between the East Village, the Lower East Side and more. Swipe through a place's photos. Search now covers every neighborhood.
+```
+
+168 of 500 characters. Same text as "What's New" in `listing.md`.
 
 ## Category and tags
 

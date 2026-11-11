@@ -2,7 +2,7 @@
 
 Source of truth for the App Store Connect listing of the iOS app in
 `apps/mobile/` (bundle id `com.eastvillageeverything.app`, ASC app id
-`6765464747`, version 1.0.0). `node scripts/app-store-metadata.mjs` generates
+`6765464747`, version 1.1.0, build 13). `node scripts/app-store-metadata.mjs` generates
 the fastlane `apps/mobile/fastlane/metadata/` tree and the screenshot folder
 from this file (it reads the fenced blocks, the URLs table, the Category
 bullets and the Review contact table, so keep their shape); task 5.8 copies
@@ -35,10 +35,10 @@ Bars, happy hours, late nights
 Editable without a new build. 170 character limit.
 
 ```
-Every bar in the East Village in one list. Happy hours, pool tables, trivia, live music and late-night eats, with hours and what's on right now.
+Every East Village bar, plus spots in the neighborhoods around it. Happy hours, pool tables, trivia, live music and late-night eats, with hours and what's on right now.
 ```
 
-144 of 170 characters.
+168 of 170 characters.
 
 ## Description
 
@@ -49,7 +49,7 @@ them.
 East Village Everything is a guide to the bars and late-night spots of the East Village, Manhattan. Nearly 250 places in one list, with the details that matter when you're already out: where the happy hour is still going, who has a pool table or a dart board, where there's trivia tonight, and what's open late.
 
 BROWSE AND SEARCH
-Scroll the whole neighborhood or search by name. Each place shows its address, hours, phone number, website and tags, plus the current specials and our notes on what it's good for.
+Pick a neighborhood, or search across all of them by name. Each place shows its address, hours, phone number, website and tags, plus the current specials and our notes on what it's good for. Open a place and swipe through its photos.
 
 FILTER BY WHAT YOU'RE IN THE MOOD FOR
 Tap tags to narrow the list: Happy Hours, Late Night Eats, Live Music, Trivia Night, Pool Tables, Darts, Skeeball, Ping Pong, Karaoke, Dancing, Sports Bars, Wine Bar, BYOB, Brunch and more. Combine them. Sort A to Z or by what's closing soonest.
@@ -69,10 +69,10 @@ Phone numbers dial. Websites open in your browser. Tap the address for direction
 NO ACCOUNT, NO TRACKING
 There is nothing to sign up for. The app does not ask for your location, does not show ads and does not use third-party analytics. Details in the privacy policy at https://eastvillageeverything.nyc/privacy.
 
-East Village Everything is made in the East Village and covers the East Village only. If your favorite spot is missing or something is wrong, tell us at https://eastvillageeverything.nyc/support.
+East Village Everything is made in the East Village and covers it best, with a growing list of places in the neighborhoods next door: the Lower East Side, Nolita, SoHo, Greenwich Village and the West Village. If your favorite spot is missing or something is wrong, tell us at https://eastvillageeverything.nyc/support.
 ```
 
-About 1,900 of 4000 characters.
+About 2,100 of 4000 characters.
 
 Facts the description relies on, and where they come from:
 
@@ -100,6 +100,18 @@ Facts the description relies on, and where they come from:
   stored coordinates).
 - No location, ads or analytics: `apps/mobile/package.json` has no location,
   ads or analytics SDK, and `app.json` declares no usage-description strings.
+- Pick a neighborhood: the masthead title opens a row of neighborhood pills
+  (`src/components/NeighborhoodRail.tsx`, `src/state/useNeighborhood.ts`).
+  The neighborhoods named in the closing paragraph are rows in the production
+  `GET /api/neighborhoods` response (checked 2026-11-10; Gramercy and Murray
+  Hill also exist, with one place each, and are not named).
+- Search across all of them: with text in the search box `useFilterState`
+  ignores the selected neighborhood (`src/state/useFilterState.ts`).
+- Swipe through photos: `src/components/HeroGallery.tsx` on the detail
+  screen. Most places have one photo today; the sentence promises the
+  gesture, not a count.
+- "Every bar" is claimed for the East Village alone; the other neighborhoods
+  are "spots" and "a growing list" (221 of 246 places are East Village).
 - Privacy and support URLs: tasks 5.2 and 5.3. Both must be live before this
   description is uploaded.
 
@@ -231,7 +243,7 @@ Goes in App Review Information > Notes. There is no login, so the demo
 account fields stay blank.
 
 ```
-East Village Everything is a read-only directory of bars and restaurants in the East Village neighborhood of Manhattan. No account is needed; all content loads from our public API at https://eastvillageeverything.nyc/api/places. The app sends a random per-install identifier so we can rate-limit and debug; it is not linked to any person. Crash reports go to Sentry.
+East Village Everything is a read-only directory of bars and restaurants in and around the East Village neighborhood of Manhattan. No account is needed; all content loads from our public API at https://eastvillageeverything.nyc/api/places. The app sends a random per-install identifier so we can rate-limit and debug; it is not linked to any person. Crash reports go to Sentry.
 
 The age rating answers Infrequent or Mild for alcohol references because the app lists bars and their happy hours. It does not sell or deliver alcohol.
 ```
@@ -250,11 +262,14 @@ this file; add it in App Store Connect (task 5.8).
 | Last name | `Gulati` |
 | Email | `amit@gulatilabs.me` |
 
-## What's New (version 1.0.0)
+## What's New (version 1.1.0)
 
 ```
-First release.
+Pick a neighborhood: tap the title to move between the East Village, the Lower East Side and more. Swipe through a place's photos. Search now covers every neighborhood.
 ```
+
+168 of 4000 characters. The same text is the Play release notes in
+`play-listing.md`. Version 1.0.0 said "First release."
 
 ## Inputs from other tasks
 

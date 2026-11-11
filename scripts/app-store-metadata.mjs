@@ -5,6 +5,7 @@
 //     apps/mobile/fastlane/screenshots/en-US/       from docs/app-store/screenshots/<size>/*.png
 //   Android (fastlane supply, run by task 2.6 in scripts/ralph/plan.md)
 //     apps/mobile/fastlane/metadata/android/en-US/{title,short_description,full_description}.txt
+//     apps/mobile/fastlane/metadata/android/en-US/changelogs/<android.versionCode from app.json>.txt
 //                                                    from docs/app-store/play-listing.md
 //     apps/mobile/fastlane/metadata/android/en-US/images/{icon.png,featureGraphic.png,phoneScreenshots/}
 //                                                    from docs/app-store/android/
@@ -118,12 +119,16 @@ const review = phone
   : null;
 
 // Google Play (fastlane supply) character limits.
-const PLAY_LIMITS = { title: 30, short_description: 80, full_description: 4000 };
+const PLAY_LIMITS = { title: 30, short_description: 80, full_description: 4000, release_notes: 500 };
 const playLocale = {
   title: play.fenced('Name'),
   short_description: play.fenced('Short description'),
   full_description: play.fenced('Full description'),
+  release_notes: play.fenced('Release notes'),
 };
+// supply reads release notes from changelogs/<versionCode>.txt; app.json is the only source of the version code.
+const playVersionCode = JSON.parse(readFileSync(join(root, 'apps/mobile/app.json'), 'utf8')).expo.android.versionCode;
+if (!Number.isInteger(playVersionCode)) throw new Error('apps/mobile/app.json: expo.android.versionCode is not an integer');
 // supply's image names are fixed; the phone screenshots keep their docs filenames (01-list.png ...).
 const PLAY_IMAGES = { 'icon-512.png': 'icon.png', 'feature-graphic.png': 'featureGraphic.png' };
 const playShots = readdirSync(playSrc).filter((f) => /^\d\d-.*\.png$/.test(f)).sort();
@@ -182,10 +187,14 @@ console.log(`  categories: ${nonLocalised.primary_category}, ${nonLocalised.seco
 console.log(`copied ${shotCount} screenshots to ${shotsDir}`);
 
 // Android: metadata/android/en-US/{title,short_description,full_description}.txt and images/.
-for (const [key, value] of Object.entries(playLocale)) writeFileSync(join(playDir, `${key}.txt`), value + '\n');
+const playChangelog = join(playDir, 'changelogs', `${playVersionCode}.txt`);
+mkdirSync(dirname(playChangelog), { recursive: true });
+for (const [key, value] of Object.entries(playLocale)) {
+  writeFileSync(key === 'release_notes' ? playChangelog : join(playDir, `${key}.txt`), value + '\n');
+}
 for (const [src, dest] of Object.entries(PLAY_IMAGES)) copyFileSync(join(playSrc, src), join(playImagesDir, dest));
 for (const file of playShots) copyFileSync(join(playSrc, file), join(playImagesDir, 'phoneScreenshots', file));
 
-console.log(`wrote ${Object.keys(playLocale).length} en-US files to ${playDir}`);
+console.log(`wrote ${Object.keys(playLocale).length} en-US files to ${playDir} (release notes in changelogs/${playVersionCode}.txt)`);
 for (const [key, limit] of Object.entries(PLAY_LIMITS)) console.log(`  ${key}: ${playLocale[key].length}/${limit}`);
 console.log(`copied ${Object.keys(PLAY_IMAGES).length} graphics and ${playShots.length} phone screenshots to ${playImagesDir}`);
