@@ -237,3 +237,9 @@ Neighborhood switcher: layout 3
 - Files touched: `scripts/ralph/progress.txt` only.
 - Validation: `grep -nE '^\s*- \[ \]' scripts/ralph/plan.md` lists 2.4, 2.6, 2.7, 3.2, 3.3, 4.7, 4.8; `ls apps/mobile/google-play-key.json` → No such file.
 ---
+## 2026-11-10 - Plan restructured by the planning session with the human
+- The human has no Android phone to hand, so the Play Console device check (and everything behind it) waits. They want iOS to ship regardless and Android taken as far as it can go without the console.
+- Play Console checked in Chrome today (`https://play.google.com/console/u/1/developers/7467548760272069888/home`; the account index in the URL is 1 now, it was 4 on 2026-11-06): legal name, address and contact email are set and verified; outstanding are the Android device check and the contact phone number (+1 646 number on file, no Verify button until the device check passes). No separate identity-document item is shown.
+- Tasks removed: 3.2, 3.3, 4.7, 4.8 (the 1.1.0-then-1.2.0 releases on both platforms). Replaced by Phase 5: 5.1 version and copy, 5.2 iOS build 13 to TestFlight, 5.3 Android bundle built and verified plus an emulator device pass, 5.4 Play screenshots and a console runbook, 5.5 [HUMAN] iOS release. The Play tasks keep their ids (2.4, 2.6, 2.7) and moved to Phase 6 at the end of the file, reworded to submit the bundle 5.3 builds.
+- One release, 1.1.0, carries both features: iOS build 13, Android versionCode 2.
+---
