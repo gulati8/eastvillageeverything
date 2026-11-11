@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>EVE — neighborhood switcher (three options)</title>
+<title>EVE — neighborhood switcher (three layouts)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -140,34 +140,6 @@
     display: flex; align-items: center; gap: 6px;
   }
   .eyebrow.split { justify-content: space-between; }
-  .masthead-title {
-    font-family: 'Instrument Serif', serif;
-    font-style: italic;
-    font-size: 32px; line-height: 38px;
-    color: var(--ink); letter-spacing: -0.02em;
-    display: inline-flex; align-items: center; gap: 10px;
-  }
-  /* Option A: small accent chevron after the neighborhood name */
-  .chev-down {
-    width: 9px; height: 9px;
-    border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent);
-    transform: translateY(-4px) rotate(45deg);
-    display: inline-block; flex-shrink: 0;
-  }
-  /* Option B: pill in the eyebrow */
-  .eyebrow .pill {
-    height: 20px; padding: 0 9px;
-    border: 1px solid var(--line-strong); border-radius: 999px;
-    color: var(--accent); text-transform: none; letter-spacing: 0;
-    font-size: 11px; font-weight: 600;
-    display: inline-flex; align-items: center; gap: 5px;
-  }
-  .eyebrow .pill .chev {
-    width: 6px; height: 6px;
-    border-right: 1.5px solid var(--accent); border-bottom: 1.5px solid var(--accent);
-    transform: translateY(-2px) rotate(45deg);
-  }
-
   /* ─── Search + filter ─────────────────────────────────────────────────── */
   .search-row { display: flex; gap: 8px; padding: 14px 22px 0; align-items: center; }
   .search {
@@ -200,7 +172,6 @@
 
   /* ─── Filter rail (FilterRail.tsx) ───────────────────────────────────── */
   .rail { display: flex; gap: 8px; padding: 12px 22px 0; overflow: hidden; }
-  .rail.second { padding-top: 8px; }
   .chip {
     flex: 0 0 auto;
     height: 32px; padding: 0 14px;
@@ -321,79 +292,51 @@
   .tab.active { color: var(--ink); }
   .tab .glyph { width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 4px; }
 
-  /* ─── Shared neighborhood rows (menu + sheet) ────────────────────────── */
-  .nrow {
-    display: flex; align-items: center; gap: 10px;
-    height: 46px; padding: 0 16px;
-    font-size: 14px; font-weight: 500; color: var(--ink);
-    border-top: 1px solid var(--line);
+  
+  /* ─── Masthead title: the neighborhood, then the accent arrow ────────── */
+  .masthead-title {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 32px; line-height: 38px;
+    color: var(--ink); letter-spacing: -0.02em;
   }
-  .nrow:first-child { border-top: none; }
-  .nrow .count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--ink3); }
-  .nrow .check {
-    width: 14px; height: 14px; flex-shrink: 0;
-    visibility: hidden;
-  }
-  .nrow.current { color: var(--ink); font-weight: 600; }
-  .nrow.current .check { visibility: visible; position: relative; }
-  .nrow.current .check::before {
-    content: ''; position: absolute; left: 2px; top: 0;
-    width: 5px; height: 10px;
+  .chev-down {
+    width: 9px; height: 9px; margin-left: 12px;
     border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent);
-    transform: rotate(45deg);
+    transform: translateY(-9px) rotate(45deg);
+    display: inline-block;
   }
-  .nrow.all { border-top: 1px solid var(--line-strong); color: var(--ink2); }
+  .chev-down.up { transform: translateY(-4px) rotate(-135deg); }
 
-  /* ─── Option A: dimmed list + anchored menu ──────────────────────────── */
-  .dim {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    background: rgba(22,17,12,0.62);
-  }
-  .menu {
-    position: absolute; left: 22px; top: 0;
-    width: 282px;
-    background: var(--card);
-    border: 1px solid var(--line-strong);
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.55);
-  }
+  /* ─── Neighborhood pill row (expanded state) ─────────────────────────── */
+  .rail.hood { display: block; }
+  .rail.hood .track { display: flex; gap: 8px; }
+  .chip .n { color: var(--ink3); font-weight: 600; font-size: 12px; }
 
-  /* ─── Option B: bottom sheet in FilterSheet style ────────────────────── */
-  .sheet-dim { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
-  .sheet {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    background: var(--paper);
-    border-top-left-radius: 24px; border-top-right-radius: 24px;
-    padding-bottom: 0;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  /* ─── Layout 2: search and filter as round buttons on the title row ──── */
+  .title-row { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+  .title-row .masthead-title { flex: 1; min-width: 0; }
+  .title-btns { display: flex; gap: 8px; flex-shrink: 0; }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 999px;
+    background: var(--paper2); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .grabber { width: 36px; height: 4px; border-radius: 2px; background: rgba(139,126,105,0.5); margin: 10px auto 4px; }
-  .sheet-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 4px 22px 16px;
-    border-bottom: 1px solid var(--line);
-  }
-  .sheet-header .side { min-width: 56px; font-size: 13px; font-weight: 600; color: var(--ink2); }
-  .sheet-header .side.done { text-align: right; font-weight: 700; color: var(--accentDeep); }
-  .sheet-header .title {
-    flex: 1; text-align: center;
-    font-family: 'Instrument Serif', serif; font-style: italic;
-    font-size: 22px; color: var(--ink);
-  }
-  .sheet .nrow { padding: 0 22px; height: 50px; }
-  .sheet .nrow:first-child { border-top: none; }
-  .sheet-footer {
-    padding: 14px 18px 28px;
-    border-top: 1px solid var(--line);
-    background: var(--paper);
-  }
-  .sheet-footer .btn {
-    height: 48px; border-radius: 999px;
-    background: var(--ink); color: var(--paper);
-    font-size: 14px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-  }
+  .icon-btn .search-icon { border-color: var(--ink); transform: translate(-1px, -1px); }
+  .icon-btn .search-icon::after { background: var(--ink); }
+  .search.focused { border-color: var(--line-strong); gap: 0; }
+  .search.focused .search-icon { margin-right: 8px; }
+  .caret { width: 1.5px; height: 17px; background: var(--accent); margin-right: 1px; flex-shrink: 0; }
+  .cancel { font-size: 13px; font-weight: 600; color: var(--accent); flex-shrink: 0; padding-left: 2px; }
+
+  /* ─── Layout 3: small filter button leading the tag rail ─────────────── */
+  .filter-btn.sm { width: 32px; height: 32px; gap: 2.5px; }
+  .filter-btn.sm span:nth-child(1) { width: 14px; }
+  .filter-btn.sm span:nth-child(2) { width: 10px; }
+  .filter-btn.sm span:nth-child(3) { width: 6px; }
+
+  .phone-label b { text-transform: none; }
+  .phone-col .phone + .phone-label { margin-top: 18px; }
 
   /* ─── Annotations ────────────────────────────────────────────────────── */
   .annotations {
@@ -416,23 +359,20 @@
 <body>
 <div class="page">
   <div class="page-header">
-    <h1>Neighborhood switcher — three options</h1>
-    <p>The app is about to cover more than the East Village. Each column is one way to let a reader pick a neighborhood on the list screen, drawn in the app's dark palette (<code>darkColors</code> in <code>apps/mobile/src/theme/tokens.ts</code>) with the three Google Fonts the app loads (Instrument Serif, Source Serif 4, Schibsted Grotesk). The top phone is the closed state; the bottom phone is what a tap produces. Place names, streets and italic lines are real rows from prod; the neighborhood counts are from the addresses in today's data and are rough until 4.5 assigns rows.</p>
-    <p>The brand stays <strong>East Village Everything</strong> in every option. Pick A, B or C in task 4.2.</p>
-    <div class="note">
-      <strong>How it works underneath, in every option:</strong> the app fetches the whole place list once and filters it on the device, so switching is instant and works offline. The pick is remembered on the device. <strong>Saved places ignore the switch</strong>: the Saved tab always shows everything you bookmarked, from any neighborhood.
-    </div>
+    <h1>Neighborhood switcher — three layouts</h1>
+    <p>Tap the arrow beside the title to open the neighborhood row, tap a pill to switch and close it; the list is fetched once and filtered on the device, and saved places ignore the switch.</p>
+    <p>The masthead is the same on every phone: the brand and the clock in the eyebrow, the neighborhood as the title. The columns differ only in where the search box and the filter button sit. Each column shows the row collapsed, then expanded. Neighborhood names, order and counts are today's prod data, as are the places. Pick layout 1, 2 or 3 in task 4.2.</p>
   </div>
 
   <div class="phones">
 
-    <!-- ═══════════════════ OPTION A ═══════════════════ -->
+    <!-- ═══════════════════ LAYOUT 1 ═══════════════════ -->
     <div class="phone-col">
-      <div class="option-h">Option <em>A</em> — the masthead is the neighborhood</div>
-      <div class="option-sub">The eyebrow carries the brand on the left and the clock on the right. The big italic title becomes the neighborhood name with a chevron; tapping it drops a menu under the title.</div>
+      <div class="option-h">Layout <em>1</em> — search row under the title</div>
+      <div class="option-sub">Search and filter stay where they are today: one row under the title. The neighborhood row opens between the title and that row.</div>
 
-      <div class="phone-label"><b>A1</b> · Closed · East Village selected</div>
-      <div class="phone">
+      <div class="phone-label"><b>1a</b> · Collapsed · East Village</div>
+      <div class="phone" id="phone-1a">
         <div class="scroll-area">
           <div class="status-bar">
             <span>6:24</span>
@@ -444,14 +384,13 @@
 
           <div class="masthead">
             <div class="eyebrow split"><span>East Village Everything</span><span>Tue · 6:24pm</span></div>
-            <div class="masthead-title">East Village <span class="chev-down"></span></div>
+            <div class="masthead-title">East Village<span class="chev-down"></span></div>
           </div>
 
           <div class="search-row">
             <div class="search"><span class="search-icon"></span><span>Search a name or a feeling</span></div>
             <div class="filter-btn"><span></span><span></span><span></span></div>
           </div>
-
           <div class="rail">
             <div class="chip">Happy hour</div>
             <div class="chip">Food</div>
@@ -459,8 +398,7 @@
             <div class="chip">Live music</div>
             <div class="chip">Pool</div>
           </div>
-          <div class="meta-row"><span><b>220</b> spots</span><span class="sort">A–Z ▾</span></div>
-
+          <div class="meta-row"><span><b>221</b> spots</span><span class="sort">A–Z ▾</span></div>
           <div class="list">
             <div class="row">
               <div class="thumb p1"></div>
@@ -506,6 +444,14 @@
                 <div class="italic-line">a low-key Thursday with foosball and a strong pour</div>
               </div>
             </div>
+            <div class="row">
+              <div class="thumb p6"></div>
+              <div class="text">
+                <div class="top"><div class="name">Bar Primi</div><div class="bookmark"></div></div>
+                <div class="meta">325 Bowery</div>
+                <div class="italic-line">pre-show pasta near the Bowery</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="tabbar">
@@ -514,8 +460,8 @@
         </div>
       </div>
 
-      <div class="phone-label"><b>A2</b> · Open · menu anchored under the title</div>
-      <div class="phone">
+      <div class="phone-label"><b>1b</b> · Expanded · arrow tapped</div>
+      <div class="phone" id="phone-1b">
         <div class="scroll-area">
           <div class="status-bar">
             <span>6:24</span>
@@ -527,122 +473,24 @@
 
           <div class="masthead">
             <div class="eyebrow split"><span>East Village Everything</span><span>Tue · 6:24pm</span></div>
-            <div class="masthead-title">East Village <span class="chev-down" style="transform: translateY(2px) rotate(-135deg);"></span></div>
+            <div class="masthead-title">East Village<span class="chev-down up"></span></div>
           </div>
-
-          <!-- Everything below the masthead is dimmed -->
-          <div style="position: relative;">
-            <div class="search-row">
-              <div class="search"><span class="search-icon"></span><span>Search a name or a feeling</span></div>
-              <div class="filter-btn"><span></span><span></span><span></span></div>
-            </div>
-            <div class="rail">
-              <div class="chip">Happy hour</div>
-              <div class="chip">Food</div>
-              <div class="chip">Outdoor seating</div>
-              <div class="chip">Live music</div>
-              <div class="chip">Pool</div>
-            </div>
-            <div class="meta-row"><span><b>220</b> spots</span><span class="sort">A–Z ▾</span></div>
-            <div class="list">
-              <div class="row">
-                <div class="thumb p1"></div>
-                <div class="text">
-                  <div class="top"><div class="name">2A</div><div class="bookmark"></div></div>
-                  <div class="meta">25 Ave A</div>
-                  <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 8</span></div>
-                  <div class="italic-line">you want a window seat over Avenue A after midnight</div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="thumb p2"></div>
-                <div class="text">
-                  <div class="top"><div class="name">7B / Horseshoe</div><div class="bookmark"></div></div>
-                  <div class="meta">108 Ave B</div>
-                  <div class="italic-line">you want the classic Alphabet City dive, no frills</div>
-                  <div class="specials-line">No Happy Hour</div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="thumb p3"></div>
-                <div class="text">
-                  <div class="top"><div class="name">Ace Bar</div><div class="bookmark"></div></div>
-                  <div class="meta">531 E 5th Street</div>
-                  <div class="italic-line">ten friends need skee-ball and cheap pitchers</div>
-                  <div class="specials-line">Temp no happy hour Skeeball, jukebox, pool, darts</div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="thumb p4"></div>
-                <div class="text">
-                  <div class="top"><div class="name">Amor y Amargo</div><div class="bookmark"></div></div>
-                  <div class="meta">95 Ave A</div>
-                  <div class="italic-line">you want a serious stirred drink before dinner</div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="thumb p5"></div>
-                <div class="text">
-                  <div class="top"><div class="name">B-side</div><div class="bookmark"></div></div>
-                  <div class="meta">204 Avenue B</div>
-                  <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 6</span></div>
-                  <div class="italic-line">a low-key Thursday with foosball and a strong pour</div>
-                </div>
-              </div>
-            </div>
-            <div class="dim" style="top: 0; height: 700px;"></div>
-
-            <div class="menu" style="top: 6px;">
-              <div class="nrow current"><span class="check"></span>East Village<span class="count">220</span></div>
-              <div class="nrow"><span class="check"></span>Lower East Side<span class="count">18</span></div>
-              <div class="nrow"><span class="check"></span>West Village<span class="count">6</span></div>
-              <div class="nrow"><span class="check"></span>SoHo<span class="count">1</span></div>
-              <div class="nrow"><span class="check"></span>Nolita<span class="count">1</span></div>
-              <div class="nrow all"><span class="check"></span>All neighborhoods<span class="count">246</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="tabbar">
-          <div class="tab active"><span class="glyph"></span><span>Home</span></div>
-          <div class="tab"><span class="glyph"></span><span>Saved</span></div>
-        </div>
-      </div>
-
-      <div class="annotations">
-        <ul>
-          <li><span class="k">List</span>The title line is the neighborhood; the brand and the clock move up into the eyebrow. The rows, the chip rail and the spot count all filter to the pick; "All neighborhoods" shows every row.</li>
-          <li><span class="k">Detail</span>The street line reads "25 Ave A · East Village"; the Maps link is built from the place's own neighborhood instead of the hard-coded "East Village".</li>
-          <li><span class="k">Trade-off</span>"East Village Everything" leaves the big type and lives only in 11 px caps, and the title has to be learned as a button; in return the switcher takes no vertical space at all.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- ═══════════════════ OPTION B ═══════════════════ -->
-    <div class="phone-col">
-      <div class="option-h">Option <em>B</em> — a pill in the eyebrow, a sheet to pick</div>
-      <div class="option-sub">The masthead stays "East Village Everything". The eyebrow ends in a small pill naming the current neighborhood; tapping it opens a bottom sheet titled "Where to?" in the filter sheet's style.</div>
-
-      <div class="phone-label"><b>B1</b> · Closed · East Village selected</div>
-      <div class="phone">
-        <div class="scroll-area">
-          <div class="status-bar">
-            <span>6:24</span>
-            <span class="status-icons">
-              <span class="bars"><span></span><span></span><span></span><span></span></span>
-              <span class="battery"></span>
-            </span>
-          </div>
-
-          <div class="masthead">
-            <div class="eyebrow"><span>Tue · 6:24pm ·</span><span class="pill">East Village <span class="chev"></span></span></div>
-            <div class="masthead-title">East Village Everything</div>
-          </div>
+          <div class="rail hood"><div class="track">
+            <div class="chip active">East Village <span class="n">221</span></div>
+            <div class="chip">Lower East Side <span class="n">14</span></div>
+            <div class="chip">Nolita <span class="n">1</span></div>
+            <div class="chip">SoHo <span class="n">2</span></div>
+            <div class="chip">Greenwich Village <span class="n">3</span></div>
+            <div class="chip">West Village <span class="n">3</span></div>
+            <div class="chip">Gramercy <span class="n">1</span></div>
+            <div class="chip">Murray Hill <span class="n">1</span></div>
+            <div class="chip">All <span class="n">246</span></div>
+          </div></div>
 
           <div class="search-row">
             <div class="search"><span class="search-icon"></span><span>Search a name or a feeling</span></div>
             <div class="filter-btn"><span></span><span></span><span></span></div>
           </div>
-
           <div class="rail">
             <div class="chip">Happy hour</div>
             <div class="chip">Food</div>
@@ -650,8 +498,7 @@
             <div class="chip">Live music</div>
             <div class="chip">Pool</div>
           </div>
-          <div class="meta-row"><span><b>220</b> spots</span><span class="sort">A–Z ▾</span></div>
-
+          <div class="meta-row"><span><b>221</b> spots</span><span class="sort">A–Z ▾</span></div>
           <div class="list">
             <div class="row">
               <div class="thumb p1"></div>
@@ -697,6 +544,14 @@
                 <div class="italic-line">a low-key Thursday with foosball and a strong pour</div>
               </div>
             </div>
+            <div class="row">
+              <div class="thumb p6"></div>
+              <div class="text">
+                <div class="top"><div class="name">Bar Primi</div><div class="bookmark"></div></div>
+                <div class="meta">325 Bowery</div>
+                <div class="italic-line">pre-show pasta near the Bowery</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="tabbar">
@@ -705,92 +560,22 @@
         </div>
       </div>
 
-      <div class="phone-label"><b>B2</b> · Open · "Where to?" sheet</div>
-      <div class="phone">
-        <div class="scroll-area">
-          <div class="status-bar">
-            <span>6:24</span>
-            <span class="status-icons">
-              <span class="bars"><span></span><span></span><span></span><span></span></span>
-              <span class="battery"></span>
-            </span>
-          </div>
-
-          <div class="masthead">
-            <div class="eyebrow"><span>Tue · 6:24pm ·</span><span class="pill">East Village <span class="chev"></span></span></div>
-            <div class="masthead-title">East Village Everything</div>
-          </div>
-
-          <div class="search-row">
-            <div class="search"><span class="search-icon"></span><span>Search a name or a feeling</span></div>
-            <div class="filter-btn"><span></span><span></span><span></span></div>
-          </div>
-
-          <div class="rail">
-            <div class="chip">Happy hour</div>
-            <div class="chip">Food</div>
-            <div class="chip">Outdoor seating</div>
-            <div class="chip">Live music</div>
-            <div class="chip">Pool</div>
-          </div>
-          <div class="meta-row"><span><b>220</b> spots</span><span class="sort">A–Z ▾</span></div>
-
-          <div class="list">
-            <div class="row">
-              <div class="thumb p1"></div>
-              <div class="text">
-                <div class="top"><div class="name">2A</div><div class="bookmark"></div></div>
-                <div class="meta">25 Ave A</div>
-                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 8</span></div>
-                <div class="italic-line">you want a window seat over Avenue A after midnight</div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="thumb p2"></div>
-              <div class="text">
-                <div class="top"><div class="name">7B / Horseshoe</div><div class="bookmark"></div></div>
-                <div class="meta">108 Ave B</div>
-                <div class="italic-line">you want the classic Alphabet City dive, no frills</div>
-                <div class="specials-line">No Happy Hour</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="sheet-dim"></div>
-          <div class="sheet">
-            <div class="grabber"></div>
-            <div class="sheet-header">
-              <span class="side"></span>
-              <span class="title">Where to?</span>
-              <span class="side done">Done</span>
-            </div>
-            <div class="nrow current"><span class="check"></span>East Village<span class="count">220</span></div>
-            <div class="nrow"><span class="check"></span>Lower East Side<span class="count">18</span></div>
-            <div class="nrow"><span class="check"></span>West Village<span class="count">6</span></div>
-            <div class="nrow"><span class="check"></span>SoHo<span class="count">1</span></div>
-            <div class="nrow"><span class="check"></span>Nolita<span class="count">1</span></div>
-            <div class="nrow all"><span class="check"></span>All neighborhoods<span class="count">246</span></div>
-            <div class="sheet-footer"><div class="btn">Show 220 spots</div></div>
-          </div>
-        </div>
-      </div>
-
       <div class="annotations">
         <ul>
-          <li><span class="k">List</span>Nothing in the layout moves. The eyebrow becomes "Tue · 6:24pm ·" plus a pill with the neighborhood; the sheet picks one and the rows, chips and count filter to it. "All neighborhoods" is the last row.</li>
-          <li><span class="k">Detail</span>The street line reads "25 Ave A · East Village"; the Maps link uses the place's own neighborhood.</li>
-          <li><span class="k">Trade-off</span>The masthead keeps the brand in big type, but switching costs a tap, a sheet and a dismiss, and the pill is a 20 px target that needs a generous hit slop.</li>
+          <li><span class="k">Where</span>The search field and the round filter button share one row under the title, as in the app today.</li>
+          <li><span class="k">Rows</span>3 list rows fully visible above the tab bar collapsed, 3 expanded.</li>
+          <li><span class="k">Trade-off</span>Nothing has to be relearned, but the header is 52 px taller than layout 2's, and opening the neighborhood row pushes the search field down under the reader's thumb.</li>
         </ul>
       </div>
     </div>
 
-    <!-- ═══════════════════ OPTION C ═══════════════════ -->
+    <!-- ═══════════════════ LAYOUT 2 ═══════════════════ -->
     <div class="phone-col">
-      <div class="option-h">Option <em>C</em> — a rail of neighborhood pills</div>
-      <div class="option-sub">The masthead stays "East Village Everything". A first rail of pills under the search row, one per neighborhood plus "All", with the current one filled; the tag chip rail sits below it. One tap switches, no menu.</div>
+      <div class="option-h">Layout <em>2</em> — search and filter on the title row</div>
+      <div class="option-sub">No search row. A magnifier and the filter button sit at the right end of the title's own row; tapping the magnifier turns that row into the search field.</div>
 
-      <div class="phone-label"><b>C1</b> · East Village selected</div>
-      <div class="phone">
+      <div class="phone-label"><b>2a</b> · Collapsed · East Village</div>
+      <div class="phone" id="phone-2a">
         <div class="scroll-area">
           <div class="status-bar">
             <span>6:24</span>
@@ -801,32 +586,20 @@
           </div>
 
           <div class="masthead">
-            <div class="eyebrow"><span>Tue · 6:24pm · East Village</span></div>
-            <div class="masthead-title">East Village Everything</div>
+            <div class="eyebrow split"><span>East Village Everything</span><span>Tue · 6:24pm</span></div>
+            <div class="title-row">
+              <div class="masthead-title">East Village<span class="chev-down"></span></div>
+              <div class="title-btns"><div class="icon-btn"><span class="search-icon"></span></div><div class="filter-btn"><span></span><span></span><span></span></div></div>
+            </div>
           </div>
-
-          <div class="search-row">
-            <div class="search"><span class="search-icon"></span><span>Search a name or a feeling</span></div>
-            <div class="filter-btn"><span></span><span></span><span></span></div>
-          </div>
-
           <div class="rail">
-            <div class="chip">All</div>
-            <div class="chip active">East Village</div>
-            <div class="chip">Lower East Side</div>
-            <div class="chip">West Village</div>
-            <div class="chip">SoHo</div>
-            <div class="chip">Nolita</div>
-          </div>
-          <div class="rail second">
             <div class="chip">Happy hour</div>
             <div class="chip">Food</div>
             <div class="chip">Outdoor seating</div>
             <div class="chip">Live music</div>
             <div class="chip">Pool</div>
           </div>
-          <div class="meta-row"><span><b>220</b> spots</span><span class="sort">A–Z ▾</span></div>
-
+          <div class="meta-row"><span><b>221</b> spots</span><span class="sort">A–Z ▾</span></div>
           <div class="list">
             <div class="row">
               <div class="thumb p1"></div>
@@ -868,7 +641,16 @@
               <div class="text">
                 <div class="top"><div class="name">B-side</div><div class="bookmark"></div></div>
                 <div class="meta">204 Avenue B</div>
+                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 6</span></div>
                 <div class="italic-line">a low-key Thursday with foosball and a strong pour</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p6"></div>
+              <div class="text">
+                <div class="top"><div class="name">Bar Primi</div><div class="bookmark"></div></div>
+                <div class="meta">325 Bowery</div>
+                <div class="italic-line">pre-show pasta near the Bowery</div>
               </div>
             </div>
           </div>
@@ -879,8 +661,8 @@
         </div>
       </div>
 
-      <div class="phone-label"><b>C2</b> · After one tap · Lower East Side selected</div>
-      <div class="phone">
+      <div class="phone-label"><b>2b</b> · Expanded · Greenwich Village</div>
+      <div class="phone" id="phone-2b">
         <div class="scroll-area">
           <div class="status-bar">
             <span>6:24</span>
@@ -891,75 +673,141 @@
           </div>
 
           <div class="masthead">
-            <div class="eyebrow"><span>Tue · 6:24pm · Lower East Side</span></div>
-            <div class="masthead-title">East Village Everything</div>
+            <div class="eyebrow split"><span>East Village Everything</span><span>Tue · 6:24pm</span></div>
+            <div class="title-row">
+              <div class="masthead-title">Greenwich Village<span class="chev-down up"></span></div>
+              <div class="title-btns"><div class="icon-btn"><span class="search-icon"></span></div><div class="filter-btn"><span></span><span></span><span></span></div></div>
+            </div>
           </div>
-
-          <div class="search-row">
-            <div class="search"><span class="search-icon"></span><span>Search a name or a feeling</span></div>
-            <div class="filter-btn"><span></span><span></span><span></span></div>
-          </div>
-
+          <div class="rail hood"><div class="track" style="transform: translateX(-372px);">
+            <div class="chip">East Village <span class="n">221</span></div>
+            <div class="chip">Lower East Side <span class="n">14</span></div>
+            <div class="chip">Nolita <span class="n">1</span></div>
+            <div class="chip">SoHo <span class="n">2</span></div>
+            <div class="chip active">Greenwich Village <span class="n">3</span></div>
+            <div class="chip">West Village <span class="n">3</span></div>
+            <div class="chip">Gramercy <span class="n">1</span></div>
+            <div class="chip">Murray Hill <span class="n">1</span></div>
+            <div class="chip">All <span class="n">246</span></div>
+          </div></div>
           <div class="rail">
-            <div class="chip">All</div>
-            <div class="chip">East Village</div>
-            <div class="chip active">Lower East Side</div>
-            <div class="chip">West Village</div>
-            <div class="chip">SoHo</div>
-            <div class="chip">Nolita</div>
-          </div>
-          <div class="rail second">
             <div class="chip">Happy hour</div>
             <div class="chip">Food</div>
             <div class="chip">Outdoor seating</div>
             <div class="chip">Live music</div>
             <div class="chip">Pool</div>
           </div>
-          <div class="meta-row"><span><b>18</b> spots</span><span class="sort">A–Z ▾</span></div>
-
+          <div class="meta-row"><span><b>3</b> spots</span><span class="sort">A–Z ▾</span></div>
           <div class="list">
             <div class="row">
               <div class="thumb p6"></div>
               <div class="text">
-                <div class="top"><div class="name">Chloe 81</div><div class="bookmark"></div></div>
-                <div class="meta">81 Ludlow St</div>
-                <div class="italic-line">you need a dance floor for forty friends</div>
-                <div class="specials-line">Ask for specials</div>
+                <div class="top"><div class="name">Blue Haven</div><div class="bookmark"></div></div>
+                <div class="meta">108 W Houston Street</div>
+                <div class="italic-line">your crew needs a table for a big game</div>
               </div>
             </div>
             <div class="row">
               <div class="thumb p4"></div>
               <div class="text">
-                <div class="top"><div class="name">Claw Daddy's</div><div class="bookmark"></div></div>
-                <div class="meta">185 Orchard St</div>
-                <div class="italic-line">you want to get messy with a seafood boil</div>
-                <div class="specials-line">Yes Happy Hour</div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="thumb p3"></div>
-              <div class="text">
-                <div class="top"><div class="name">Donnybrook</div><div class="bookmark"></div></div>
-                <div class="meta">35 Clinton Street</div>
-                <div class="signals"><span class="pip walkin"><span class="dot"></span>Open now</span></div>
-                <div class="italic-line">a cheap afternoon pint that turns into a night</div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="thumb p1"></div>
-              <div class="text">
-                <div class="top"><div class="name">Grey Lady</div><div class="bookmark"></div></div>
-                <div class="meta">77 Delancey Street</div>
-                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 7</span></div>
-                <div class="italic-line">dollar oysters on a weekend afternoon</div>
+                <div class="top"><div class="name">Mace</div><div class="bookmark"></div></div>
+                <div class="meta">35 West 8th St.</div>
+                <div class="italic-line">you want a cocktail menu that reads like a spice rack.</div>
+                <div class="specials-line">Happy hour drinks, food at bar, outdoor seating</div>
               </div>
             </div>
             <div class="row">
               <div class="thumb p2"></div>
               <div class="text">
-                <div class="top"><div class="name">Marshall Stack</div><div class="bookmark"></div></div>
-                <div class="meta">66 Rivington Street near East Village</div>
-                <div class="italic-line">you want a serious beer list and no scene.</div>
+                <div class="top"><div class="name">The Stone</div><div class="bookmark"></div></div>
+                <div class="italic-line">you want to hear something you cannot name yet.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab active"><span class="glyph"></span><span>Home</span></div>
+          <div class="tab"><span class="glyph"></span><span>Saved</span></div>
+        </div>
+      </div>
+
+      <div class="phone-label"><b>2c</b> · Search tapped · field replaces the title row</div>
+      <div class="phone" id="phone-2c">
+        <div class="scroll-area">
+          <div class="status-bar">
+            <span>6:24</span>
+            <span class="status-icons">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"></span>
+            </span>
+          </div>
+
+          <div class="masthead">
+            <div class="eyebrow split"><span>East Village Everything</span><span>Tue · 6:24pm</span></div>
+            <div class="title-row">
+              <div class="search focused"><span class="search-icon"></span><span class="caret"></span><span>Search a name or a feeling</span></div>
+              <span class="cancel">Cancel</span>
+            </div>
+          </div>
+          <div class="rail">
+            <div class="chip">Happy hour</div>
+            <div class="chip">Food</div>
+            <div class="chip">Outdoor seating</div>
+            <div class="chip">Live music</div>
+            <div class="chip">Pool</div>
+          </div>
+          <div class="meta-row"><span><b>221</b> spots</span><span class="sort">A–Z ▾</span></div>
+          <div class="list">
+            <div class="row">
+              <div class="thumb p1"></div>
+              <div class="text">
+                <div class="top"><div class="name">2A</div><div class="bookmark"></div></div>
+                <div class="meta">25 Ave A</div>
+                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 8</span></div>
+                <div class="italic-line">you want a window seat over Avenue A after midnight</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p2"></div>
+              <div class="text">
+                <div class="top"><div class="name">7B / Horseshoe</div><div class="bookmark"></div></div>
+                <div class="meta">108 Ave B</div>
+                <div class="italic-line">you want the classic Alphabet City dive, no frills</div>
+                <div class="specials-line">No Happy Hour</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p3"></div>
+              <div class="text">
+                <div class="top"><div class="name">Ace Bar</div><div class="bookmark"></div></div>
+                <div class="meta">531 E 5th Street</div>
+                <div class="italic-line">ten friends need skee-ball and cheap pitchers</div>
+                <div class="specials-line">Temp no happy hour Skeeball, jukebox, pool, darts</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p4"></div>
+              <div class="text">
+                <div class="top"><div class="name">Amor y Amargo</div><div class="bookmark"></div></div>
+                <div class="meta">95 Ave A</div>
+                <div class="italic-line">you want a serious stirred drink before dinner</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p5"></div>
+              <div class="text">
+                <div class="top"><div class="name">B-side</div><div class="bookmark"></div></div>
+                <div class="meta">204 Avenue B</div>
+                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 6</span></div>
+                <div class="italic-line">a low-key Thursday with foosball and a strong pour</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p6"></div>
+              <div class="text">
+                <div class="top"><div class="name">Bar Primi</div><div class="bookmark"></div></div>
+                <div class="meta">325 Bowery</div>
+                <div class="italic-line">pre-show pasta near the Bowery</div>
               </div>
             </div>
           </div>
@@ -972,9 +820,212 @@
 
       <div class="annotations">
         <ul>
-          <li><span class="k">List</span>A second rail above the tag chips; the neighborhood is always visible and one tap switches it. The eyebrow names the pick ("Tue · 6:24pm · Lower East Side") and the rows and count follow.</li>
-          <li><span class="k">Detail</span>The street line reads "81 Ludlow St · Lower East Side"; the Maps link uses the place's own neighborhood.</li>
-          <li><span class="k">Trade-off</span>Fastest to switch and nothing is hidden, but it costs about 40 px of list on every screen, and two stacked rails read as one filter set even though one is single-choice and the other is multi-choice.</li>
+          <li><span class="k">Where</span>Two 40 px round buttons at the right end of the title row. Search opens in place of the title, with Cancel to bring the title back.</li>
+          <li><span class="k">Rows</span>4 list rows fully visible above the tab bar collapsed, 3 expanded with the same East Village rows (phone 2b shows Greenwich Village, which has only 3 places, with the rail scrolled to its pill).</li>
+          <li><span class="k">Trade-off</span>"Greenwich Village", the longest name, fits on one line at 32 px with 26 px to spare before the buttons; a longer name added later would have to wrap or shrink. Search costs a tap before typing and the title disappears while searching; in return this is the shortest header.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ LAYOUT 3 ═══════════════════ -->
+    <div class="phone-col">
+      <div class="option-h">Layout <em>3</em> — search full width, filter leads the tags</div>
+      <div class="option-sub">The search field takes the whole row. The filter button shrinks to 32 px and becomes the first item of the tag rail it controls.</div>
+
+      <div class="phone-label"><b>3a</b> · Collapsed · East Village</div>
+      <div class="phone" id="phone-3a">
+        <div class="scroll-area">
+          <div class="status-bar">
+            <span>6:24</span>
+            <span class="status-icons">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"></span>
+            </span>
+          </div>
+
+          <div class="masthead">
+            <div class="eyebrow split"><span>East Village Everything</span><span>Tue · 6:24pm</span></div>
+            <div class="masthead-title">East Village<span class="chev-down"></span></div>
+          </div>
+
+          <div class="search-row">
+            <div class="search"><span class="search-icon"></span><span>Search a name or a feeling</span></div>
+          </div>
+          <div class="rail">
+            <div class="filter-btn sm"><span></span><span></span><span></span></div>
+            <div class="chip">Happy hour</div>
+            <div class="chip">Food</div>
+            <div class="chip">Outdoor seating</div>
+            <div class="chip">Live music</div>
+            <div class="chip">Pool</div>
+          </div>
+          <div class="meta-row"><span><b>221</b> spots</span><span class="sort">A–Z ▾</span></div>
+          <div class="list">
+            <div class="row">
+              <div class="thumb p1"></div>
+              <div class="text">
+                <div class="top"><div class="name">2A</div><div class="bookmark"></div></div>
+                <div class="meta">25 Ave A</div>
+                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 8</span></div>
+                <div class="italic-line">you want a window seat over Avenue A after midnight</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p2"></div>
+              <div class="text">
+                <div class="top"><div class="name">7B / Horseshoe</div><div class="bookmark"></div></div>
+                <div class="meta">108 Ave B</div>
+                <div class="italic-line">you want the classic Alphabet City dive, no frills</div>
+                <div class="specials-line">No Happy Hour</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p3"></div>
+              <div class="text">
+                <div class="top"><div class="name">Ace Bar</div><div class="bookmark"></div></div>
+                <div class="meta">531 E 5th Street</div>
+                <div class="italic-line">ten friends need skee-ball and cheap pitchers</div>
+                <div class="specials-line">Temp no happy hour Skeeball, jukebox, pool, darts</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p4"></div>
+              <div class="text">
+                <div class="top"><div class="name">Amor y Amargo</div><div class="bookmark"></div></div>
+                <div class="meta">95 Ave A</div>
+                <div class="italic-line">you want a serious stirred drink before dinner</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p5"></div>
+              <div class="text">
+                <div class="top"><div class="name">B-side</div><div class="bookmark"></div></div>
+                <div class="meta">204 Avenue B</div>
+                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 6</span></div>
+                <div class="italic-line">a low-key Thursday with foosball and a strong pour</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p6"></div>
+              <div class="text">
+                <div class="top"><div class="name">Bar Primi</div><div class="bookmark"></div></div>
+                <div class="meta">325 Bowery</div>
+                <div class="italic-line">pre-show pasta near the Bowery</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab active"><span class="glyph"></span><span>Home</span></div>
+          <div class="tab"><span class="glyph"></span><span>Saved</span></div>
+        </div>
+      </div>
+
+      <div class="phone-label"><b>3b</b> · Expanded · arrow tapped</div>
+      <div class="phone" id="phone-3b">
+        <div class="scroll-area">
+          <div class="status-bar">
+            <span>6:24</span>
+            <span class="status-icons">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"></span>
+            </span>
+          </div>
+
+          <div class="masthead">
+            <div class="eyebrow split"><span>East Village Everything</span><span>Tue · 6:24pm</span></div>
+            <div class="masthead-title">East Village<span class="chev-down up"></span></div>
+          </div>
+          <div class="rail hood"><div class="track">
+            <div class="chip active">East Village <span class="n">221</span></div>
+            <div class="chip">Lower East Side <span class="n">14</span></div>
+            <div class="chip">Nolita <span class="n">1</span></div>
+            <div class="chip">SoHo <span class="n">2</span></div>
+            <div class="chip">Greenwich Village <span class="n">3</span></div>
+            <div class="chip">West Village <span class="n">3</span></div>
+            <div class="chip">Gramercy <span class="n">1</span></div>
+            <div class="chip">Murray Hill <span class="n">1</span></div>
+            <div class="chip">All <span class="n">246</span></div>
+          </div></div>
+
+          <div class="search-row">
+            <div class="search"><span class="search-icon"></span><span>Search a name or a feeling</span></div>
+          </div>
+          <div class="rail">
+            <div class="filter-btn sm"><span></span><span></span><span></span></div>
+            <div class="chip">Happy hour</div>
+            <div class="chip">Food</div>
+            <div class="chip">Outdoor seating</div>
+            <div class="chip">Live music</div>
+            <div class="chip">Pool</div>
+          </div>
+          <div class="meta-row"><span><b>221</b> spots</span><span class="sort">A–Z ▾</span></div>
+          <div class="list">
+            <div class="row">
+              <div class="thumb p1"></div>
+              <div class="text">
+                <div class="top"><div class="name">2A</div><div class="bookmark"></div></div>
+                <div class="meta">25 Ave A</div>
+                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 8</span></div>
+                <div class="italic-line">you want a window seat over Avenue A after midnight</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p2"></div>
+              <div class="text">
+                <div class="top"><div class="name">7B / Horseshoe</div><div class="bookmark"></div></div>
+                <div class="meta">108 Ave B</div>
+                <div class="italic-line">you want the classic Alphabet City dive, no frills</div>
+                <div class="specials-line">No Happy Hour</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p3"></div>
+              <div class="text">
+                <div class="top"><div class="name">Ace Bar</div><div class="bookmark"></div></div>
+                <div class="meta">531 E 5th Street</div>
+                <div class="italic-line">ten friends need skee-ball and cheap pitchers</div>
+                <div class="specials-line">Temp no happy hour Skeeball, jukebox, pool, darts</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p4"></div>
+              <div class="text">
+                <div class="top"><div class="name">Amor y Amargo</div><div class="bookmark"></div></div>
+                <div class="meta">95 Ave A</div>
+                <div class="italic-line">you want a serious stirred drink before dinner</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p5"></div>
+              <div class="text">
+                <div class="top"><div class="name">B-side</div><div class="bookmark"></div></div>
+                <div class="meta">204 Avenue B</div>
+                <div class="signals"><span class="pip happy"><span class="dot"></span>Happy hour · til 6</span></div>
+                <div class="italic-line">a low-key Thursday with foosball and a strong pour</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="thumb p6"></div>
+              <div class="text">
+                <div class="top"><div class="name">Bar Primi</div><div class="bookmark"></div></div>
+                <div class="meta">325 Bowery</div>
+                <div class="italic-line">pre-show pasta near the Bowery</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tabbar">
+          <div class="tab active"><span class="glyph"></span><span>Home</span></div>
+          <div class="tab"><span class="glyph"></span><span>Saved</span></div>
+        </div>
+      </div>
+
+      <div class="annotations">
+        <ul>
+          <li><span class="k">Where</span>The search field alone, full width, under the title; a 32 px round filter button is the first item of the tag chip rail.</li>
+          <li><span class="k">Rows</span>3 list rows fully visible above the tab bar collapsed, 3 expanded.</li>
+          <li><span class="k">Trade-off</span>The filter button sits beside the chips it filters and search gets 48 px more room, but the button is smaller (32 px against 40) and the header is exactly as tall as layout 1.</li>
         </ul>
       </div>
     </div>
