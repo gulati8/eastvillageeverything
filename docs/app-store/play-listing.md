@@ -2,7 +2,7 @@
 
 Source of truth for the Play Console listing of the Android app in
 `apps/mobile/` (package `com.eastvillageeverything.app`, version 1.1.0,
-`versionCode` 2). `node scripts/app-store-metadata.mjs` generates the fastlane
+`versionCode` 3). `node scripts/app-store-metadata.mjs` generates the fastlane
 `supply` tree `apps/mobile/fastlane/metadata/android/en-US/` from this file:
 the fenced blocks under Name, Short description and Full description become
 `title.txt`, `short_description.txt` and `full_description.txt`, the block
@@ -82,7 +82,7 @@ lands in whatever maps app the phone has (Google Maps on most), hence "Maps".
 ## Release notes
 
 500 character limit. Written to `changelogs/<versionCode>.txt`, where the
-version code is `android.versionCode` in `apps/mobile/app.json` (2 for
+version code is `android.versionCode` in `apps/mobile/app.json` (3 for
 1.1.0, the first version uploaded to Play).
 
 ```

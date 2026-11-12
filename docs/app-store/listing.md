@@ -2,7 +2,7 @@
 
 Source of truth for the App Store Connect listing of the iOS app in
 `apps/mobile/` (bundle id `com.eastvillageeverything.app`, ASC app id
-`6765464747`, version 1.1.0, build 13). `node scripts/app-store-metadata.mjs` generates
+`6765464747`, version 1.1.0, build 14). `node scripts/app-store-metadata.mjs` generates
 the fastlane `apps/mobile/fastlane/metadata/` tree and the screenshot folder
 from this file (it reads the fenced blocks, the URLs table, the Category
 bullets and the Review contact table, so keep their shape); task 5.8 copies
