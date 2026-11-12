@@ -251,7 +251,6 @@ const styles = StyleSheet.create({
   },
   filterBadgeText: {
     fontSize: 10,
-    fontWeight: '700',
     lineHeight: 14,
   },
   scroll: {

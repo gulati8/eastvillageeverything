@@ -252,7 +252,6 @@ const styles = StyleSheet.create({
   distanceText: {
     fontSize: 10,
     fontFamily: typography.ui700.fontFamily,
-    fontWeight: '700',
     color: '#1F1A14',
   },
 });

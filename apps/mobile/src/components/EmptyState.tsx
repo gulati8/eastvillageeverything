@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontStyle: 'italic',
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -82,6 +81,5 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 13,
-    fontWeight: '600',
   },
 });

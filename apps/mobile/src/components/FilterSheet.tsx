@@ -22,6 +22,8 @@ interface FilterSheetProps {
   onDone: () => void;
   /** Sheet index changes (-1 is closed); lets the screen know when it is open. */
   onChange?: (index: number) => void;
+  /** The sheet is about to move between indexes; fires before `onChange`. */
+  onAnimate?: (fromIndex: number, toIndex: number) => void;
 }
 
 const SNAP_POINTS = ['76%'];
@@ -36,6 +38,7 @@ export function FilterSheet({
   onClear,
   onDone,
   onChange,
+  onAnimate,
 }: FilterSheetProps) {
   const { colors, typography } = useTheme();
 
@@ -78,6 +81,7 @@ export function FilterSheet({
       snapPoints={SNAP_POINTS}
       enablePanDownToClose
       onChange={onChange}
+      onAnimate={onAnimate}
       handleComponent={renderHandle}
       backgroundStyle={[
         styles.sheetBackground,
@@ -258,7 +262,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 22,
-    fontStyle: 'italic',
     flex: 1,
     textAlign: 'center',
     marginHorizontal: 4,

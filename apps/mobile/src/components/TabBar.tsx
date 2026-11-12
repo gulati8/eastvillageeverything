@@ -12,6 +12,11 @@ export type TabKey = 'home' | 'saved';
 export interface TabBarProps {
   activeTab?: TabKey;
   onTabPress?: (tab: TabKey) => void;
+  /**
+   * Fades the capsule out and makes it untouchable, for when something that
+   * must not be covered (the filter sheet) is on screen.
+   */
+  hidden?: boolean;
 }
 
 /** Outer height of the floating capsule. */
@@ -23,6 +28,7 @@ const SEGMENT_INSET = 4;
 const ICON_SIZE = 20;
 const ICON_STROKE = 2.4;
 const SLIDE_MS = 220;
+const FADE_MS = 150;
 
 /**
  * Bottom padding a scrolling list needs (before adding `insets.bottom`) so its
@@ -56,7 +62,7 @@ function TabIcon({ tab, color, active }: { tab: TabKey; color: string; active: b
   return <HomeIcon color={color} />;
 }
 
-export function TabBar({ activeTab = 'home', onTabPress }: TabBarProps) {
+export function TabBar({ activeTab = 'home', onTabPress, hidden = false }: TabBarProps) {
   const { colors, isDark, typography } = useTheme();
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
@@ -72,8 +78,13 @@ export function TabBar({ activeTab = 'home', onTabPress }: TabBarProps) {
     [activeIndex, segmentWidth],
   );
 
+  const fadeStyle = useAnimatedStyle(
+    () => ({ opacity: withTiming(hidden ? 0 : 1, { duration: FADE_MS }) }),
+    [hidden],
+  );
+
   return (
-    <View
+    <Animated.View
       style={[
         styles.capsule,
         {
@@ -82,7 +93,11 @@ export function TabBar({ activeTab = 'home', onTabPress }: TabBarProps) {
           backgroundColor: colors.paper + 'E6',
           shadowColor: isDark ? '#000000' : colors.ink,
         },
+        fadeStyle,
       ]}
+      pointerEvents={hidden ? 'none' : 'auto'}
+      accessibilityElementsHidden={hidden}
+      importantForAccessibility={hidden ? 'no-hide-descendants' : 'auto'}
       testID="tab-bar"
     >
       {/* Clipped backdrop: blur + hairline border, rounded to the capsule */}
@@ -131,7 +146,7 @@ export function TabBar({ activeTab = 'home', onTabPress }: TabBarProps) {
           );
         })}
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

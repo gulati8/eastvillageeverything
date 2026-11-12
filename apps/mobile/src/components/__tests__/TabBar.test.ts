@@ -127,4 +127,26 @@ describe('TabBar', () => {
     expect(flat.bottom).toBe(34 + 12);
     expect(flat.width).toBe(260);
   });
+
+  it('is visible and interactive by default', () => {
+    const { tree } = renderTabs('home');
+    const capsule = collect(tree, (el) => el.props.testID === 'tab-bar')[0];
+    const flat = Object.assign({}, ...(capsule.props.style as object[]));
+    expect(flat.opacity).toBe(1);
+    expect(capsule.props.pointerEvents).toBe('auto');
+    expect(capsule.props.accessibilityElementsHidden).toBe(false);
+  });
+
+  it('when hidden, the capsule is transparent, untouchable and out of the accessibility tree', () => {
+    const tree = TabBar({ activeTab: 'home', onTabPress: jest.fn(), hidden: true });
+    const capsule = collect(tree, (el) => el.props.testID === 'tab-bar')[0];
+    const flat = Object.assign({}, ...(capsule.props.style as object[]));
+    expect(flat.opacity).toBe(0);
+    expect(capsule.props.pointerEvents).toBe('none');
+    expect(capsule.props.accessibilityElementsHidden).toBe(true);
+    expect(capsule.props.importantForAccessibility).toBe('no-hide-descendants');
+    // Still laid out in the same place, so it fades rather than jumps.
+    expect(flat.position).toBe('absolute');
+    expect(flat.bottom).toBe(34 + 12);
+  });
 });

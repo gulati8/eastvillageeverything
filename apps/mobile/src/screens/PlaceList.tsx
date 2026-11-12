@@ -21,6 +21,7 @@ import { usePlacesList } from '../api/places';
 import { useTagsStructured } from '../api/tags';
 import { useNeighborhoods } from '../api/neighborhoods';
 import { transformPlace } from '../data/transformPlace';
+import { placesForTab } from '../data/tabPlaces';
 import { deriveFilterSections, filterSectionsForPlaces } from '../data/deriveFilterSections';
 import { useFilterState } from '../state/useFilterState';
 import { useNeighborhood } from '../state/useNeighborhood';
@@ -83,6 +84,7 @@ export function PlaceList() {
   const listRef = useRef<FlatList<PlaceV2Display>>(null);
   const [activeTab, setActiveTab] = React.useState<TabKey>('home');
   const [sheetOpen, setSheetOpen] = React.useState(false);
+  const [tabBarHidden, setTabBarHidden] = React.useState(false);
   const [switcherOpen, setSwitcherOpen] = React.useState(false);
   const { savedPlaceKeys, toggleSavedPlace } = useSavedPlaces();
 
@@ -125,6 +127,13 @@ export function PlaceList() {
   const title = onSavedTab ? 'Saved' : neighborhoodTitle(neighborhood, neighborhoods, allPlaces);
   const canSwitch = !onSavedTab && title !== null;
 
+  // The Saved tab works over the saved places only, so every count it shows
+  // (the count line, the sheet's button, the chip counts) is of saved rows.
+  const tabPlaces = React.useMemo(
+    () => placesForTab(activeTab, allPlaces, savedPlaceKeys),
+    [activeTab, allPlaces, savedPlaceKeys],
+  );
+
   // Filter state. The Saved tab ignores the neighborhood: a saved list is the user's own.
   const {
     activeFilters,
@@ -143,13 +152,13 @@ export function PlaceList() {
     chipCounts,
     railChips,
   } = useFilterState(
-    allPlaces,
+    tabPlaces,
     filterSections,
     onSavedTab ? ALL_NEIGHBORHOODS : neighborhood ?? ALL_NEIGHBORHOODS,
   );
 
-  // Filtered + sorted places for the Home list
-  const filteredPlaces = React.useMemo(
+  // Filtered + sorted rows; Home and Saved share the same row formatting.
+  const displayPlaces = React.useMemo(
     () => applyFilters(scopedPlaces),
     [applyFilters, scopedPlaces],
   );
@@ -157,16 +166,6 @@ export function PlaceList() {
   // Rows name their neighborhood whenever the list spans more than one.
   const showRowNeighborhood =
     onSavedTab || neighborhood === ALL_NEIGHBORHOODS || searchingEverywhere;
-
-  // Home and Saved share the same row formatting; Saved narrows to saved IDs.
-  const displayPlaces = React.useMemo(
-    () => (
-      activeTab === 'saved'
-        ? filteredPlaces.filter((place) => savedPlaceKeys.has(place.key))
-        : filteredPlaces
-    ),
-    [activeTab, filteredPlaces, savedPlaceKeys],
-  );
 
   // Pull-to-refresh
   const [refreshing, setRefreshing] = React.useState(false);
@@ -222,6 +221,14 @@ export function PlaceList() {
 
   const handleSheetChange = useCallback((index: number) => {
     setSheetOpen(index >= 0);
+    setTabBarHidden(index >= 0);
+  }, []);
+
+  // The tab capsule floats above the sheet and would cover its "Show n spots"
+  // button. It goes as soon as the sheet starts to open, and comes back only
+  // once the sheet has finished closing (handleSheetChange with -1).
+  const handleSheetAnimate = useCallback((_fromIndex: number, toIndex: number) => {
+    if (toIndex >= 0) setTabBarHidden(true);
   }, []);
 
   // Android hardware back: while the filter sheet is open it closes the sheet
@@ -435,10 +442,11 @@ export function PlaceList() {
         onClear={clearFilters}
         onDone={handleSheetDone}
         onChange={handleSheetChange}
+        onAnimate={handleSheetAnimate}
       />
 
-      {/* 7. TabBar */}
-      <TabBar activeTab={activeTab} onTabPress={handleTabPress} />
+      {/* 7. TabBar, out of the way while the filter sheet is up */}
+      <TabBar activeTab={activeTab} onTabPress={handleTabPress} hidden={tabBarHidden} />
     </View>
   );
 }
@@ -460,7 +468,6 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     fontSize: 11,
-    fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.66,
     lineHeight: 16,

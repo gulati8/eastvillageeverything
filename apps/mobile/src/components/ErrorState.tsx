@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontStyle: 'italic',
     textAlign: 'center',
     marginBottom: 16,
   },
