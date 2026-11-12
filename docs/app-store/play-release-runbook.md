@@ -10,9 +10,9 @@ What is staged:
 | Thing | Value |
 | --- | --- |
 | Package | `com.eastvillageeverything.app` |
-| Version | 1.1.0, `versionCode` 2 |
-| App bundle | `apps/mobile/build-2.aab` (EAS build `ba53f91f-6020-4066-96a3-b4769cc8920d`, target SDK 36, signed with the EAS upload key) |
-| Same code as an APK | `apps/mobile/build-2.apk`, installed on the `eve-pixel` emulator |
+| Version | 1.1.0, `versionCode` 3 |
+| App bundle | `apps/mobile/build-3.aab` (EAS build `b32c4630-d69f-4e78-9918-6170b018f94c`, target SDK 36, signed with the EAS upload key) |
+| Same code as an APK | `apps/mobile/build-3.apk`, installed on the `eve-pixel` emulator |
 | Listing text and images | `apps/mobile/fastlane/metadata/android/en-US/`, generated from `docs/app-store/play-listing.md` |
 | Developer account | `gulatilabs.me@gmail.com`, "Gulati Labs", id 7467548760272069888, personal account |
 | Console | `https://play.google.com/console/developers/7467548760272069888/home` |
@@ -198,7 +198,7 @@ In Play Console:
    ```
 
 3. The agent does task 2.6: validates the key
-   (`fastlane run validate_play_store_json_key`), submits `build-2.aab` to
+   (`fastlane run validate_play_store_json_key`), submits `build-3.aab` to
    the **internal testing** track as a **draft** release with `eas submit`,
    and uploads the title, descriptions, release notes, icon, feature graphic
    and six screenshots with `fastlane supply`.
@@ -208,7 +208,7 @@ In Play Console:
    step satisfies. If either tool refuses anyway, the agent writes the exact
    message in `progress.txt` and adds a manual upload to task 2.7:
    **Test and release > Testing > Internal testing > Create new release**,
-   upload `apps/mobile/build-2.aab`, **Next**, **Save as draft**.
+   upload `apps/mobile/build-3.aab`, **Next**, **Save as draft**.
 5. When the loop stops, read the 2.6 entry in `progress.txt`, then carry on
    with section 6.
 
@@ -394,7 +394,7 @@ review wait for this track.
    Android device will install the app, separated by commas. **Save
    changes**, then **Create**. Tick the list so it is selected for this
    track, and **Save**.
-2. **Releases** tab. The draft release for `2 (1.1.0)` made by task 2.6 is
+2. **Releases** tab. The draft release for `3 (1.1.0)` made by task 2.6 is
    there. Open it (**Edit release**); release notes should read "Pick a
    neighborhood: tap the title to move between the East Village, the Lower
    East Side and more. Swipe through a place's photos. Search now covers
@@ -452,7 +452,7 @@ Steps:
    name: `EVE closed test`. Add the testers' Google account addresses.
    **Save**.
 4. **Releases** tab > **Create new release** > **Add from library** and pick
-   bundle `2 (1.1.0)` (it is already uploaded; or promote the internal
+   bundle `3 (1.1.0)` (it is already uploaded; or promote the internal
    release if a **Promote release** button is offered, which is
    **unconfirmed**). Same release notes. **Next** > **Save** > **Send for
    review** from **Publishing overview** if the console asks. The first
@@ -534,10 +534,10 @@ Sources: <https://support.google.com/googleplay/android-developer/answer/9859348
    States. (The app is in English and about Manhattan; more countries can
    be added later.) Save.
 3. **Releases** tab > **Create new release** > **Add from library** > bundle
-   `2 (1.1.0)`. If the testing track's release page offers **Promote
+   `3 (1.1.0)`. If the testing track's release page offers **Promote
    release > Production** instead, that does the same thing
    (**unconfirmed**; the button is in Expo's guide, not Google's).
-4. Release name: leave the default `2 (1.1.0)`. Release notes, en-US: "Pick
+4. Release name: leave the default `3 (1.1.0)`. Release notes, en-US: "Pick
    a neighborhood: tap the title to move between the East Village, the Lower
    East Side and more. Swipe through a place's photos. Search now covers
    every neighborhood."

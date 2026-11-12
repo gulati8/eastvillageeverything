@@ -134,7 +134,7 @@ them to `apps/mobile/fastlane/metadata/android/en-US/images/` as
 | `06-saved.png` | 1080 x 2400 | Phone screenshot 6 | Saved tab with four bookmarked places, one on the Lower East Side |
 
 Screenshots were captured from the `eve-pixel` AVD (Pixel 8, 1080 x 2400,
-420 dpi, Android 17) running the 1.1.0 EAS `preview` APK (`build-2.apk`,
+420 dpi, Android 17) running the 1.1.0 EAS `preview` APK (`build-3.apk`,
 the same commit as the store bundle) against production data, driven with
 `adb shell input`. Play accepts PNG or JPEG, 16:9 to 9:16, each
 side 320 to 3840 px, so the emulator's raw `screencap` output is uploaded as
