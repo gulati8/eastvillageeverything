@@ -43,5 +43,12 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // `api/admin/uploads` is excluded on purpose. When a request passes through
+  // middleware, Next clones its body for the route handler, and in a
+  // production build that clone breaks for a multipart body that is still
+  // arriving when the middleware returns (any photo sent from a phone):
+  // `req.formData()` throws and the upload fails with "Invalid form data".
+  // The route does its own auth (`requireAdminRequest(req, { mutation: true })`
+  // answers 401 JSON when signed out), so it does not need the middleware.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/admin/uploads).*)'],
 };
