@@ -399,3 +399,10 @@ Neighborhood switcher: layout 3
 - `review_status.rb` (run with Homebrew fastlane's gems): `version 1.1.0 state=WAITING_FOR_REVIEW release_type="AFTER_APPROVAL" build=14 (VALID)`, review submission `c4c6f3a2-2581-49d0-b804-cbbeb98415c7` submitted 2026-11-13T23:20:23Z. 1.0.0 is still READY_FOR_SALE with build 12. Release is automatic once Apple approves.
 - 5.5 stays unticked until 1.1.0 is live. The release notes still say "Swipe through a place's photos" while every prod place has one photo.
 ---
+## 2026-11-13 - Play internal testing is live (planning session in Chrome, the human said "publish")
+- Play Console > Testing > Internal testing: email list "EVE internal" created with one tester (`gulatilabs.me@gmail.com`) and attached to the track; the draft release 1.1.0 (version code 3) was previewed and published. The preview showed no errors and one warning (no deobfuscation file; the app does not use R8/proguard obfuscation). No App content form was required for internal testing.
+- Track state: Active, latest release 1.1.0. Until app setup is complete and reviewed, testers see the temporary name `com.eastvillageeverything.app (unreviewed)`.
+- Opt-in link for testers: https://play.google.com/apps/internaltest/4700974679392943408 (only works for Google accounts on the email list). Add testers by editing the list; no new release is needed.
+- `fastlane run google_play_track_version_codes … track:internal` -> `[3]`.
+- Still the human's for 2.7: the App content forms (runbook section 6), the closed test with 12 testers for 14 days (section 8, required for this personal account), then production (section 9). Internal testers do not count toward the 12.
+---
