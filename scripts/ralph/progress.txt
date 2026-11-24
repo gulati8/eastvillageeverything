@@ -413,3 +413,10 @@ Neighborhood switcher: layout 3
 - The shipped manifest requests more than INTERNET (runbook 6.8 is wrong): ACCESS_NETWORK_STATE, READ/WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW, USE_BIOMETRIC, USE_FINGERPRINT, VIBRATE. Framework defaults; trim with `android.blockedPermissions` in `app.json` in a future build.
 - Still open for 2.7: send the saved changes for review from Publishing overview; store settings (runbook 6.9: category, contact email, website); then the closed test (section 8).
 ---
+## 2026-11-14 - 5.5 done: iOS 1.1.0 is live (reported by the human)
+- The human reported that 1.1.0 (build 14) is live on the App Store. Not re-checked against App Store Connect in this session.
+- 5.5 ticked. The only open task in the plan is 2.7 `[HUMAN]` (Play Console: send the saved declarations for review, store settings, closed test, production).
+- Photo paging verified by the human on the live app with Upstate, which now has more than one photo on prod. Earlier entries saying no prod place has two photos are out of date.
+- Closed-test testers (2.7, runbook section 8): the human will recruit them; nothing for an agent to do there.
+- **Do not send the saved App content declarations for review on their own.** The human says the previous planning session advised holding them until the closed test; that advice was not written down here, and the 2026-11-14 entry above lists "send for review" first, which is superseded. Nothing goes to Publishing overview > Send for review until the human says so.
+---
